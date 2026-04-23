@@ -1,0 +1,46 @@
+# Dépendances
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+dist/
+.turbo/
+
+# Variables d'environnement — ne jamais commiter
+.env
+.env.local
+.env.production
+.env.staging
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker — SSL non commité
+docker/nginx/ssl/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+
+# Claude AI
+.claude/
+ai_docs/
+prompts/
+PRPs/
+scripts/
+.claudeignore
+CLAUDE.md
