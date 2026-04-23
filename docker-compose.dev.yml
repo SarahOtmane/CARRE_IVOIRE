@@ -1,0 +1,64 @@
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Back office: ajouter --profile back-office
+
+services:
+  database:
+    ports:
+      - "3307:3306"
+
+  backend:
+    build:
+      context: ./apps/api
+      target: development
+    volumes:
+      - ./apps/api/src:/app/src
+    environment:
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    command: npm run start:dev
+    # En dev, on ne bloque pas sur le healthcheck backend pour démarrer plus vite
+    depends_on:
+      database:
+        condition: service_healthy
+
+  front-office:
+    build:
+      context: ./apps/front-office
+      target: development
+    volumes:
+      - ./apps/front-office/src:/app/src
+    environment:
+      VITE_API_URL: http://localhost:3000/api/v1
+      VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY:-pk_test_xxx}
+    ports:
+      - "5173:5173"
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5173/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  back-office:
+    build:
+      context: ./apps/back-office
+      target: development
+    volumes:
+      - ./apps/back-office/src:/app/src
+    environment:
+      VITE_API_URL: http://localhost:3000/api/v1
+    ports:
+      - "5174:5174"
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5174/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

@@ -1,0 +1,54 @@
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Back office: ajouter --profile back-office
+
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: carre_ivoire_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - carre_ivoire_network
+    depends_on:
+      front-office:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    build:
+      context: ./apps/api
+      target: production
+    environment:
+      NODE_ENV: production
+    restart: unless-stopped
+
+  front-office:
+    build:
+      context: ./apps/front-office
+      target: production
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
+    restart: unless-stopped
+
+  back-office:
+    build:
+      context: ./apps/back-office
+      target: production
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    restart: unless-stopped
+
+  database:
+    restart: unless-stopped
