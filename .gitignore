@@ -39,6 +39,7 @@ coverage/
 # Claude AI
 .claude/
 ai_docs/
+ia_design/
 prompts/
 PRPs/
 scripts/
