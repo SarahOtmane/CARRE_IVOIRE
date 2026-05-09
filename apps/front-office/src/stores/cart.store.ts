@@ -2,11 +2,12 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 interface CartItem {
-  productId: number
+  productId: string
   name: string
   price: number
   quantity: number
-  imageUrl?: string
+  image: string
+  origin?: string
   format?: string
 }
 
@@ -31,13 +32,13 @@ export const useCartStore = defineStore(
       }
     }
 
-    function removeItem(productId: number, format?: string) {
+    function removeItem(productId: string, format?: string) {
       items.value = items.value.filter(
         (i) => !(i.productId === productId && i.format === format),
       )
     }
 
-    function updateQuantity(productId: number, quantity: number, format?: string) {
+    function updateQuantity(productId: string, quantity: number, format?: string) {
       const item = items.value.find(
         (i) => i.productId === productId && i.format === format,
       )
