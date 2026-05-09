@@ -1,0 +1,29 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" width="800" height="1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E8C9BC"></stop>
+      <stop offset="100%" stop-color="#D9BFA9"></stop>
+    </linearGradient>
+    <linearGradient id="table" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8A5A3C"></stop>
+      <stop offset="100%" stop-color="#5E3A2A"></stop>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="1000" fill="url(#wall)"></rect>
+  
+  <rect x="120" y="80" width="280" height="360" fill="#FFFBF7" opacity="0.85"></rect>
+  <rect x="120" y="80" width="280" height="360" fill="none" stroke="#5E3A2A" stroke-width="2"></rect>
+  <line x1="260" y1="80" x2="260" y2="440" stroke="#5E3A2A" stroke-width="2"></line>
+  <line x1="120" y1="260" x2="400" y2="260" stroke="#5E3A2A" stroke-width="2"></line>
+  
+  <rect x="0" y="620" width="800" height="380" fill="url(#table)"></rect>
+  
+  <rect x="260" y="700" width="280" height="180" fill="#3A1F14"></rect>
+  <g fill="none" stroke="#2A150C" stroke-width="1.2">
+    <line x1="330" y1="700" x2="330" y2="880"></line><line x1="400" y1="700" x2="400" y2="880"></line><line x1="470" y1="700" x2="470" y2="880"></line>
+    <line x1="260" y1="745" x2="540" y2="745"></line><line x1="260" y1="790" x2="540" y2="790"></line><line x1="260" y1="835" x2="540" y2="835"></line>
+  </g>
+  
+  <path d="M 120 620 L 400 620 L 500 1000 L 0 1000 Z" fill="#FFFBF7" opacity="0.10"></path>
+</svg>

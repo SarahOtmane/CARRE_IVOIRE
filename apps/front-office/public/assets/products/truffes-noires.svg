@@ -1,0 +1,27 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <rect width="600" height="600" fill="#FFFBF7"></rect>
+  <ellipse cx="300" cy="465" rx="180" ry="18" fill="#3A1F14" opacity="0.08"></ellipse>
+  
+  <g>
+    <circle cx="200" cy="200" r="55" fill="#3A1F14"></circle>
+    <circle cx="200" cy="200" r="55" fill="#6B4430" opacity="0.35"></circle>
+    <circle cx="300" cy="200" r="55" fill="#3A1F14"></circle>
+    <circle cx="400" cy="200" r="55" fill="#3A1F14"></circle>
+    <circle cx="400" cy="200" r="55" fill="#6B4430" opacity="0.35"></circle>
+    <circle cx="200" cy="300" r="55" fill="#3A1F14"></circle>
+    <circle cx="300" cy="300" r="55" fill="#3A1F14"></circle>
+    <circle cx="300" cy="300" r="55" fill="#6B4430" opacity="0.35"></circle>
+    <circle cx="400" cy="300" r="55" fill="#3A1F14"></circle>
+    <circle cx="200" cy="400" r="55" fill="#3A1F14"></circle>
+    <circle cx="200" cy="400" r="55" fill="#6B4430" opacity="0.35"></circle>
+    <circle cx="300" cy="400" r="55" fill="#3A1F14"></circle>
+    <circle cx="400" cy="400" r="55" fill="#3A1F14"></circle>
+    
+    <g fill="#3A1F14" opacity="0.12">
+      <circle cx="160" cy="160" r="1.5"></circle><circle cx="175" cy="170" r="1"></circle><circle cx="250" cy="155" r="1.5"></circle>
+      <circle cx="340" cy="165" r="1"></circle><circle cx="440" cy="240" r="1.5"></circle><circle cx="165" cy="340" r="1"></circle>
+      <circle cx="350" cy="450" r="1.5"></circle><circle cx="440" cy="460" r="1"></circle>
+    </g>
+  </g>
+</svg>
