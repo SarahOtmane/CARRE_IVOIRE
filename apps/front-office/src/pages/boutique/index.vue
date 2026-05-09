@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import ProductCard, { type Product } from '@/components/product/ProductCard.vue'
+import ProductCard from '@/components/product/ProductCard.vue'
+import { ALL_PRODUCTS, type CatalogProduct } from '@/data/products'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,89 +18,6 @@ const BOUTIQUE_CATS = [
   { slug: 'oursons', label: 'Oursons' },
   { slug: 'chocobombs', label: 'Chocobombs' },
   { slug: 'pates-a-tartiner', label: 'Pâtes à tartiner' },
-]
-
-interface CatalogProduct extends Product {
-  category: string
-}
-
-const ALL_PRODUCTS: CatalogProduct[] = [
-  // Tablettes
-  {
-    id: 'noir-pur-72',
-    name: 'Noir Pur — 72%',
-    origin: 'Venezuela · Porcelana',
-    price: 14,
-    image: '/assets/products/tablet-noir-pur.svg',
-    badge: null,
-    category: 'tablettes',
-  },
-  {
-    id: 'praline-noisette',
-    name: 'Praliné Noisette',
-    origin: 'Piémont · Tonda Gentile',
-    price: 16,
-    image: '/assets/products/tablet-praline-noisette.svg',
-    badge: 'Nouveau',
-    category: 'tablettes',
-  },
-  {
-    id: 'lait-madagascar',
-    name: 'Lait Madagascar',
-    origin: 'Madagascar · Sambirano',
-    price: 15,
-    image: '/assets/products/tablet-noir-pur.svg',
-    badge: null,
-    category: 'tablettes',
-  },
-  // Carrés Signature
-  {
-    id: 'coffret-decouverte',
-    name: 'Coffret Découverte',
-    origin: '9 carrés · 3 origines',
-    price: 48,
-    image: '/assets/products/coffret-decouverte.svg',
-    badge: 'Signature',
-    category: 'carres-signature',
-  },
-  {
-    id: 'coffret-signature-16',
-    name: 'Coffret Signature',
-    origin: '16 carrés · 5 origines',
-    price: 64,
-    image: '/assets/products/coffret-decouverte.svg',
-    badge: 'Signature',
-    category: 'carres-signature',
-  },
-  // Gourmandises
-  {
-    id: 'truffes-noires',
-    name: 'Truffes Noires',
-    origin: 'Ghana · Forastero',
-    price: 22,
-    image: '/assets/products/truffes-noires.svg',
-    badge: null,
-    category: 'gourmandises',
-  },
-  {
-    id: 'truffes-praline',
-    name: 'Truffes Praliné',
-    origin: 'Piémont · Tonda Gentile',
-    price: 24,
-    image: '/assets/products/truffes-noires.svg',
-    badge: 'Nouveau',
-    category: 'gourmandises',
-  },
-  // Mini Carrés
-  {
-    id: 'mini-carres-assortiment',
-    name: 'Assortiment Mini Carrés',
-    origin: '12 pièces · 4 origines',
-    price: 28,
-    image: '/assets/products/coffret-decouverte.svg',
-    badge: null,
-    category: 'mini-carres',
-  },
 ]
 
 const SORT_OPTIONS = [
