@@ -3,19 +3,34 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ivory: '#FFFDF6',
-        'rose-powder': '#EAD7D1',
-        beige: '#F2E8E4',
-        cocoa: '#4A2E2A',
-        gold: '#C9A86A',
+        ivoire: "#F6E8DE",
+        "ivoire-deep": "#EED9CA",
+        "rose-poudre": "#E8C9BC",
+        "rose-poudre-2": "#DDB5A4",
+        "beige-doux": "#D9BFA9",
+        "beige-doux-2": "#C9A98F",
+        "brun-cacao": "#3A1F14",
+        "brun-cacao-2": "#5E3A2A",
+        "brun-cacao-3": "#8A6A58",
+        dore: "#B08A4F",
+        "dore-deep": "#8F6E3B",
+        papier: "#FFFBF7",
       },
       fontFamily: {
-        display: ['Kingred Modern', 'Georgia', 'serif'],
-        body: ['Arial', 'Helvetica', 'sans-serif'],
+        serif: ["Cormorant Garamond", "Georgia", "serif"],
+        sans: [
+          "Inter",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Helvetica",
+          "Arial",
+          "sans-serif",
+        ],
       },
       borderRadius: {
-        brand: '4px',
+        brand: "0px",
       },
     },
   },
-}
+};
