@@ -28,6 +28,7 @@ services:
       target: development
     volumes:
       - ./apps/front-office/src:/app/src
+      - ./apps/front-office/public:/app/public
     environment:
       VITE_API_URL: http://localhost:3000/api/v1
       VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY:-pk_test_xxx}
