@@ -5,15 +5,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        ivory: '#FFFDF6',
-        'rose-powder': '#EAD7D1',
-        beige: '#F2E8E4',
-        cocoa: '#4A2E2A',
-        gold: '#C9A86A',
+        ivoire: {
+          DEFAULT: 'var(--ivoire)',
+          deep:    'var(--ivoire-deep)',
+        },
+        'rose-poudre': {
+          DEFAULT: 'var(--rose-poudre)',
+          '2':     'var(--rose-poudre-2)',
+        },
+        'beige-doux': {
+          DEFAULT: 'var(--beige-doux)',
+          '2':     'var(--beige-doux-2)',
+        },
+        'brun-cacao': {
+          DEFAULT: 'var(--brun-cacao)',
+          '2':     'var(--brun-cacao-2)',
+          '3':     'var(--brun-cacao-3)',
+        },
+        dore: {
+          DEFAULT: 'var(--dore)',
+          deep:    'var(--dore-deep)',
+        },
+        papier: 'var(--papier)',
       },
       fontFamily: {
+        serif:   ['Cormorant Garamond', 'EB Garamond', 'Georgia', 'Times New Roman', 'serif'],
+        sans:    ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif'],
         display: ['Kingred Modern', 'Georgia', 'serif'],
-        body: ['Arial', 'Helvetica', 'sans-serif'],
+      },
+      transitionTimingFunction: {
+        ambient: 'var(--ease-ambient)',
+        ui:      'var(--ease-ui)',
+      },
+      transitionDuration: {
+        '180': '180ms',
+        '400': '400ms',
+        '800': '800ms',
       },
     },
   },
