@@ -181,3 +181,12 @@ Les volumes `node_modules_api`, `node_modules_front`, `node_modules_back` persis
 # Rebuild complet (après changement de dépendances)
 ./scripts/docker-dev.sh --clean
 ```
+
+## Documentation
+
+| Document | Description |
+|---|---|
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Structure du monorepo, couches, modules, flux de données |
+| [`DEVELOPMENT.md`](DEVELOPMENT.md) | Setup local, workflows courants, debugging, troubleshooting |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Conventions de code, commits, branches, revue |
+| [`docs/patterns.md`](docs/patterns.md) | Patterns Repository, DTO, Guard, Composable, Store |
