@@ -141,12 +141,15 @@ function customerOrders(customerId: string) {
         <span class="text-right">Action</span>
       </div>
 
-      <button
+      <div
         v-for="customer in filteredCustomers"
         :key="customer.id"
-        type="button"
+        role="button"
+        tabindex="0"
         class="grid w-full grid-cols-[40px_minmax(0,2fr)_minmax(0,2fr)_110px_84px_110px_126px_84px] items-center gap-4 border-b border-cocoa/8 px-6 py-5 text-left transition-colors duration-200 hover:bg-beige/50 last:border-b-0"
         @click="selectedCustomer = customer.id"
+        @keydown.enter.prevent="selectedCustomer = customer.id"
+        @keydown.space.prevent="selectedCustomer = customer.id"
       >
         <button
           type="button"
@@ -181,7 +184,7 @@ function customerOrders(customerId: string) {
           class="text-right font-body text-[11px] uppercase tracking-[0.18em] text-cocoa/55"
           >Voir</span
         >
-      </button>
+      </div>
     </section>
 
     <div
