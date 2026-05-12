@@ -8,12 +8,13 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "test": "turbo run test"
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "dev:api": "npm --prefix apps/api run start:dev",
+    "dev:front": "npm --prefix apps/front-office run dev",
+    "dev:back": "npm --prefix apps/back-office run dev"
   },
-  "devDependencies": {
-    "turbo": "^2.0.0"
-  }
+  "devDependencies": {}
 }
