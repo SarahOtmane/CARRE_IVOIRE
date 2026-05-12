@@ -1,5 +1,5 @@
 # Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-# Back office: ajouter --profile back-office
+# With back-office: --profile back-office
 
 services:
   nginx:
@@ -24,6 +24,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
 
   backend:
     build:
@@ -32,6 +37,11 @@ services:
     environment:
       NODE_ENV: production
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
 
   front-office:
     build:
@@ -41,6 +51,11 @@ services:
         VITE_API_URL: ${VITE_API_URL}
         VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
 
   back-office:
     build:
@@ -49,6 +64,16 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL}
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
 
   database:
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
