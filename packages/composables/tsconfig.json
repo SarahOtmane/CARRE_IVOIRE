@@ -1,0 +1,9 @@
+{
+  "extends": "@carre-ivoire/config/typescript/vue",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

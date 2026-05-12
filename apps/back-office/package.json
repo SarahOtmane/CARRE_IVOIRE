@@ -12,6 +12,8 @@
   "dependencies": {
     "@carre-ivoire/types": "*",
     "@carre-ivoire/ui": "*",
+    "@carre-ivoire/stores": "*",
+    "@carre-ivoire/composables": "*",
     "axios": "^1.6.0",
     "pinia": "^2.1.0",
     "pinia-plugin-persistedstate": "^3.2.0",
