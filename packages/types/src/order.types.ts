@@ -1,7 +1,10 @@
+import type { Product } from './product.types'
+
 export enum OrderStatus {
+  PENDING = 'pending',
   PAYMENT_PENDING = 'payment_pending',
-  PAID = 'paid',
-  PREPARING = 'preparing',
+  CONFIRMED = 'confirmed',
+  PROCESSING = 'processing',
   SHIPPED = 'shipped',
   DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
@@ -11,9 +14,10 @@ export enum OrderStatus {
 export interface ShippingAddress {
   firstName: string
   lastName: string
-  address: string
-  city: string
+  line1: string
+  line2?: string
   postalCode: string
+  city: string
   country: string
 }
 
@@ -21,11 +25,10 @@ export interface OrderItem {
   id: number
   orderId: number
   productId: number
-  productName: string
-  unitPrice: number
+  product?: Product
   quantity: number
+  unitPrice: number
   format?: string
-  subtotal: number
 }
 
 export interface Order {
@@ -38,4 +41,24 @@ export interface Order {
   items: OrderItem[]
   createdAt: string
   updatedAt: string
+}
+
+export type OrderResponse = Order
+
+export interface CartItem {
+  productId: number
+  name: string
+  imageUrl: string
+  price: number
+  quantity: number
+  format?: string
+}
+
+export interface CreateOrderDto {
+  items: Array<{
+    productId: number
+    quantity: number
+    format?: string
+  }>
+  shippingAddress: ShippingAddress
 }

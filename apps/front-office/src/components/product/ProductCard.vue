@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import type { Product as ProductBase } from '@carre-ivoire/types'
 
-export interface Product {
-  id: string
-  name: string
-  origin: string
-  price: number
+// Display interface — extends shared type with UI-only fields.
+// image/origin align with API fields in PRP 09 when mock data is removed.
+interface ProductCardItem extends Pick<ProductBase, 'name' | 'price'> {
+  id: ProductBase['id'] | string
   image: string
+  origin?: string
   badge?: string | null
 }
 
-const props = defineProps<{ product: Product }>()
+const props = defineProps<{ product: ProductCardItem }>()
 const router = useRouter()
 
 const hovered = ref(false)
