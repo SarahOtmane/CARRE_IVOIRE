@@ -1,11 +1,27 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { useAdminStore } from "@/stores/admin.store";
-import { formatCurrency, formatDate } from "@/data/admin";
+import { useAdminProducts, useAdminOrders } from "@carre-ivoire/composables";
+import { OrderStatus } from "@carre-ivoire/types";
 
 const router = useRouter();
-const adminStore = useAdminStore();
+
+const { products, fetchAll: fetchProducts } = useAdminProducts();
+const { orders, fetchAll: fetchOrders } = useAdminOrders();
+
+onMounted(() => Promise.all([fetchProducts(), fetchOrders()]));
+
+function formatPrice(centimes: number) {
+  return `${(centimes / 100).toFixed(2).replace(".", ",")} €`;
+}
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 const today = new Date().toLocaleDateString("fr-FR", {
   day: "2-digit",
@@ -14,72 +30,56 @@ const today = new Date().toLocaleDateString("fr-FR", {
 });
 
 const revenue = computed(() =>
-  adminStore.state.orders
-    .filter((order) => order.status !== "Annulée")
-    .reduce((sum, order) => sum + order.total, 0),
+  orders.value
+    .filter((o) => o.status !== OrderStatus.CANCELLED && o.status !== OrderStatus.REFUNDED)
+    .reduce((sum, o) => sum + o.totalAmount, 0),
+);
+
+const pendingCount = computed(
+  () =>
+    orders.value.filter(
+      (o) => o.status === OrderStatus.PENDING || o.status === OrderStatus.PAYMENT_PENDING,
+    ).length,
+);
+
+const processingCount = computed(
+  () => orders.value.filter((o) => o.status === OrderStatus.PROCESSING).length,
+);
+
+const lowStockProducts = computed(() =>
+  products.value.filter((p) => p.stock < 10).slice(0, 5),
 );
 
 const recentOrders = computed(() =>
-  [...adminStore.state.orders]
-    .sort((a, b) => b.date.localeCompare(a.date))
+  [...orders.value]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
     .slice(0, 6),
 );
-const lowStockProducts = computed(() =>
-  adminStore.state.products.filter((product) => product.stock < 10).slice(0, 5),
-);
-
-const topProducts = computed(() => {
-  const tally: Record<string, number> = {};
-
-  adminStore.state.orders.forEach((order) => {
-    order.items.forEach((item) => {
-      tally[item.pid] = (tally[item.pid] || 0) + item.qty;
-    });
-  });
-
-  return Object.entries(tally)
-    .sort((left, right) => right[1] - left[1])
-    .slice(0, 4)
-    .map(([productId, quantity]) => ({
-      quantity,
-      product: adminStore.state.products.find(
-        (entry) => entry.id === productId,
-      ),
-    }))
-    .filter(
-      (
-        entry,
-      ): entry is {
-        quantity: number;
-        product: (typeof adminStore.state.products)[number];
-      } => !!entry.product,
-    );
-});
 
 const kpis = computed(() => [
   {
-    label: "Chiffre d’affaires",
-    value: formatCurrency(revenue.value),
-    hint: `${adminStore.state.orders.length} commandes`,
+    label: "Chiffre d'affaires",
+    value: formatPrice(revenue.value),
+    hint: `${orders.value.length} commandes`,
   },
-  {
-    label: "Nouvelles commandes",
-    value: adminStore.counts.newOrders,
-    hint: "à traiter",
-  },
-  {
-    label: "En préparation",
-    value: adminStore.state.orders.filter(
-      (order) => order.status === "En préparation",
-    ).length,
-    hint: "au laboratoire",
-  },
-  {
-    label: "Clients actifs",
-    value: adminStore.counts.customers,
-    hint: `${adminStore.state.customers.filter((customer) => customer.segment === "VIP").length} VIP`,
-  },
+  { label: "Nouvelles commandes", value: pendingCount.value, hint: "à traiter" },
+  { label: "En préparation", value: processingCount.value, hint: "au laboratoire" },
+  { label: "Produits actifs", value: products.value.filter((p) => p.isActive).length, hint: `${lowStockProducts.value.length} en stock bas` },
 ]);
+
+function statusLabel(status: OrderStatus) {
+  const labels: Record<string, string> = {
+    pending: "Nouvelle",
+    payment_pending: "Paiement en attente",
+    confirmed: "Confirmée",
+    processing: "En préparation",
+    shipped: "Expédiée",
+    delivered: "Livrée",
+    cancelled: "Annulée",
+    refunded: "Remboursée",
+  };
+  return labels[status] ?? status;
+}
 
 function goTo(name: string, params?: Record<string, string>) {
   router.push({ name, params });
@@ -99,11 +99,10 @@ function goTo(name: string, params?: Record<string, string>) {
           <h2
             class="mt-4 max-w-3xl font-display text-5xl leading-[0.92] text-cocoa sm:text-6xl"
           >
-            Bonjour Marie.
-            <span class="italic text-cocoa/55"> aujourd’hui à l’atelier.</span>
+            Bonjour.
+            <span class="italic text-cocoa/55"> aujourd'hui à l'atelier.</span>
           </h2>
         </div>
-
         <div class="font-body text-sm text-cocoa/55">{{ today }}</div>
       </div>
     </section>
@@ -151,34 +150,38 @@ function goTo(name: string, params?: Record<string, string>) {
             v-for="order in recentOrders"
             :key="order.id"
             type="button"
-            class="grid w-full grid-cols-[72px_minmax(0,1fr)_112px_120px_110px] items-center gap-4 py-4 text-left transition-colors duration-200 hover:bg-beige/50"
-            @click="goTo('admin-commandes-detail', { id: order.id })"
+            class="grid w-full grid-cols-[72px_minmax(0,1fr)_84px_120px_110px] items-center gap-4 py-4 text-left transition-colors duration-200 hover:bg-beige/50"
+            @click="goTo('admin-commandes-detail', { id: String(order.id) })"
           >
             <span class="font-body text-[11px] text-cocoa/55 tabular-nums">{{
-              formatDate(order.date)
+              formatDate(order.createdAt)
             }}</span>
             <span class="min-w-0">
-              <span class="block truncate font-display text-lg text-cocoa">{{
-                order.customer
-              }}</span>
-              <span class="font-body text-[11px] text-cocoa/55"
-                >{{ order.ref }} · {{ order.city }}</span
-              >
+              <span class="block truncate font-display text-lg text-cocoa">
+                Commande #{{ order.id }}
+              </span>
+              <span class="font-body text-[11px] text-cocoa/55">
+                {{ order.shippingAddress?.city ?? "—" }}
+              </span>
             </span>
             <span class="font-body text-sm text-cocoa/65"
-              >{{ order.items.length }} article<span
-                v-if="order.items.length > 1"
-                >s</span
-              ></span
+              >{{ order.items.length }} art.</span
             >
             <span class="text-right font-body text-sm tabular-nums text-gold">{{
-              formatCurrency(order.total)
+              formatPrice(order.totalAmount)
             }}</span>
             <span
               class="justify-self-end border border-cocoa/12 px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cocoa/70"
-              >{{ order.status }}</span
+              >{{ statusLabel(order.status) }}</span
             >
           </button>
+
+          <div
+            v-if="recentOrders.length === 0"
+            class="py-8 text-center font-body text-sm italic text-cocoa/45"
+          >
+            Aucune commande pour le moment.
+          </div>
         </div>
       </article>
 
@@ -195,12 +198,7 @@ function goTo(name: string, params?: Record<string, string>) {
             >
               <div class="font-display text-lg text-cocoa">
                 Confirmer
-                <span class="italic"
-                  >{{ adminStore.counts.newOrders }} nouvelle<span
-                    v-if="adminStore.counts.newOrders > 1"
-                    >s</span
-                  ></span
-                >
+                <span class="italic">{{ pendingCount }} nouvelle<span v-if="pendingCount > 1">s</span></span>
               </div>
               <div class="mt-1 font-body text-[11px] text-cocoa/55">
                 commandes en attente
@@ -218,75 +216,10 @@ function goTo(name: string, params?: Record<string, string>) {
                   >— {{ lowStockProducts.length }} produits</span
                 >
               </div>
-              <div
-                class="mt-1 line-clamp-2 font-body text-[11px] text-cocoa/55"
-              >
-                {{
-                  lowStockProducts.map((product) => product.name).join(" · ")
-                }}
+              <div class="mt-1 line-clamp-2 font-body text-[11px] text-cocoa/55">
+                {{ lowStockProducts.map((p) => p.name).join(" · ") }}
               </div>
             </button>
-
-            <button
-              type="button"
-              class="block w-full py-4 text-left"
-              @click="goTo('admin-categories')"
-            >
-              <div class="font-display text-lg text-cocoa">
-                Réviser les <span class="italic">brouillons</span>
-              </div>
-              <div class="mt-1 font-body text-[11px] text-cocoa/55">
-                {{
-                  adminStore.state.categories.filter(
-                    (category) => category.status === "draft",
-                  ).length
-                }}
-                catégorie<span
-                  v-if="
-                    adminStore.state.categories.filter(
-                      (category) => category.status === 'draft',
-                    ).length > 1
-                  "
-                  >s</span
-                >
-                non publiée<span
-                  v-if="
-                    adminStore.state.categories.filter(
-                      (category) => category.status === 'draft',
-                    ).length > 1
-                  "
-                  >s</span
-                >
-              </div>
-            </button>
-          </div>
-        </article>
-
-        <article class="border border-cocoa/12 bg-ivory">
-          <div class="border-b border-cocoa/12 px-6 py-5">
-            <h3 class="font-display text-2xl text-cocoa">Plus vendus.</h3>
-          </div>
-
-          <div class="divide-y divide-cocoa/8 px-6">
-            <div
-              v-for="(entry, index) in topProducts"
-              :key="entry.product.id"
-              class="flex items-center justify-between py-4"
-            >
-              <div class="min-w-0">
-                <div
-                  class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
-                >
-                  {{ String(index + 1).padStart(2, "0") }}
-                </div>
-                <div class="truncate font-display text-lg text-cocoa">
-                  {{ entry.product.name }}
-                </div>
-              </div>
-              <div class="font-body text-sm tabular-nums text-gold">
-                × {{ entry.quantity }}
-              </div>
-            </div>
           </div>
         </article>
       </aside>

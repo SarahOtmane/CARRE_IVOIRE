@@ -2,12 +2,10 @@
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth.store";
-import { useAdminStore } from "@/stores/admin.store";
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const adminStore = useAdminStore();
 
 const sectionTitles: Record<string, string> = {
   dashboard: "Tableau de bord",
@@ -45,7 +43,7 @@ function logout() {
         >
         <span
           class="font-body text-[10px] uppercase tracking-[0.2em] text-cocoa/45"
-          >{{ adminStore.counts.products }} produits actifs</span
+          >Carré Ivoire</span
         >
       </div>
       <h1 class="mt-2 truncate font-display text-2xl text-cocoa sm:text-[2rem]">

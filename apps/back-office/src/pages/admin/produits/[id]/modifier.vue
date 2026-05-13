@@ -1,64 +1,86 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useAdminStore } from "@/stores/admin.store";
-import {
-  adminOrigins,
-  adminProductFormats,
-  formatCurrency,
-  type AdminProduct,
-} from "@/data/admin";
+import { useAdminProducts, useAdminCategories } from "@carre-ivoire/composables";
 
 const route = useRoute();
 const router = useRouter();
-const adminStore = useAdminStore();
-const draft = ref<AdminProduct | null>(null);
+const { products, fetchAll, update, remove, isLoading } = useAdminProducts();
+const { categories } = useAdminCategories();
 
-const productId = computed(() => String(route.params.id || ""));
+const productId = computed(() => Number(route.params.id));
+
+const draft = ref({
+  name: "",
+  slug: "",
+  categoryId: 0,
+  price: 0,
+  stock: 0,
+  shortDescription: "",
+  description: "",
+  isActive: true,
+  ingredients: "",
+  allergens: "",
+  weightGrams: 0,
+});
+
+const found = ref(false);
+
+onMounted(async () => {
+  await fetchAll();
+});
 
 watch(
-  productId,
-  (value) => {
-    const product = adminStore.state.products.find(
-      (entry) => entry.id === value,
-    );
-    draft.value = product ? { ...product } : null;
+  [products, productId],
+  ([list, id]) => {
+    const product = list.find((p) => p.id === id);
+    if (product) {
+      found.value = true;
+      draft.value = {
+        name: product.name,
+        slug: product.slug,
+        categoryId: product.categoryId,
+        price: product.price / 100,
+        stock: product.stock,
+        shortDescription: product.shortDescription ?? "",
+        description: product.description ?? "",
+        isActive: product.isActive,
+        ingredients: product.ingredients ?? "",
+        allergens: product.allergens ?? "",
+        weightGrams: product.weightGrams ?? 0,
+      };
+    }
   },
   { immediate: true },
 );
 
-function save() {
-  if (!draft.value?.name.trim()) {
-    return;
-  }
-
-  const nextProduct = {
-    ...draft.value,
-    updatedAt: new Date().toISOString().slice(0, 10),
-  };
-
-  adminStore.setState({
-    ...adminStore.state,
-    products: adminStore.state.products.map((product) =>
-      product.id === nextProduct.id ? nextProduct : product,
-    ),
+async function save() {
+  if (!draft.value.name.trim() || !draft.value.slug.trim()) return;
+  await update(productId.value, {
+    name: draft.value.name,
+    slug: draft.value.slug,
+    categoryId: draft.value.categoryId,
+    price: Math.round(draft.value.price * 100),
+    stock: draft.value.stock,
+    shortDescription: draft.value.shortDescription || undefined,
+    description: draft.value.description || undefined,
+    isActive: draft.value.isActive,
+    ingredients: draft.value.ingredients || undefined,
+    allergens: draft.value.allergens || undefined,
+    weightGrams: draft.value.weightGrams || undefined,
   });
   router.push({ name: "admin-produits" });
 }
 
-function archive() {
-  if (!draft.value || !globalThis.window.confirm("Archiver ce produit ?")) {
-    return;
-  }
+async function archive() {
+  if (!globalThis.window.confirm("Désactiver ce produit ?")) return;
+  await update(productId.value, { isActive: false });
+  router.push({ name: "admin-produits" });
+}
 
-  adminStore.setState({
-    ...adminStore.state,
-    products: adminStore.state.products.map((product) =>
-      product.id === draft.value?.id
-        ? { ...product, status: "archived" }
-        : product,
-    ),
-  });
+async function deleteProduct() {
+  if (!globalThis.window.confirm("Supprimer définitivement ce produit ?")) return;
+  await remove(productId.value);
   router.push({ name: "admin-produits" });
 }
 </script>
@@ -67,42 +89,27 @@ function archive() {
   <div class="space-y-8 pb-10">
     <section class="border-b border-cocoa/12 pb-8">
       <div>
-        <div
-          class="font-body text-[10px] uppercase tracking-[0.28em] text-cocoa/45"
-        >
+        <div class="font-body text-[10px] uppercase tracking-[0.28em] text-cocoa/45">
           02 — Produits
         </div>
-        <h2
-          class="mt-4 font-display text-5xl leading-[0.92] text-cocoa sm:text-6xl"
-        >
+        <h2 class="mt-4 font-display text-5xl leading-[0.92] text-cocoa sm:text-6xl">
           Modifier le produit,
           <span class="italic text-cocoa/55">sans perdre la main.</span>
         </h2>
       </div>
     </section>
 
+    <div v-if="isLoading && !found" class="py-16 text-center font-body text-sm italic text-cocoa/45">
+      Chargement…
+    </div>
+
     <div
-      v-if="draft"
+      v-else-if="found"
       class="grid gap-8 border border-cocoa/12 bg-ivory p-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]"
     >
       <div class="grid gap-6">
         <label class="grid gap-2">
-          <span
-            class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-            >Référence</span
-          >
-          <input
-            v-model="draft.ref"
-            type="text"
-            class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
-          />
-        </label>
-
-        <label class="grid gap-2">
-          <span
-            class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-            >Nom du produit</span
-          >
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Nom du produit</span>
           <input
             v-model="draft.name"
             type="text"
@@ -110,88 +117,65 @@ function archive() {
           />
         </label>
 
+        <label class="grid gap-2">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Slug (URL)</span>
+          <input
+            v-model="draft.slug"
+            type="text"
+            class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+          />
+        </label>
+
         <div class="grid gap-6 lg:grid-cols-2">
           <label class="grid gap-2">
-            <span
-              class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-              >Catégorie</span
-            >
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Catégorie</span>
             <select
-              v-model="draft.category"
+              v-model.number="draft.categoryId"
               class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
             >
-              <option
-                v-for="category in adminStore.state.categories"
-                :key="category.id"
-                :value="category.id"
-              >
-                {{ category.label }}
-              </option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
             </select>
           </label>
 
           <label class="grid gap-2">
-            <span
-              class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-              >Origine</span
-            >
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Statut</span>
             <select
-              v-model="draft.origin"
+              v-model="draft.isActive"
               class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
             >
-              <option value="">—</option>
-              <option
-                v-for="origin in adminOrigins"
-                :key="origin"
-                :value="origin"
-              >
-                {{ origin }}
-              </option>
+              <option :value="true">Actif</option>
+              <option :value="false">Inactif</option>
             </select>
           </label>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-3">
           <label class="grid gap-2">
-            <span
-              class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-              >Format</span
-            >
-            <select
-              v-model="draft.format"
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
-            >
-              <option
-                v-for="format in adminProductFormats"
-                :key="format"
-                :value="format"
-              >
-                {{ format }}
-              </option>
-            </select>
-          </label>
-
-          <label class="grid gap-2">
-            <span
-              class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-              >Prix</span
-            >
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Prix (€)</span>
             <input
               v-model.number="draft.price"
               type="number"
               min="0"
-              step="0.5"
+              step="0.01"
               class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
             />
           </label>
 
           <label class="grid gap-2">
-            <span
-              class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-              >Stock</span
-            >
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Stock</span>
             <input
               v-model.number="draft.stock"
+              type="number"
+              min="0"
+              step="1"
+              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+            />
+          </label>
+
+          <label class="grid gap-2">
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Poids (g)</span>
+            <input
+              v-model.number="draft.weightGrams"
               type="number"
               min="0"
               step="1"
@@ -201,63 +185,42 @@ function archive() {
         </div>
 
         <label class="grid gap-2">
-          <span
-            class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-            >Description</span
-          >
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Accroche courte</span>
+          <input
+            v-model="draft.shortDescription"
+            type="text"
+            class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+          />
+        </label>
+
+        <label class="grid gap-2">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Description</span>
           <textarea
             v-model="draft.description"
-            rows="5"
+            rows="4"
             class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base leading-7 text-cocoa outline-none"
           />
         </label>
 
         <label class="grid gap-2">
-          <span
-            class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55"
-            >Statut</span
-          >
-          <select
-            v-model="draft.status"
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Ingrédients</span>
+          <input
+            v-model="draft.ingredients"
+            type="text"
             class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
-          >
-            <option value="active">Actif</option>
-            <option value="draft">Brouillon</option>
-            <option value="archived">Archivé</option>
-          </select>
+          />
         </label>
       </div>
 
-      <aside
-        class="space-y-6 border-t border-cocoa/12 pt-6 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0"
-      >
+      <aside class="space-y-6 border-t border-cocoa/12 pt-6 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
         <div class="border border-cocoa/12 bg-beige/50 p-5">
-          <div
-            class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
-          >
-            Aperçu prix
-          </div>
+          <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45">Aperçu prix</div>
           <div class="mt-3 font-display text-4xl text-gold">
-            {{ formatCurrency(draft.price) }}
+            {{ draft.price.toFixed(2).replace(".", ",") }} €
           </div>
           <div class="mt-2 font-body text-sm text-cocoa/60">
-            {{ draft.format }}
+            {{ categories.find((c) => c.id === draft.categoryId)?.name ?? "—" }}
           </div>
-        </div>
-
-        <div class="border border-cocoa/12 bg-ivory p-5">
-          <div
-            class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
-          >
-            Mise à jour
-          </div>
-          <div class="mt-3 font-display text-2xl text-cocoa">
-            {{ draft.updatedAt }}
-          </div>
-          <p class="mt-3 font-body text-sm leading-7 text-cocoa/60">
-            Les modifications se répercutent immédiatement dans le catalogue
-            admin.
-          </p>
         </div>
 
         <div class="flex flex-wrap gap-3">
@@ -273,14 +236,22 @@ function archive() {
             class="border border-cocoa/25 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa"
             @click="archive"
           >
-            Archiver
+            Désactiver
           </button>
           <button
             type="button"
-            class="border border-cocoa bg-cocoa px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-ivory"
+            class="border border-red-700/30 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-red-700"
+            @click="deleteProduct"
+          >
+            Supprimer
+          </button>
+          <button
+            type="button"
+            :disabled="isLoading"
+            class="border border-cocoa bg-cocoa px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-ivory disabled:opacity-50"
             @click="save"
           >
-            Enregistrer
+            {{ isLoading ? "Enregistrement…" : "Enregistrer" }}
           </button>
         </div>
       </aside>

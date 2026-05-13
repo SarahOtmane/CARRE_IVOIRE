@@ -1,58 +1,36 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth.store";
-import { useAdminStore } from "@/stores/admin.store";
+import { useAdminProducts, useAdminOrders, useAdminCategories } from "@carre-ivoire/composables";
+import { OrderStatus } from "@carre-ivoire/types";
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
-const adminStore = useAdminStore();
+
+const { products, fetchAll: fetchProducts } = useAdminProducts();
+const { orders, fetchAll: fetchOrders } = useAdminOrders();
+const { categories } = useAdminCategories();
+
+onMounted(() => Promise.all([fetchProducts(), fetchOrders()]));
+
+const lowStockCount = computed(() => products.value.filter((p) => p.stock < 10).length);
+const pendingOrdersCount = computed(() =>
+  orders.value.filter(
+    (o) => o.status === OrderStatus.PENDING || o.status === OrderStatus.PAYMENT_PENDING,
+  ).length,
+);
 
 const navItems = computed(() => [
   { name: "dashboard", label: "Tableau de bord", badge: undefined, code: "00" },
-  {
-    name: "admin-categories",
-    label: "Catégories",
-    badge: adminStore.counts.categories,
-    code: "01",
-  },
-  {
-    name: "admin-produits",
-    label: "Produits",
-    badge: adminStore.counts.products,
-    code: "02",
-  },
-  {
-    name: "admin-commandes",
-    label: "Commandes",
-    badge: adminStore.counts.orders,
-    code: "03",
-  },
-  {
-    name: "admin-stocks",
-    label: "Stocks",
-    badge: adminStore.counts.lowStock,
-    code: "04",
-  },
-  {
-    name: "admin-pages",
-    label: "Pages",
-    badge: adminStore.state.pages.length,
-    code: "05",
-  },
-  {
-    name: "admin-clients",
-    label: "Clients",
-    badge: adminStore.counts.customers,
-    code: "06",
-  },
-  {
-    name: "admin-parametres",
-    label: "Paramètres",
-    badge: undefined,
-    code: "07",
-  },
+  { name: "admin-categories", label: "Catégories", badge: categories.value.length || undefined, code: "01" },
+  { name: "admin-produits", label: "Produits", badge: products.value.length || undefined, code: "02" },
+  { name: "admin-commandes", label: "Commandes", badge: orders.value.length || undefined, code: "03" },
+  { name: "admin-stocks", label: "Stocks", badge: lowStockCount.value || undefined, code: "04" },
+  { name: "admin-pages", label: "Pages", badge: undefined, code: "05" },
+  { name: "admin-clients", label: "Clients", badge: undefined, code: "06" },
+  { name: "admin-parametres", label: "Paramètres", badge: undefined, code: "07" },
 ]);
 
 function isActive(name: string) {
@@ -125,7 +103,7 @@ function logout() {
         {{ authStore.fullName || "Équipe admin" }}
       </div>
       <div class="mt-1 font-body text-sm italic text-cocoa/55">
-        {{ adminStore.counts.newOrders }} commandes à traiter
+        {{ pendingOrdersCount }} commandes à traiter
       </div>
       <button
         type="button"
