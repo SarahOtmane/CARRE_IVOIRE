@@ -1,7 +1,7 @@
 <template>
   <button
     :class="[
-      'font-body font-medium transition-colors',
+      'font-body inline-flex items-center justify-center transition-all duration-[180ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] active:translate-y-px',
       variantClasses,
       sizeClasses,
       disabled ? 'opacity-50 cursor-not-allowed' : '',
@@ -31,11 +31,11 @@ const props = withDefaults(defineProps<Props>(), {
 const variantClasses = computed(() => {
   switch (props.variant) {
     case 'primary':
-      return 'bg-brun-cacao text-papier border border-brun-cacao hover:bg-brun-cacao-2'
+      return 'bg-cacao text-ivoire border border-cacao hover:bg-cacao/85'
     case 'secondary':
-      return 'bg-rose-poudre text-brun-cacao border border-rose-poudre hover:bg-rose-poudre-2'
+      return 'bg-transparent text-cacao border border-cacao hover:bg-cacao hover:text-ivoire'
     case 'outline':
-      return 'bg-transparent text-brun-cacao border border-brun-cacao hover:bg-ivoire'
+      return 'bg-transparent text-cacao border border-cacao/25 hover:border-cacao'
     default:
       return ''
   }
@@ -44,11 +44,11 @@ const variantClasses = computed(() => {
 const sizeClasses = computed(() => {
   switch (props.size) {
     case 'sm':
-      return 'text-xs px-3 py-1'
+      return 'text-[10px] tracking-[0.18em] uppercase px-4 py-2'
     case 'lg':
-      return 'text-base px-6 py-3'
+      return 'text-[11px] tracking-[0.18em] uppercase px-8 py-5'
     default:
-      return 'text-sm px-4 py-2'
+      return 'text-[11px] tracking-[0.18em] uppercase px-5 py-3'
   }
 })
 </script>

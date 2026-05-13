@@ -37,7 +37,7 @@ defineEmits<{
 
 .modal-enter-active,
 .modal-leave-active {
-  transition: opacity 200ms var(--ease-ui, cubic-bezier(0.2, 0.8, 0.2, 1));
+  transition: opacity 400ms var(--ease-ui, cubic-bezier(0.2, 0.8, 0.2, 1));
 }
 
 .modal-enter-from,

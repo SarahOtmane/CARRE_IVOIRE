@@ -30,6 +30,17 @@ module.exports = {
           deep: 'var(--dore-deep)',
         },
         papier: 'var(--papier)',
+        ivory: 'var(--ivoire)',
+        beige: 'var(--beige-doux)',
+        cocoa: {
+          DEFAULT: 'var(--brun-cacao)',
+          '2': 'var(--brun-cacao-2)',
+          '3': 'var(--brun-cacao-3)',
+        },
+        gold: {
+          DEFAULT: 'var(--dore)',
+          deep: 'var(--dore-deep)',
+        },
       },
       fontFamily: {
         display: ['Cormorant Garamond', 'EB Garamond', 'Georgia', 'Times New Roman', 'serif'],

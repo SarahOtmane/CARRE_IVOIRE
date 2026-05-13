@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+import { Button } from "@carre-ivoire/ui";
 const router = useRouter();
 </script>
 
@@ -25,13 +26,12 @@ const router = useRouter();
         L'API clients sera disponible dans une prochaine version.
         Les commandes existantes sont accessibles depuis l'onglet Commandes.
       </p>
-      <button
-        type="button"
-        class="mt-8 border border-cocoa bg-cocoa px-5 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-ivory"
+      <Button
+        class="mt-8"
         @click="router.push({ name: 'admin-commandes' })"
       >
         Voir les commandes
-      </button>
+      </Button>
     </div>
   </div>
 </template>

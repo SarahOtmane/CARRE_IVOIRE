@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useAdminCategories } from "@carre-ivoire/composables";
+import { Button } from "@carre-ivoire/ui";
 import type { CategoryResponse } from "@carre-ivoire/types";
 
 const { categories, isLoading, create, update, remove } = useAdminCategories();
@@ -90,13 +91,9 @@ async function deleteCategory() {
             Familles de <span class="italic text-cocoa/55">la maison.</span>
           </h2>
         </div>
-        <button
-          type="button"
-          class="border border-cocoa bg-cocoa px-5 py-3 font-body text-[11px] uppercase tracking-[0.18em] text-ivory"
-          @click="createNew"
-        >
+        <Button @click="createNew">
           Nouvelle catégorie
-        </button>
+        </Button>
       </div>
     </section>
 
