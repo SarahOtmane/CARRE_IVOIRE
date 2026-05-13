@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart.store";
 import ProductCard from "@/components/product/ProductCard.vue";
-import type { CatalogProduct } from "@/data/products";
+import type { ProductResponse } from "@carre-ivoire/types";
 
 type FormatOption = {
   id: string;
@@ -24,8 +24,8 @@ type ProductSheet = {
 };
 
 const props = defineProps<{
-  product: CatalogProduct;
-  relatedProducts: CatalogProduct[];
+  product: ProductResponse;
+  relatedProducts: ProductResponse[];
   sheet: ProductSheet;
 }>();
 
@@ -43,8 +43,9 @@ const selectedFormat = computed(
     props.sheet.formats[0],
 );
 
+const basePrice = computed(() => props.product.price / 100);
 const unitPrice = computed(
-  () => props.product.price + (selectedFormat.value?.extraPrice ?? 0),
+  () => basePrice.value + (selectedFormat.value?.extraPrice ?? 0),
 );
 const total = computed(() => unitPrice.value * quantity.value);
 
@@ -54,8 +55,7 @@ function addToCart() {
     name: props.product.name,
     price: unitPrice.value,
     quantity: quantity.value,
-    image: props.product.image,
-    origin: props.product.origin,
+    imageUrl: props.product.imageUrl ?? '',
     format: selectedFormat.value?.label,
   });
   added.value = true;
@@ -96,7 +96,7 @@ function formatPrice(value: number) {
       <div class="lg:sticky lg:top-[96px] lg:self-start">
         <div class="overflow-hidden bg-papier" style="aspect-ratio: 1 / 1">
           <img
-            :src="product.image"
+            :src="product.imageUrl ?? '/assets/placeholder.svg'"
             :alt="product.name"
             class="h-full w-full object-cover"
           />
@@ -110,7 +110,7 @@ function formatPrice(value: number) {
             style="aspect-ratio: 1 / 1"
           >
             <img
-              :src="product.image"
+              :src="product.imageUrl ?? '/assets/placeholder.svg'"
               :alt="product.name"
               class="h-full w-full object-cover opacity-80"
             />

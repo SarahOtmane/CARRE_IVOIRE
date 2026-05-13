@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import ProductCard from "@/components/product/ProductCard.vue";
-import { ALL_PRODUCTS } from "@/data/products";
+import type { ProductResponse } from "@carre-ivoire/types";
 
 const router = useRouter();
 
-// Mock : les 3 premiers produits sont en favoris
-const favoris = ALL_PRODUCTS.slice(0, 3);
+const favoris: ProductResponse[] = [];
 </script>
 
 <template>

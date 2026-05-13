@@ -7,6 +7,10 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 
+import { useApi } from "@carre-ivoire/composables";
+
+const api = useApi();
+
 const form = ref({
   email: authStore.user?.email ?? "",
   password: "",
@@ -20,7 +24,7 @@ const redirectPath = computed(() => {
   return typeof value === "string" && value.startsWith("/") ? value : "/compte";
 });
 
-function login() {
+async function login() {
   error.value = "";
 
   if (!form.value.email.trim() || !form.value.password.trim()) {
@@ -29,18 +33,18 @@ function login() {
   }
 
   loading.value = true;
-
-  globalThis.setTimeout(() => {
-    authStore.setAuth("mock-token", {
-      id: 1,
+  try {
+    const res = await api.post("/auth/login", {
       email: form.value.email.trim(),
-      firstName: "Sarah",
-      lastName: "Martin",
-      role: "client",
+      password: form.value.password,
     });
-    loading.value = false;
+    authStore.setAuth(res.data.data.token, res.data.data.user);
     router.replace(redirectPath.value);
-  }, 450);
+  } catch {
+    error.value = "Email ou mot de passe incorrect.";
+  } finally {
+    loading.value = false;
+  }
 }
 
 function goToAccount() {

@@ -2,7 +2,7 @@
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useCartStore } from "@/stores/cart.store";
-import { ALL_PRODUCTS } from "@/data/products";
+import type { ProductResponse } from "@carre-ivoire/types";
 
 const router = useRouter();
 const route = useRoute();
@@ -75,16 +75,8 @@ const suggestions = [
 ];
 const familles = ["Tablettes", "Mini Carrés", "Mendiants", "Pâtes à tartiner"];
 
-const searchResults = computed(() => {
-  const q = query.value.trim().toLowerCase();
-  if (!q) return [];
-  return ALL_PRODUCTS.filter(
-    (p) =>
-      p.name.toLowerCase().includes(q) ||
-      p.origin.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q),
-  ).slice(0, 8);
-});
+// Search via API — à implémenter lors de la PRP dédiée
+const searchResults = computed<ProductResponse[]>(() => []);
 
 const hasQuery = computed(() => query.value.trim().length > 0);
 
@@ -456,30 +448,10 @@ function toggleSearch() {
             >
               Populaires
             </div>
-            <div class="flex flex-col gap-3">
-              <div
-                v-for="p in ALL_PRODUCTS.slice(0, 3)"
-                :key="p.id"
-                class="flex cursor-pointer items-center gap-3 transition-opacity duration-180 hover:opacity-70"
-                @click="navigateAndClose('/produits/' + p.id)"
-              >
-                <div class="h-11 w-11 shrink-0 bg-papier">
-                  <img
-                    :src="p.image"
-                    :alt="p.name"
-                    class="h-full w-full object-cover"
-                  />
-                </div>
-                <div class="min-w-0">
-                  <div class="font-serif text-[15px] text-brun-cacao">
-                    {{ p.name }}
-                  </div>
-                  <div class="font-sans text-[11px] text-brun-cacao-3">
-                    {{ p.origin }}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <a
+              class="cursor-pointer font-serif text-[18px] text-brun-cacao transition-opacity duration-180 hover:opacity-60"
+              @click="navigateAndClose('/boutique')"
+            >Découvrir la collection</a>
           </div>
         </div>
 
@@ -498,11 +470,11 @@ function toggleSearch() {
               :key="p.id"
               class="flex cursor-pointer items-center gap-4 border-t py-3 pr-4 transition-opacity duration-180 hover:opacity-70"
               style="border-color: var(--cacao-a08)"
-              @click="navigateAndClose('/produits/' + p.id)"
+              @click="navigateAndClose('/produits/' + p.slug)"
             >
               <div class="h-16 w-16 shrink-0 bg-papier">
                 <img
-                  :src="p.image"
+                  :src="p.imageUrl ?? '/assets/placeholder.svg'"
                   :alt="p.name"
                   class="h-full w-full object-cover"
                 />
@@ -511,7 +483,7 @@ function toggleSearch() {
                 <div
                   class="font-sans text-[10px] uppercase tracking-[0.18em] text-brun-cacao-3"
                 >
-                  {{ p.origin }}
+                  {{ p.category?.name }}
                 </div>
                 <div
                   class="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap font-serif text-[18px] text-brun-cacao"
@@ -522,7 +494,7 @@ function toggleSearch() {
                   class="mt-1 font-sans text-[13px] text-dore"
                   style="font-variant-numeric: tabular-nums"
                 >
-                  {{ p.price.toFixed(2).replace(".", ",") }} €
+                  {{ (p.price / 100).toFixed(2).replace(".", ",") }} €
                 </div>
               </div>
             </div>

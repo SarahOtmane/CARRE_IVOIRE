@@ -1,35 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import ProductCard, { type Product } from '@/components/product/ProductCard.vue'
+import { useProducts } from '@carre-ivoire/composables'
+import ProductCard from '@/components/product/ProductCard.vue'
 
 const router = useRouter()
-
-const products: Product[] = [
-  {
-    id: 'noir-pur-72',
-    name: 'Noir Pur — 72%',
-    origin: 'Venezuela · Porcelana',
-    price: 14,
-    image: '/assets/products/tablet-noir-pur.svg',
-    badge: null,
-  },
-  {
-    id: 'praline-noisette',
-    name: 'Praliné Noisette',
-    origin: 'Piémont · Tonda Gentile',
-    price: 16,
-    image: '/assets/products/tablet-praline-noisette.svg',
-    badge: 'Nouveau',
-  },
-  {
-    id: 'coffret-decouverte',
-    name: 'Coffret Découverte',
-    origin: '9 carrés · 3 origines',
-    price: 48,
-    image: '/assets/products/coffret-decouverte.svg',
-    badge: 'Signature',
-  },
-]
+const { result } = useProducts({ limit: 3 })
 </script>
 
 <template>
@@ -55,7 +30,7 @@ const products: Product[] = [
     <!-- Grille produits -->
     <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
       <ProductCard
-        v-for="product in products"
+        v-for="product in result.items.slice(0, 3)"
         :key="product.id"
         :product="product"
       />

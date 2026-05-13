@@ -1,26 +1,16 @@
 <script setup lang="ts">
-type CartItem = {
-  productId: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  origin?: string;
-  format?: string;
-};
+import type { CartItem } from '@carre-ivoire/types'
 
-defineProps<{
-  item: CartItem;
-}>();
+defineProps<{ item: CartItem }>()
 
 const emit = defineEmits<{
-  (e: "increment"): void;
-  (e: "decrement"): void;
-  (e: "remove"): void;
-}>();
+  (e: 'increment'): void
+  (e: 'decrement'): void
+  (e: 'remove'): void
+}>()
 
 function formatPrice(value: number) {
-  return `${value.toFixed(2).replace(".", ",")} €`;
+  return `${value.toFixed(2).replace('.', ',')} €`
 }
 </script>
 
@@ -31,7 +21,7 @@ function formatPrice(value: number) {
   >
     <div class="h-[88px] w-[88px] shrink-0 bg-papier">
       <img
-        :src="item.image"
+        :src="item.imageUrl || '/assets/placeholder.svg'"
         :alt="item.name"
         class="h-full w-full object-cover"
       />
@@ -43,10 +33,10 @@ function formatPrice(value: number) {
           {{ item.name }}
         </div>
         <div
+          v-if="item.format"
           class="mt-1 font-sans text-[11px] uppercase tracking-[0.18em] text-brun-cacao-2"
         >
-          <span v-if="item.origin">{{ item.origin }} · </span>
-          <span v-if="item.format">Format {{ item.format }}</span>
+          Format {{ item.format }}
         </div>
       </div>
 

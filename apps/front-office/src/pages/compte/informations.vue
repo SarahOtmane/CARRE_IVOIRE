@@ -16,7 +16,7 @@ const form = ref({
 });
 
 const saved = ref(false);
-let savedTimeout: number | undefined;
+let savedTimeout: ReturnType<typeof setTimeout> | undefined;
 
 function save() {
   // Intégration API à brancher ici

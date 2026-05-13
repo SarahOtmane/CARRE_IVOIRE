@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Product as ProductBase } from '@carre-ivoire/types'
+import type { ProductResponse } from '@carre-ivoire/types'
 
-// Display interface — extends shared type with UI-only fields.
-// image/origin align with API fields in PRP 09 when mock data is removed.
-interface ProductCardItem extends Pick<ProductBase, 'name' | 'price'> {
-  id: ProductBase['id'] | string
-  image: string
-  origin?: string
-  badge?: string | null
-}
-
-const props = defineProps<{ product: ProductCardItem }>()
+defineProps<{ product: ProductResponse }>()
 const router = useRouter()
 
 const hovered = ref(false)
 
+function formatPrice(centimes: number) {
+  return `${(centimes / 100).toFixed(2).replace('.', ',')} €`
+}
+
 const badgeVariants: Record<string, string> = {
-  'Nouveau':         'bg-papier text-brun-cacao border border-[var(--cacao-a24)]',
+  'NOUVEAU':         'bg-papier text-brun-cacao border border-[var(--cacao-a24)]',
   'Édition limitée': 'bg-brun-cacao text-ivoire',
   'Signature':       'text-dore border border-dore',
 }
@@ -29,7 +24,7 @@ const badgeVariants: Record<string, string> = {
     class="cursor-pointer"
     @mouseenter="hovered = true"
     @mouseleave="hovered = false"
-    @click="router.push('/produits/' + product.id)"
+    @click="router.push('/produits/' + product.slug)"
   >
     <!-- Image 1:1 sur fond papier -->
     <div class="relative overflow-hidden bg-papier" style="aspect-ratio: 1/1">
@@ -43,7 +38,7 @@ const badgeVariants: Record<string, string> = {
 
       <!-- Image -->
       <img
-        :src="product.image"
+        :src="product.imageUrl ?? '/assets/placeholder.svg'"
         :alt="product.name"
         class="h-full w-full object-cover transition-transform duration-800"
         :style="{ transform: hovered ? 'scale(1.03)' : 'scale(1)' }"
@@ -60,12 +55,12 @@ const badgeVariants: Record<string, string> = {
 
     <!-- Infos produit -->
     <div class="pt-5">
-      <span class="ci-eyebrow">{{ product.origin }}</span>
+      <span v-if="product.shortDescription" class="ci-eyebrow">{{ product.shortDescription }}</span>
       <div class="mt-1.5 font-serif text-[22px] leading-[1.15] tracking-[-0.005em] text-brun-cacao">
         {{ product.name }}
       </div>
       <div class="mt-2 font-sans text-[13px] text-dore" style="letter-spacing: 0.02em; font-variant-numeric: tabular-nums">
-        {{ product.price.toFixed(2).replace('.', ',') }} €
+        {{ formatPrice(product.price) }}
       </div>
     </div>
   </article>
