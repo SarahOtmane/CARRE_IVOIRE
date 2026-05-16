@@ -1,0 +1,26 @@
+{
+  "name": "@carre-ivoire/composables",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./useAuth": "./src/useAuth.ts",
+    "./useApi": "./src/useApi.ts",
+    "./useNotification": "./src/useNotification.ts",
+    "./useLoading": "./src/useLoading.ts"
+  },
+  "peerDependencies": {
+    "axios": "^1.6.0",
+    "pinia": "^2.1.0",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "axios": "^1.6.0",
+    "pinia": "^2.1.0",
+    "typescript": "^5.0.0",
+    "vue": "^3.4.0"
+  }
+}

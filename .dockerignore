@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+dist
+build
+.git
+.gitignore
+README.md
+.env.example
+.DS_Store
+.vscode
+.idea
+PRPs
+prompts
+ai_docs
+ia_design

@@ -1,106 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import ProductCard, { type Product } from '@/components/product/ProductCard.vue'
+import { useProducts, useCategories } from '@carre-ivoire/composables'
+import ProductCard from '@/components/product/ProductCard.vue'
 
-const route = useRoute()
-const router = useRouter()
+const { result, isLoading, fetch } = useProducts({ limit: 12 })
+const { categories } = useCategories()
 
-const BOUTIQUE_CATS = [
-  { slug: 'tous', label: 'tous les produits' },
-  { slug: 'carres-signature', label: 'Carrés Signature' },
-  { slug: 'mini-carres', label: 'Mini Carrés' },
-  { slug: 'tablettes', label: 'Tablettes' },
-  { slug: 'gourmandises', label: 'Gourmandises' },
-  { slug: 'sables', label: 'Sablés' },
-  { slug: 'mendiants', label: 'Mendiants' },
-  { slug: 'oursons', label: 'Oursons' },
-  { slug: 'chocobombs', label: 'Chocobombs' },
-  { slug: 'pates-a-tartiner', label: 'Pâtes à tartiner' },
-]
-
-interface CatalogProduct extends Product {
-  category: string
-}
-
-const ALL_PRODUCTS: CatalogProduct[] = [
-  // Tablettes
-  {
-    id: 'noir-pur-72',
-    name: 'Noir Pur — 72%',
-    origin: 'Venezuela · Porcelana',
-    price: 14,
-    image: '/assets/products/tablet-noir-pur.svg',
-    badge: null,
-    category: 'tablettes',
-  },
-  {
-    id: 'praline-noisette',
-    name: 'Praliné Noisette',
-    origin: 'Piémont · Tonda Gentile',
-    price: 16,
-    image: '/assets/products/tablet-praline-noisette.svg',
-    badge: 'Nouveau',
-    category: 'tablettes',
-  },
-  {
-    id: 'lait-madagascar',
-    name: 'Lait Madagascar',
-    origin: 'Madagascar · Sambirano',
-    price: 15,
-    image: '/assets/products/tablet-noir-pur.svg',
-    badge: null,
-    category: 'tablettes',
-  },
-  // Carrés Signature
-  {
-    id: 'coffret-decouverte',
-    name: 'Coffret Découverte',
-    origin: '9 carrés · 3 origines',
-    price: 48,
-    image: '/assets/products/coffret-decouverte.svg',
-    badge: 'Signature',
-    category: 'carres-signature',
-  },
-  {
-    id: 'coffret-signature-16',
-    name: 'Coffret Signature',
-    origin: '16 carrés · 5 origines',
-    price: 64,
-    image: '/assets/products/coffret-decouverte.svg',
-    badge: 'Signature',
-    category: 'carres-signature',
-  },
-  // Gourmandises
-  {
-    id: 'truffes-noires',
-    name: 'Truffes Noires',
-    origin: 'Ghana · Forastero',
-    price: 22,
-    image: '/assets/products/truffes-noires.svg',
-    badge: null,
-    category: 'gourmandises',
-  },
-  {
-    id: 'truffes-praline',
-    name: 'Truffes Praliné',
-    origin: 'Piémont · Tonda Gentile',
-    price: 24,
-    image: '/assets/products/truffes-noires.svg',
-    badge: 'Nouveau',
-    category: 'gourmandises',
-  },
-  // Mini Carrés
-  {
-    id: 'mini-carres-assortiment',
-    name: 'Assortiment Mini Carrés',
-    origin: '12 pièces · 4 origines',
-    price: 28,
-    image: '/assets/products/coffret-decouverte.svg',
-    badge: null,
-    category: 'mini-carres',
-  },
-]
+const selectedCategoryId = ref<number | undefined>()
 
 const SORT_OPTIONS = [
   { value: 'nouveaute', label: 'Nouveauté' },
@@ -108,29 +14,21 @@ const SORT_OPTIONS = [
   { value: 'prix-desc', label: 'Prix décroissant' },
 ]
 
-const filter = ref((route.query.cat as string) || 'tous')
 const sort = ref('nouveaute')
 const sortOpen = ref(false)
 
-function productsByCat(slug: string): CatalogProduct[] {
-  if (slug === 'tous') return ALL_PRODUCTS
-  return ALL_PRODUCTS.filter((p) => p.category === slug)
-}
+const currentSort = computed(() => SORT_OPTIONS.find((s) => s.value === sort.value)!)
 
-const currentCat = computed(() => BOUTIQUE_CATS.find((c) => c.slug === filter.value)!)
-
-const filtered = computed(() => {
-  const list = productsByCat(filter.value)
+const sortedProducts = computed(() => {
+  const list = result.value.items
   if (sort.value === 'prix-asc') return [...list].sort((a, b) => a.price - b.price)
   if (sort.value === 'prix-desc') return [...list].sort((a, b) => b.price - a.price)
   return list
 })
 
-const currentSort = computed(() => SORT_OPTIONS.find((s) => s.value === sort.value)!)
-
-function setFilter(slug: string) {
-  filter.value = slug
-  router.replace({ query: slug !== 'tous' ? { cat: slug } : {} })
+function filterByCategory(categoryId?: number) {
+  selectedCategoryId.value = categoryId
+  fetch({ categoryId, limit: 12 })
 }
 
 function closeSort(e: MouseEvent) {
@@ -149,7 +47,7 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
       class="mb-12 pb-8"
       style="border-bottom: 1px solid var(--border)"
     >
-      <span class="ci-eyebrow">Boutique — {{ currentCat.label }}</span>
+      <span class="ci-eyebrow">Boutique</span>
       <h1
         class="mt-4 font-serif font-medium text-brun-cacao"
         style="font-size: clamp(40px, 6vw, 80px); line-height: 0.95; letter-spacing: -0.01em"
@@ -165,21 +63,24 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
       <!-- Filtres catégories -->
       <div class="flex flex-wrap gap-x-6 gap-y-3" style="max-width: 82%">
         <button
-          v-for="cat in BOUTIQUE_CATS"
-          :key="cat.slug"
           class="flex cursor-pointer items-baseline gap-1.5 border-b pb-1 font-sans text-[12px] tracking-[0.02em] transition-[border-color,color,opacity] duration-180"
-          :class="filter === cat.slug
+          :class="selectedCategoryId === undefined
             ? 'border-brun-cacao text-brun-cacao'
-            : productsByCat(cat.slug).length === 0 && cat.slug !== 'tous'
-              ? 'border-transparent text-brun-cacao-3 opacity-55'
-              : 'border-transparent text-brun-cacao-2 hover:border-brun-cacao hover:text-brun-cacao'"
-          @click="setFilter(cat.slug)"
+            : 'border-transparent text-brun-cacao-2 hover:border-brun-cacao hover:text-brun-cacao'"
+          @click="filterByCategory(undefined)"
         >
-          <span>{{ cat.label }}</span>
-          <span
-            class="font-sans text-[10px] opacity-60"
-            style="font-variant-numeric: tabular-nums"
-          >{{ productsByCat(cat.slug).length }}</span>
+          tous les produits
+        </button>
+        <button
+          v-for="cat in categories"
+          :key="cat.id"
+          class="flex cursor-pointer items-baseline gap-1.5 border-b pb-1 font-sans text-[12px] tracking-[0.02em] transition-[border-color,color,opacity] duration-180"
+          :class="selectedCategoryId === cat.id
+            ? 'border-brun-cacao text-brun-cacao'
+            : 'border-transparent text-brun-cacao-2 hover:border-brun-cacao hover:text-brun-cacao'"
+          @click="filterByCategory(cat.id)"
+        >
+          {{ cat.name }}
         </button>
       </div>
 
@@ -222,13 +123,18 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
       </div>
     </div>
 
+    <!-- Loader -->
+    <div v-if="isLoading" class="py-24 text-center">
+      <span class="ci-eyebrow">Chargement</span>
+    </div>
+
     <!-- Grille produits -->
     <div
-      v-if="filtered.length > 0"
+      v-else-if="sortedProducts.length > 0"
       class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
     >
       <ProductCard
-        v-for="product in filtered"
+        v-for="product in sortedProducts"
         :key="product.id"
         :product="product"
       />
@@ -245,11 +151,11 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
         class="mx-auto mt-4 font-serif font-medium"
         style="font-size: clamp(28px, 3.5vw, 44px); line-height: 1.1; max-width: 520px"
       >
-        <em class="text-brun-cacao-2">{{ currentCat.label }}</em>
-        <span class="text-brun-cacao"> — en préparation.</span>
+        <em class="text-brun-cacao-2">Cette collection</em>
+        <span class="text-brun-cacao"> arrive dans nos vitrines.</span>
       </h2>
       <p class="mx-auto mb-8 mt-4 max-w-[420px] font-sans text-[15px] leading-relaxed text-brun-cacao-2">
-        Cette collection arrive dans nos vitrines. Inscrivez-vous à la lettre pour être prévenu·e de sa sortie.
+        Inscrivez-vous à la lettre pour être prévenu de sa sortie.
       </p>
       <button
         class="pb-0.5 font-sans text-[13px] text-brun-cacao"

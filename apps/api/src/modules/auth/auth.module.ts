@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 import { UsersModule } from '@/modules/users/users.module'
@@ -10,12 +11,23 @@ import { AdminGuard } from './guards/admin.guard'
 
 @Module({
   imports: [
+    ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({}), // secrets passés dynamiquement dans auth.service.ts
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES_IN', '1h'),
+          algorithm: 'HS256',
+        },
+      }),
+      inject: [ConfigService],
+    }),
     UsersModule,
   ],
   providers: [AuthService, JwtStrategy, JwtAuthGuard, AdminGuard],
   controllers: [AuthController],
   exports: [JwtAuthGuard, AdminGuard, AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }

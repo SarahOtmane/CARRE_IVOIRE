@@ -1,5 +1,13 @@
 {
   "name": "@carre-ivoire/config",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "exports": {
+    "./tailwind": "./tailwind/preset.js",
+    "./eslint/vue": "./eslint/vue.js",
+    "./eslint/nest": "./eslint/nest.js",
+    "./typescript/base": "./typescript/base.json",
+    "./typescript/vue": "./typescript/vue.json",
+    "./typescript/nest": "./typescript/nest.json"
+  }
 }

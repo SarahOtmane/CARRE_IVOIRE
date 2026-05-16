@@ -1,102 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+@import "../../../../ia_design/colors_and_type.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Kingred Modern';
-  src: url('./fonts/KingredModern.woff2') format('woff2');
+  font-family: "Kingred Modern";
+  src: url("./fonts/KingredModern.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
-}
-
-/* ── Design tokens — source de vérité UI ─────────────────────────── */
-:root {
-  /* Palette */
-  --ivoire:          #F6E8DE;
-  --ivoire-deep:     #EED9CA;
-  --rose-poudre:     #E8C9BC;
-  --rose-poudre-2:   #DDB5A4;
-  --beige-doux:      #D9BFA9;
-  --beige-doux-2:    #C9A98F;
-  --brun-cacao:      #3A1F14;
-  --brun-cacao-2:    #5E3A2A;
-  --brun-cacao-3:    #8A6A58;
-  --dore:            #B08A4F;
-  --dore-deep:       #8F6E3B;
-  --papier:          #FFFBF7;
-
-  /* Échelles alpha — cacao sur ivoire */
-  --cacao-a04: rgba(58, 31, 20, 0.04);
-  --cacao-a08: rgba(58, 31, 20, 0.08);
-  --cacao-a12: rgba(58, 31, 20, 0.12);
-  --cacao-a24: rgba(58, 31, 20, 0.24);
-  --cacao-a45: rgba(58, 31, 20, 0.45);
-  --cacao-a78: rgba(58, 31, 20, 0.78);
-
-  /* Échelles alpha — ivoire sur fond sombre */
-  --ivoire-a15: rgba(246, 232, 222, 0.15);
-  --ivoire-a40: rgba(246, 232, 222, 0.40);
-
-  /* Rôles sémantiques */
-  --bg:           var(--ivoire);
-  --fg:           var(--brun-cacao);
-  --fg-muted:     var(--brun-cacao-2);
-  --fg-subtle:    var(--brun-cacao-3);
-  --fg-on-dark:   var(--ivoire);
-  --fg-accent:    var(--dore);
-  --border:       var(--cacao-a12);
-  --header-glass: rgba(246, 232, 222, 0.78);
-
-  /* Typographie */
-  --font-serif: 'Cormorant Garamond', 'EB Garamond', Georgia, 'Times New Roman', serif;
-  --font-sans:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-
-  /* Motion */
-  --ease-ambient: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-ui:      cubic-bezier(0.2, 0.8, 0.2, 1);
-  --dur-fast:     180ms;
-  --dur-med:      400ms;
-  --dur-slow:     800ms;
-
-  /* Ombre produit */
-  --shadow-lift: 0 24px 32px rgba(58, 31, 20, 0.08);
-}
-
-@layer base {
-  html,
-  body {
-    background-color: var(--ivoire);
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  ::selection {
-    background-color: var(--brun-cacao);
-    color: var(--ivoire);
-  }
-}
-
-/* ── Utilitaires typographiques ──────────────────── */
-.ci-label,
-.ci-eyebrow {
-  font-family: var(--font-sans);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-  color: var(--fg-subtle);
-}
-
-.ci-label {
-  font-weight: 500;
-}
-
-.ci-eyebrow-accent {
-  font-family: var(--font-sans);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.22em;
-  color: var(--dore);
 }
