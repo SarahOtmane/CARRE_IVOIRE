@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
+import { ErrorCodes } from '@/common/constants'
 import { UsersRepository } from '@/modules/users/users.repository'
 import type { User } from '@/modules/users/users.model'
 import type { RegisterDto } from './dto/register.dto'
@@ -22,13 +23,13 @@ export class AuthService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto & TokenPair> {
     const exists = await this.usersRepository.emailExists(dto.email)
     if (exists) {
       throw new ConflictException({
-        code: 'EMAIL_ALREADY_EXISTS',
+        code: ErrorCodes.EMAIL_ALREADY_EXISTS,
         message: 'Un compte existe déjà avec cette adresse email',
       })
     }
@@ -50,7 +51,7 @@ export class AuthService {
   async login(dto: LoginDto): Promise<AuthResponseDto & TokenPair> {
     // Même message d'erreur pour email inconnu ou mot de passe incorrect (anti-énumération)
     const INVALID_CREDENTIALS = new UnauthorizedException({
-      code: 'UNAUTHORIZED',
+      code: ErrorCodes.UNAUTHORIZED,
       message: 'Identifiants invalides',
     })
 
@@ -67,7 +68,7 @@ export class AuthService {
   async refresh(refreshToken: string | undefined): Promise<{ accessToken: string }> {
     if (!refreshToken) {
       throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
+        code: ErrorCodes.UNAUTHORIZED,
         message: 'Refresh token manquant',
       })
     }
@@ -77,13 +78,13 @@ export class AuthService {
       })
       const user = await this.usersRepository.findById(payload.sub)
       if (!user || !user.is_active) {
-        throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Token invalide' })
+        throw new UnauthorizedException({ code: ErrorCodes.UNAUTHORIZED, message: 'Token invalide' })
       }
       const accessToken = this.signAccessToken(user)
       return { accessToken }
     } catch {
       throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
+        code: ErrorCodes.UNAUTHORIZED,
         message: 'Refresh token invalide ou expiré',
       })
     }
