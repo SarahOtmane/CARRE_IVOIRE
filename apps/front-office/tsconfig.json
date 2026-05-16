@@ -1,9 +1,11 @@
 {
   "extends": "@carre-ivoire/config/typescript/vue",
   "compilerOptions": {
-    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "baseUrl": "./src",
+    "rootDir": "./src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],

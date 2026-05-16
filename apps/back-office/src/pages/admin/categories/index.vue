@@ -73,7 +73,7 @@ async function save() {
 }
 
 async function deleteCategory() {
-  if (!draft.value?.id || !globalThis.window.confirm("Supprimer cette catégorie ?")) return;
+  if (!draft.value?.id || !confirm("Supprimer cette catégorie ?")) return;
   await remove(draft.value.id);
   close();
 }

@@ -73,13 +73,13 @@ async function save() {
 }
 
 async function archive() {
-  if (!globalThis.window.confirm("Désactiver ce produit ?")) return;
+  if (!confirm("Désactiver ce produit ?")) return;
   await update(productId.value, { isActive: false });
   router.push({ name: "admin-produits" });
 }
 
 async function deleteProduct() {
-  if (!globalThis.window.confirm("Supprimer définitivement ce produit ?")) return;
+  if (!confirm("Supprimer définitivement ce produit ?")) return;
   await remove(productId.value);
   router.push({ name: "admin-produits" });
 }

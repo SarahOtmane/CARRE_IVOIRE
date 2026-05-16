@@ -1,7 +1,7 @@
+/// <reference types="vite/client" />
 import axios from 'axios'
 import type { AxiosInstance } from 'axios'
-import { useAuthStore } from '@carre-ivoire/stores'
-import { useNotificationStore } from '@carre-ivoire/stores'
+import { useAuthStore, useNotificationStore } from '@carre-ivoire/stores'
 
 export function useApi(): AxiosInstance {
   const authStore = useAuthStore()

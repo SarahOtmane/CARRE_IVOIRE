@@ -3,25 +3,7 @@ import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart.store";
 import ProductCard from "@/components/product/ProductCard.vue";
-import type { ProductResponse } from "@carre-ivoire/types";
-
-type FormatOption = {
-  id: string;
-  label: string;
-  detail: string;
-  extraPrice: number;
-};
-
-type ProductSheet = {
-  eyebrow: string;
-  intro: string;
-  storyTitle: string;
-  story: string;
-  composition: string[];
-  tasting: string;
-  conservation: string;
-  formats: FormatOption[];
-};
+import type { ProductResponse, ProductSheet } from "@carre-ivoire/types";
 
 const props = defineProps<{
   product: ProductResponse;
@@ -55,7 +37,7 @@ function addToCart() {
     name: props.product.name,
     price: unitPrice.value,
     quantity: quantity.value,
-    imageUrl: props.product.imageUrl ?? '',
+    imageUrl: props.product.imageUrl ?? "",
     format: selectedFormat.value?.label,
   });
   added.value = true;

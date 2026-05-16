@@ -1,6 +1,8 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./base.json",
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "module": "commonjs",
     "target": "ES2021",
     "declaration": true,
@@ -12,13 +14,8 @@
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true,
-    "strictNullChecks": false,
-    "strictFunctionTypes": false,
-    "strictBindCallApply": false,
-    "strictPropertyInitialization": false,
-    "noImplicitAny": false,
-    "noFallthroughCasesInSwitch": false
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+    "strict": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true
+  }
 }

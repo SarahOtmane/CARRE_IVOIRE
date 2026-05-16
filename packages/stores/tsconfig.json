@@ -1,3 +1,5 @@
 {
-  "extends": "@carre-ivoire/config/typescript/vue"
+  "extends": "@carre-ivoire/config/typescript/vue",
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"],
+  "exclude": ["node_modules", "dist"]
 }
