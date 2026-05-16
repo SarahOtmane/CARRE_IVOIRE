@@ -1,7 +1,7 @@
 {
   "extends": "@carre-ivoire/config/typescript/vue",
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./src",
     "rootDir": "./src",
     "paths": {
