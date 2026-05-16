@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { ErrorCodes } from '@/common/constants'
+import throwApiError from '@/common/errors/throw-api-error'
 import { ProductsRepository } from './products.repository'
 import type { Product } from './product.model'
 import type { Category } from '@/modules/categories/category.model'
@@ -36,7 +37,7 @@ export class ProductsService {
   async findBySlug(slug: string): Promise<ProductResponseDto> {
     const product = await this.productsRepository.findBySlug(slug)
     if (!product) {
-      throw new NotFoundException({ code: ErrorCodes.PRODUCT_NOT_FOUND, message: 'Produit introuvable' })
+      throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, 'Produit introuvable')
     }
     return this.toResponseDto(product)
   }
@@ -49,7 +50,7 @@ export class ProductsService {
   async update(id: number, dto: UpdateProductDto): Promise<ProductResponseDto> {
     const existing = await this.productsRepository.findById(id)
     if (!existing) {
-      throw new NotFoundException({ code: ErrorCodes.PRODUCT_NOT_FOUND, message: 'Produit introuvable' })
+      throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, 'Produit introuvable')
     }
     const updated = await this.productsRepository.update(id, dto)
     return this.toResponseDto(updated!)
@@ -58,7 +59,7 @@ export class ProductsService {
   async delete(id: number): Promise<void> {
     const existing = await this.productsRepository.findById(id)
     if (!existing) {
-      throw new NotFoundException({ code: ErrorCodes.PRODUCT_NOT_FOUND, message: 'Produit introuvable' })
+      throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, 'Produit introuvable')
     }
     await this.productsRepository.delete(id)
   }

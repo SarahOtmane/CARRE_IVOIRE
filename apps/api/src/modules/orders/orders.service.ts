@@ -1,14 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-  BadRequestException,
-  ForbiddenException,
-} from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectConnection, InjectModel } from '@nestjs/sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import { Op } from 'sequelize'
 import { ErrorCodes } from '@/common/constants'
+import throwApiError from '@/common/errors/throw-api-error'
 import { Product } from '@/modules/products/product.model'
 import { ProductsRepository } from '@/modules/products/products.repository'
 import { OrdersRepository } from './orders.repository'
@@ -31,7 +26,7 @@ export class OrdersService {
 
   async createOrder(dto: CreateOrderDto, userId: number): Promise<OrderCreatedResponseDto> {
     if (!dto.items || dto.items.length === 0) {
-      throw new BadRequestException({ code: ErrorCodes.CART_EMPTY, message: 'Le panier est vide' })
+      throwApiError(ErrorCodes.CART_EMPTY, 'Le panier est vide')
     }
 
     return this.sequelize.transaction(async (t) => {
@@ -52,10 +47,7 @@ export class OrdersService {
         )
 
         if (rowsAffected === 0) {
-          throw new ConflictException({
-            code: ErrorCodes.OUT_OF_STOCK,
-            message: `Stock insuffisant pour le produit ${item.productId}`,
-          })
+          throwApiError(ErrorCodes.OUT_OF_STOCK, `Stock insuffisant pour le produit ${item.productId}`)
         }
       }
 
@@ -67,10 +59,7 @@ export class OrdersService {
 
       for (const item of dto.items) {
         if (!products.find((p) => p.id === item.productId)) {
-          throw new NotFoundException({
-            code: ErrorCodes.PRODUCT_NOT_FOUND,
-            message: `Produit ${item.productId} introuvable`,
-          })
+          throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, `Produit ${item.productId} introuvable`)
         }
       }
 
@@ -91,10 +80,7 @@ export class OrdersService {
         dto.items.map((item) => {
           const product = products.find((p) => p.id === item.productId)
           if (!product) {
-            throw new NotFoundException({
-              code: ErrorCodes.PRODUCT_NOT_FOUND,
-              message: `Produit ${item.productId} introuvable`,
-            })
+            throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, `Produit ${item.productId} introuvable`)
           }
           return {
             orderId: order.id,
@@ -128,9 +114,9 @@ export class OrdersService {
 
   async findById(id: number, userId: number, isAdmin: boolean): Promise<OrderResponseDto> {
     const order = await this.ordersRepository.findById(id)
-    if (!order) throw new NotFoundException({ code: 'ORDER_NOT_FOUND', message: 'Commande introuvable' })
+    if (!order) throwApiError(ErrorCodes.ORDER_NOT_FOUND, 'Commande introuvable')
     if (!isAdmin && order.userId !== userId) {
-      throw new ForbiddenException({ code: 'FORBIDDEN', message: 'Accès refusé' })
+      throwApiError(ErrorCodes.FORBIDDEN, 'Accès refusé')
     }
     return this.toResponseDto(order)
   }
@@ -142,7 +128,7 @@ export class OrdersService {
 
   async updateStatus(id: number, dto: UpdateOrderStatusDto): Promise<OrderResponseDto> {
     const order = await this.ordersRepository.findById(id)
-    if (!order) throw new NotFoundException({ code: 'ORDER_NOT_FOUND', message: 'Commande introuvable' })
+    if (!order) throwApiError(ErrorCodes.ORDER_NOT_FOUND, 'Commande introuvable')
     await this.ordersRepository.update(id, { status: dto.status })
     const updated = await this.ordersRepository.findById(id)
     return this.toResponseDto(updated!)

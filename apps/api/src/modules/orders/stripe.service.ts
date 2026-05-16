@@ -1,4 +1,6 @@
-import { Injectable, BadRequestException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
+import { ErrorCodes } from '@/common/constants'
+import throwApiError from '@/common/errors/throw-api-error'
 import { ConfigService } from '@nestjs/config'
 import Stripe from 'stripe'
 
@@ -32,10 +34,7 @@ export class StripeService {
     try {
       return this.stripe.webhooks.constructEvent(rawBody, signature, this.webhookSecret)
     } catch {
-      throw new BadRequestException({
-        code: 'INVALID_WEBHOOK_SIGNATURE',
-        message: 'Signature webhook invalide',
-      })
+      throwApiError(ErrorCodes.INVALID_WEBHOOK_SIGNATURE, 'Signature webhook invalide')
     }
   }
 }

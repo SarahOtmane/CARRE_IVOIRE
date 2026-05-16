@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  ConflictException,
-  UnauthorizedException,
-} from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { ErrorCodes } from '@/common/constants'
+import throwApiError from '@/common/errors/throw-api-error'
 import { UsersRepository } from '@/modules/users/users.repository'
 import type { User } from '@/modules/users/users.model'
 import type { RegisterDto } from './dto/register.dto'
@@ -28,10 +25,7 @@ export class AuthService {
   async register(dto: RegisterDto): Promise<AuthResponseDto & TokenPair> {
     const exists = await this.usersRepository.emailExists(dto.email)
     if (exists) {
-      throw new ConflictException({
-        code: ErrorCodes.EMAIL_ALREADY_EXISTS,
-        message: 'Un compte existe déjà avec cette adresse email',
-      })
+      throwApiError(ErrorCodes.EMAIL_ALREADY_EXISTS, 'Un compte existe déjà avec cette adresse email')
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 12)
@@ -50,16 +44,13 @@ export class AuthService {
 
   async login(dto: LoginDto): Promise<AuthResponseDto & TokenPair> {
     // Même message d'erreur pour email inconnu ou mot de passe incorrect (anti-énumération)
-    const INVALID_CREDENTIALS = new UnauthorizedException({
-      code: ErrorCodes.UNAUTHORIZED,
-      message: 'Identifiants invalides',
-    })
+    const INVALID_CREDENTIALS = () => throwApiError(ErrorCodes.INVALID_CREDENTIALS, 'Identifiants invalides')
 
     const user = await this.usersRepository.findByEmail(dto.email)
-    if (!user || !user.is_active) throw INVALID_CREDENTIALS
+    if (!user || !user.is_active) INVALID_CREDENTIALS()
 
     const passwordValid = await bcrypt.compare(dto.password, user.password_hash)
-    if (!passwordValid) throw INVALID_CREDENTIALS
+    if (!passwordValid) INVALID_CREDENTIALS()
 
     const tokens = this.generateTokens(user)
     return { ...tokens, user: this.toAuthUserDto(user) }
@@ -67,10 +58,7 @@ export class AuthService {
 
   async refresh(refreshToken: string | undefined): Promise<{ accessToken: string }> {
     if (!refreshToken) {
-      throw new UnauthorizedException({
-        code: ErrorCodes.UNAUTHORIZED,
-        message: 'Refresh token manquant',
-      })
+      throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token manquant')
     }
     try {
       const payload = this.jwtService.verify<JwtPayload>(refreshToken, {
@@ -78,15 +66,12 @@ export class AuthService {
       })
       const user = await this.usersRepository.findById(payload.sub)
       if (!user || !user.is_active) {
-        throw new UnauthorizedException({ code: ErrorCodes.UNAUTHORIZED, message: 'Token invalide' })
+        throwApiError(ErrorCodes.UNAUTHORIZED, 'Token invalide')
       }
       const accessToken = this.signAccessToken(user)
       return { accessToken }
     } catch {
-      throw new UnauthorizedException({
-        code: ErrorCodes.UNAUTHORIZED,
-        message: 'Refresh token invalide ou expiré',
-      })
+      throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token invalide ou expiré')
     }
   }
 

@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { ErrorCodes } from '@/common/constants'
 import { User } from './users.model'
+import throwApiError from '@/common/errors/throw-api-error'
 
 export interface CreateUserInput {
   email: string
@@ -50,7 +51,7 @@ export class UsersRepository {
 
   async update(id: number, data: Partial<User>): Promise<User> {
     const user = await this.findById(id)
-    if (!user) throw new NotFoundException({ code: ErrorCodes.USER_NOT_FOUND, message: 'Utilisateur introuvable' })
+    if (!user) throwApiError(ErrorCodes.USER_NOT_FOUND, 'Utilisateur introuvable')
     return user.update(data)
   }
 
