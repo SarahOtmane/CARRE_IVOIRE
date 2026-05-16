@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { ErrorCodes } from '@/common/constants'
 import { ProductsRepository } from './products.repository'
 import type { Product } from './product.model'
 import type { Category } from '@/modules/categories/category.model'
@@ -17,7 +18,7 @@ export interface PaginatedProducts {
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly productsRepository: ProductsRepository) {}
+  constructor(private readonly productsRepository: ProductsRepository) { }
 
   async findAll(query: ProductQueryDto): Promise<PaginatedProducts> {
     const { rows, count } = await this.productsRepository.findAll(query)
@@ -35,7 +36,7 @@ export class ProductsService {
   async findBySlug(slug: string): Promise<ProductResponseDto> {
     const product = await this.productsRepository.findBySlug(slug)
     if (!product) {
-      throw new NotFoundException({ code: 'PRODUCT_NOT_FOUND', message: 'Produit introuvable' })
+      throw new NotFoundException({ code: ErrorCodes.PRODUCT_NOT_FOUND, message: 'Produit introuvable' })
     }
     return this.toResponseDto(product)
   }
@@ -48,7 +49,7 @@ export class ProductsService {
   async update(id: number, dto: UpdateProductDto): Promise<ProductResponseDto> {
     const existing = await this.productsRepository.findById(id)
     if (!existing) {
-      throw new NotFoundException({ code: 'PRODUCT_NOT_FOUND', message: 'Produit introuvable' })
+      throw new NotFoundException({ code: ErrorCodes.PRODUCT_NOT_FOUND, message: 'Produit introuvable' })
     }
     const updated = await this.productsRepository.update(id, dto)
     return this.toResponseDto(updated!)
@@ -57,7 +58,7 @@ export class ProductsService {
   async delete(id: number): Promise<void> {
     const existing = await this.productsRepository.findById(id)
     if (!existing) {
-      throw new NotFoundException({ code: 'PRODUCT_NOT_FOUND', message: 'Produit introuvable' })
+      throw new NotFoundException({ code: ErrorCodes.PRODUCT_NOT_FOUND, message: 'Produit introuvable' })
     }
     await this.productsRepository.delete(id)
   }

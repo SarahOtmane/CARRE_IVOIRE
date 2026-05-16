@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
+import type { Transaction } from 'sequelize'
 import { Product } from './product.model'
 import { Category } from '@/modules/categories/category.model'
 import type { CreateProductDto } from './dto/create-product.dto'
@@ -11,7 +12,7 @@ export class ProductsRepository {
   constructor(
     @InjectModel(Product)
     private readonly db: typeof Product,
-  ) {}
+  ) { }
 
   async findAll(query: ProductQueryDto): Promise<{ rows: Product[]; count: number }> {
     const where: Record<string, unknown> = { isActive: 1 }
@@ -45,7 +46,17 @@ export class ProductsRepository {
     return this.db.findByPk(id)
   }
 
+  async findAllByIds(ids: number[], t?: Transaction): Promise<Product[]> {
+    if (ids.length === 0) return []
+    return this.db.findAll({
+      where: { id: ids },
+      raw: true,
+      transaction: t,
+    })
+  }
+
   async create(dto: CreateProductDto): Promise<Product> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize v6 Model<M> requires all fields incl. id/timestamps; partial creation attributes not inferred
     return this.db.create({
       name: dto.name,
       slug: dto.slug,
@@ -67,6 +78,13 @@ export class ProductsRepository {
   }
 
   async update(id: number, dto: UpdateProductDto): Promise<Product | null> {
+    const data = this.buildUpdateData(dto)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Record<string,unknown> incompatible with Sequelize update attributes type
+    await this.db.update(data as any, { where: { id } })
+    return this.db.findByPk(id, { include: [Category] })
+  }
+
+  private buildUpdateData(dto: UpdateProductDto): Record<string, unknown> {
     const data: Record<string, unknown> = {}
     if (dto.name !== undefined) data.name = dto.name
     if (dto.slug !== undefined) data.slug = dto.slug
@@ -84,9 +102,7 @@ export class ProductsRepository {
     if (dto.ingredients !== undefined) data.ingredients = dto.ingredients
     if (dto.allergens !== undefined) data.allergens = dto.allergens
     if (dto.weightGrams !== undefined) data.weightGrams = dto.weightGrams
-
-    await this.db.update(data as any, { where: { id } })
-    return this.db.findByPk(id, { include: [Category] })
+    return data
   }
 
   async delete(id: number): Promise<void> {

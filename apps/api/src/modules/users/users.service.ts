@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
+import { ErrorCodes } from '@/common/constants'
 import { UsersRepository } from './users.repository'
 import type { User } from './users.model'
 import type { UpdateUserDto } from './dto/update-user.dto'
@@ -6,11 +7,11 @@ import type { UserResponseDto } from './dto/user-response.dto'
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(private readonly usersRepository: UsersRepository) { }
 
   async findById(id: number): Promise<UserResponseDto> {
     const user = await this.usersRepository.findById(id)
-    if (!user) throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'Utilisateur introuvable' })
+    if (!user) throw new NotFoundException({ code: ErrorCodes.USER_NOT_FOUND, message: 'Utilisateur introuvable' })
     return this.toResponseDto(user)
   }
 

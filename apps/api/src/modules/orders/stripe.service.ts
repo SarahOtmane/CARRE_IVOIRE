@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import Stripe from 'stripe'
 
 @Injectable()
@@ -6,11 +7,17 @@ export class StripeService {
   private readonly stripe: Stripe
   private readonly webhookSecret: string
 
-  constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
-      apiVersion: '2024-06-20',
+  constructor(private readonly configService: ConfigService) {
+    const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY')
+    if (!secretKey) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is not set')
+    }
+
+    this.stripe = new Stripe(secretKey, {
+      apiVersion: '2023-10-16',
     })
-    this.webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
+
+    this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET') ?? ''
   }
 
   async createPaymentIntent(amount: number, orderId: number): Promise<Stripe.PaymentIntent> {

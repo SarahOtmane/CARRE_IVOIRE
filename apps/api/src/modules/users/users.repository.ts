@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
+import { ErrorCodes } from '@/common/constants'
 import { User } from './users.model'
 
 export interface CreateUserInput {
@@ -15,7 +16,7 @@ export class UsersRepository {
   constructor(
     @InjectModel(User)
     private readonly userModel: typeof User,
-  ) {}
+  ) { }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ where: { email } })
@@ -49,7 +50,7 @@ export class UsersRepository {
 
   async update(id: number, data: Partial<User>): Promise<User> {
     const user = await this.findById(id)
-    if (!user) throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'Utilisateur introuvable' })
+    if (!user) throw new NotFoundException({ code: ErrorCodes.USER_NOT_FOUND, message: 'Utilisateur introuvable' })
     return user.update(data)
   }
 

@@ -30,6 +30,7 @@ export class OrdersRepository {
     const address = data.shippingAddress as Record<string, string>
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '')
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize v6 Model<M> requires all fields incl. id/timestamps
     const order = await this.orderDb.create(
       {
         userId: data.userId,
@@ -51,10 +52,12 @@ export class OrdersRepository {
   }
 
   async createItems(items: CreateOrderItemData[], t?: Transaction): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize v6 bulkCreate accepts InferCreationAttributes; plain object array needs cast
     await this.orderItemDb.bulkCreate(items as any, { transaction: t })
   }
 
   async update(id: number, data: Partial<{ status: string; stripePaymentIntentId: string }>, t?: Transaction): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Record<string,unknown> incompatible with Sequelize update attributes type
     await this.orderDb.update(data as any, { where: { id }, transaction: t })
   }
 

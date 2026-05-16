@@ -27,6 +27,7 @@ export class CategoriesRepository {
   }
 
   async create(dto: CreateCategoryDto): Promise<Category> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize v6 Model<M> requires all fields incl. id/timestamps
     return this.db.create({
       name: dto.name,
       slug: dto.slug,
@@ -46,6 +47,7 @@ export class CategoriesRepository {
     if (dto.displayOrder !== undefined) data.displayOrder = dto.displayOrder
     if (dto.isActive !== undefined) data.isActive = dto.isActive ? 1 : 0
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Record<string,unknown> incompatible with Sequelize update attributes type
     await this.db.update(data as any, { where: { id } })
     return this.db.findByPk(id)
   }

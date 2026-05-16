@@ -8,7 +8,9 @@ import {
 import { InjectConnection, InjectModel } from '@nestjs/sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import { Op } from 'sequelize'
+import { ErrorCodes } from '@/common/constants'
 import { Product } from '@/modules/products/product.model'
+import { ProductsRepository } from '@/modules/products/products.repository'
 import { OrdersRepository } from './orders.repository'
 import { StripeService } from './stripe.service'
 import type { Order } from './order.model'
@@ -22,20 +24,23 @@ export class OrdersService {
   constructor(
     @InjectConnection() private readonly sequelize: Sequelize,
     @InjectModel(Product) private readonly productModel: typeof Product,
+    private readonly productsRepository: ProductsRepository,
     private readonly ordersRepository: OrdersRepository,
     private readonly stripeService: StripeService,
-  ) {}
+  ) { }
 
   async createOrder(dto: CreateOrderDto, userId: number): Promise<OrderCreatedResponseDto> {
     if (!dto.items || dto.items.length === 0) {
-      throw new BadRequestException({ code: 'CART_EMPTY', message: 'Le panier est vide' })
+      throw new BadRequestException({ code: ErrorCodes.CART_EMPTY, message: 'Le panier est vide' })
     }
 
     return this.sequelize.transaction(async (t) => {
       // 1. Décrémenter le stock atomiquement — rowsAffected === 0 → rollback
       for (const item of dto.items) {
+        const safeQuantity = Math.floor(Math.abs(Number(item.quantity)))
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
         const [rowsAffected] = await this.productModel.update(
-          { stock: Sequelize.literal(`stock - ${item.quantity}`) } as any,
+          { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
           {
             where: {
               id: item.productId,
@@ -48,29 +53,30 @@ export class OrdersService {
 
         if (rowsAffected === 0) {
           throw new ConflictException({
-            code: 'OUT_OF_STOCK',
+            code: ErrorCodes.OUT_OF_STOCK,
             message: `Stock insuffisant pour le produit ${item.productId}`,
           })
         }
       }
 
       // 2. Relire les prix depuis la BDD — jamais depuis le client
-      const products = await this.productModel.findAll({
-        where: { id: dto.items.map((i) => i.productId) },
-        transaction: t,
-      })
+      const products = await this.productsRepository.findAllByIds(
+        dto.items.map((i) => i.productId),
+        t,
+      )
 
       for (const item of dto.items) {
         if (!products.find((p) => p.id === item.productId)) {
           throw new NotFoundException({
-            code: 'PRODUCT_NOT_FOUND',
+            code: ErrorCodes.PRODUCT_NOT_FOUND,
             message: `Produit ${item.productId} introuvable`,
           })
         }
       }
 
       const totalAmount = dto.items.reduce((acc, item) => {
-        const product = products.find((p) => p.id === item.productId)!
+        const product = products.find((p) => p.id === item.productId)
+        if (!product) return acc
         return acc + product.price * item.quantity
       }, 0)
 
@@ -83,7 +89,13 @@ export class OrdersService {
       // 4. Créer les order_items (snapshot du prix et du nom)
       await this.ordersRepository.createItems(
         dto.items.map((item) => {
-          const product = products.find((p) => p.id === item.productId)!
+          const product = products.find((p) => p.id === item.productId)
+          if (!product) {
+            throw new NotFoundException({
+              code: ErrorCodes.PRODUCT_NOT_FOUND,
+              message: `Produit ${item.productId} introuvable`,
+            })
+          }
           return {
             orderId: order.id,
             productId: item.productId,
