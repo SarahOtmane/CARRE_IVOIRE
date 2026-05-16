@@ -14,6 +14,7 @@ export const ErrorCodes = {
     // Product errors
     PRODUCT_NOT_FOUND: 'PRODUCT_NOT_FOUND',
     CATEGORY_NOT_FOUND: 'CATEGORY_NOT_FOUND',
+    CATEGORY_SLUG_EXISTS: 'CATEGORY_SLUG_EXISTS',
     USER_NOT_FOUND: 'USER_NOT_FOUND',
 
     // Order errors
@@ -38,6 +39,14 @@ export const ErrorCodes = {
     INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
     NOT_FOUND: 'NOT_FOUND',
     CONFLICT: 'CONFLICT',
+    // Additional recommended errors
+    EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+    INVALID_TOKEN: 'INVALID_TOKEN',
+    PAYMENT_METHOD_DECLINED: 'PAYMENT_METHOD_DECLINED',
+    COUPON_INVALID: 'COUPON_INVALID',
+    ADDRESS_NOT_FOUND: 'ADDRESS_NOT_FOUND',
+    SESSION_EXPIRED: 'SESSION_EXPIRED',
+    RATE_LIMITED: 'RATE_LIMITED',
 } as const
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes]
