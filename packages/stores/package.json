@@ -1,0 +1,22 @@
+{
+  "name": "@carre-ivoire/stores",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./auth": "./src/auth.store.ts",
+    "./notification": "./src/notification.store.ts"
+  },
+  "peerDependencies": {
+    "pinia": "^2.1.0",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "pinia": "^2.1.0",
+    "typescript": "^5.0.0",
+    "vue": "^3.4.0"
+  }
+}

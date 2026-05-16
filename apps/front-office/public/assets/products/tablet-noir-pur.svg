@@ -1,0 +1,42 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <rect width="600" height="600" fill="#FFFBF7"></rect>
+  
+  <ellipse cx="300" cy="470" rx="200" ry="18" fill="#3A1F14" opacity="0.07"></ellipse>
+  
+  <g transform="translate(130 130)">
+    <rect x="0" y="0" width="340" height="340" fill="#4A2A1C" stroke="#2E1810" stroke-width="1"></rect>
+    
+    <g fill="none" stroke="#2E1810" stroke-width="1.5" opacity="0.55">
+      <line x1="85" y1="0" x2="85" y2="340"></line>
+      <line x1="170" y1="0" x2="170" y2="340"></line>
+      <line x1="255" y1="0" x2="255" y2="340"></line>
+      <line x1="0" y1="85" x2="340" y2="85"></line>
+      <line x1="0" y1="170" x2="340" y2="170"></line>
+      <line x1="0" y1="255" x2="340" y2="255"></line>
+    </g>
+    
+    <g fill="none" stroke="#5E3A2A" stroke-width="0.5" opacity="0.6">
+      <rect x="6" y="6" width="73" height="73"></rect>
+      <rect x="91" y="6" width="73" height="73"></rect>
+      <rect x="176" y="6" width="73" height="73"></rect>
+      <rect x="261" y="6" width="73" height="73"></rect>
+      <rect x="6" y="91" width="73" height="73"></rect>
+      <rect x="91" y="91" width="73" height="73"></rect>
+      <rect x="176" y="91" width="73" height="73"></rect>
+      <rect x="261" y="91" width="73" height="73"></rect>
+      <rect x="6" y="176" width="73" height="73"></rect>
+      <rect x="91" y="176" width="73" height="73"></rect>
+      <rect x="176" y="176" width="73" height="73"></rect>
+      <rect x="261" y="176" width="73" height="73"></rect>
+      <rect x="6" y="261" width="73" height="73"></rect>
+      <rect x="91" y="261" width="73" height="73"></rect>
+      <rect x="176" y="261" width="73" height="73"></rect>
+      <rect x="261" y="261" width="73" height="73"></rect>
+    </g>
+    
+    <text x="127" y="148" font-family="Cormorant Garamond, serif" font-size="42" fill="#2E1810" opacity="0.55" font-style="italic">CI</text>
+    
+    <rect x="0" y="0" width="340" height="6" fill="#6A4431" opacity="0.35"></rect>
+  </g>
+</svg>

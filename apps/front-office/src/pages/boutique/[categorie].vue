@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
-const categorie = route.params.categorie as string
+const router = useRouter()
 
-// TODO: fetch products by categorie slug
-void categorie
+const cat = route.params.categorie as string
+router.replace({ name: 'boutique', query: cat ? { cat } : {} })
 </script>
 
 <template>
-  <div />
+  <div class="min-h-screen bg-ivoire" />
 </template>

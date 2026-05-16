@@ -21,10 +21,16 @@ carre_ivoire/
 ├── packages/
 │   ├── types/          → Interfaces TypeScript partagées
 │   ├── ui/             → Composants Vue partagés
+│   ├── stores/         → Stores Pinia partagés (auth, notifications)
+│   ├── composables/    → Composables Vue partagés (useAuth, useApi...)
 │   └── config/         → Tailwind preset, ESLint, TypeScript config
 ├── docker/
 │   ├── nginx/          → Configuration Nginx (prod + SPA)
 │   └── mysql/          → Script d'initialisation MySQL
+├── scripts/
+│   ├── docker-dev.sh   → Démarrage dev
+│   ├── docker-prod.sh  → Démarrage prod
+│   └── docker-stop.sh  → Arrêt
 ├── docker-compose.yml
 ├── docker-compose.dev.yml
 └── docker-compose.prod.yml
@@ -58,6 +64,10 @@ Remplir les valeurs dans `.env` :
 ### 2. Lancer l'environnement de développement
 
 ```bash
+# Script rapide
+./scripts/docker-dev.sh
+
+# Ou manuellement
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
@@ -140,5 +150,43 @@ stripe listen --forward-to localhost:3000/api/v1/stripe/webhook
 ## Production
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+# Script rapide
+./scripts/docker-prod.sh
+
+# Ou manuellement
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
+
+## Profils Docker
+
+| Profil | Usage |
+|---|---|
+| (aucun) | front-office + API + DB (défaut) |
+| `back-office` | Active le portail admin |
+| `nginx` | Active nginx en mode dev (port 80) |
+
+```bash
+# Activer le back-office
+docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile back-office up
+
+# Arrêter
+./scripts/docker-stop.sh
+```
+
+## Volumes nommés (cache node_modules)
+
+Les volumes `node_modules_api`, `node_modules_front`, `node_modules_back` persistent entre redémarrages pour éviter de réinstaller les dépendances à chaque `docker compose up`. Premier démarrage plus long, suivants en 30-60 sec.
+
+```bash
+# Rebuild complet (après changement de dépendances)
+./scripts/docker-dev.sh --clean
+```
+
+## Documentation
+
+| Document | Description |
+|---|---|
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Structure du monorepo, couches, modules, flux de données |
+| [`DEVELOPMENT.md`](DEVELOPMENT.md) | Setup local, workflows courants, debugging, troubleshooting |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Conventions de code, commits, branches, revue |
+| [`docs/patterns.md`](docs/patterns.md) | Patterns Repository, DTO, Guard, Composable, Store |

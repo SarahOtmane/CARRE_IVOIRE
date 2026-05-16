@@ -1,3 +1,4 @@
-// Composants Vue partagés à venir
-// export { default as BaseButton } from './components/BaseButton.vue'
-// export { default as BaseInput } from './components/BaseInput.vue'
+export { default as Button } from './components/Button.vue'
+export { default as Badge } from './components/Badge.vue'
+export { default as Card } from './components/Card.vue'
+export { default as Modal } from './components/Modal.vue'

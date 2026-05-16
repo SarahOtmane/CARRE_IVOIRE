@@ -2,6 +2,7 @@
   "name": "@carre-ivoire/back-office",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
@@ -9,6 +10,10 @@
     "lint": "eslint src --ext .ts,.vue"
   },
   "dependencies": {
+    "@carre-ivoire/types": "*",
+    "@carre-ivoire/ui": "*",
+    "@carre-ivoire/stores": "*",
+    "@carre-ivoire/composables": "*",
     "axios": "^1.6.0",
     "pinia": "^2.1.0",
     "pinia-plugin-persistedstate": "^3.2.0",
@@ -16,13 +21,19 @@
     "vue-router": "^4.2.0"
   },
   "devDependencies": {
+    "@carre-ivoire/config": "*",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "@vitejs/plugin-vue": "^5.0.0",
     "autoprefixer": "^10.4.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.24.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.0.0",
     "vite": "^5.0.0",
+    "vue-eslint-parser": "^9.4.0",
     "vue-tsc": "^2.0.0"
   }
 }

@@ -30,6 +30,12 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, requiresAdmin: true },
       },
       {
+        path: 'categories',
+        name: 'admin-categories',
+        component: () => import('@/pages/admin/categories/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
         path: 'produits',
         name: 'admin-produits',
         component: () => import('@/pages/admin/produits/index.vue'),
@@ -69,6 +75,18 @@ const routes: RouteRecordRaw[] = [
         path: 'pages',
         name: 'admin-pages',
         component: () => import('@/pages/admin/pages/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'clients',
+        name: 'admin-clients',
+        component: () => import('@/pages/admin/clients/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'parametres',
+        name: 'admin-parametres',
+        component: () => import('@/pages/admin/parametres/index.vue'),
         meta: { requiresAuth: true, requiresAdmin: true },
       },
     ],
