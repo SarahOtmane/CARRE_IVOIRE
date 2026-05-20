@@ -9,6 +9,7 @@ export const ErrorHttpStatus: Record<ErrorCode, number> = {
 
     [ErrorCodes.PRODUCT_NOT_FOUND]: 404,
     [ErrorCodes.CATEGORY_NOT_FOUND]: 404,
+    [ErrorCodes.CATEGORY_SLUG_EXISTS]: 409,
     [ErrorCodes.USER_NOT_FOUND]: 404,
 
     [ErrorCodes.CART_EMPTY]: 400,
