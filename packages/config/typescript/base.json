@@ -5,6 +5,7 @@
     "module": "ESNext",
     "lib": ["ES2020"],
     "strict": true,
+    "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
