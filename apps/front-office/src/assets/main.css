@@ -1,4 +1,4 @@
-@import "../../../../ia_design/colors_and_type.css";
+@import "@carre-ivoire/config/styles/colors-and-type.css";
 
 @tailwind base;
 @tailwind components;
