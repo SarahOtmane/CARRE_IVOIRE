@@ -1,9 +1,20 @@
 # ─── Stage 1: Development (hot reload Vite) ──────────────────────────
 FROM node:20-alpine AS development
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
+
+# Copy root workspace manifests so private workspaces can be resolved
+COPY package.json package-lock.json ./
+# Copy this app package manifest (placed at /app) so npm sees the app scripts
+COPY apps/back-office/package*.json ./
+# Copy local packages (workspace packages) to allow resolving local deps at build-time
+COPY packages ./packages
+
+# Install at repo root (will resolve workspaces and create node_modules at /app)
+RUN npm install --legacy-peer-deps
+
+# Copy back-office source into /app (keeps /app/src expected by volumes)
+COPY apps/back-office .
+
 EXPOSE 5174
 CMD ["npm", "run", "dev", "--", "--host"]
 
