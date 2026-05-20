@@ -9,7 +9,8 @@ services:
 
   backend:
     build:
-      context: ./apps/api
+      context: .
+      dockerfile: apps/api/Dockerfile
       target: development
     volumes:
       - ./apps/api/src:/app/src
@@ -27,7 +28,8 @@ services:
 
   front-office:
     build:
-      context: ./apps/front-office
+      context: .
+      dockerfile: apps/front-office/Dockerfile
       target: development
     volumes:
       - ./apps/front-office/src:/app/src
@@ -47,7 +49,8 @@ services:
 
   back-office:
     build:
-      context: ./apps/back-office
+      context: .
+      dockerfile: apps/back-office/Dockerfile
       target: development
     volumes:
       - ./apps/back-office/src:/app/src

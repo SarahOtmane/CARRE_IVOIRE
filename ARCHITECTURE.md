@@ -16,7 +16,7 @@ carre_ivoire/ (Monorepo — npm workspaces)
 │   └── stores/         Stores Pinia partagés (auth, notification)
 ├── docker/             Configs Nginx et MySQL
 ├── scripts/            Scripts de démarrage Docker
-└── ai_design/          Design system (couleurs, typographie, composants)
+└── packages/config/    Tokens partagés (couleurs, typographie, motion)
 ```
 
 ---
@@ -56,16 +56,16 @@ DTO         →  valide et transforme les données entrantes
 
 ### Modules
 
-| Module | Routes | Guards |
-|---|---|---|
-| `auth` | POST /auth/login, /register, /refresh, /logout | — |
-| `users` | GET/PATCH /users/me | JwtAuthGuard |
-| `products` | GET /products, GET /products/:slug | — |
-| `products` (admin) | POST/PATCH/DELETE /products | JwtAuthGuard + AdminGuard |
-| `categories` | GET /categories | — |
-| `orders` | POST /orders, GET /orders/me | JwtAuthGuard |
-| `orders` (admin) | GET /orders, PATCH /orders/:id | JwtAuthGuard + AdminGuard |
-| `health` | GET /health | — |
+| Module             | Routes                                         | Guards                    |
+| ------------------ | ---------------------------------------------- | ------------------------- |
+| `auth`             | POST /auth/login, /register, /refresh, /logout | —                         |
+| `users`            | GET/PATCH /users/me                            | JwtAuthGuard              |
+| `products`         | GET /products, GET /products/:slug             | —                         |
+| `products` (admin) | POST/PATCH/DELETE /products                    | JwtAuthGuard + AdminGuard |
+| `categories`       | GET /categories                                | —                         |
+| `orders`           | POST /orders, GET /orders/me                   | JwtAuthGuard              |
+| `orders` (admin)   | GET /orders, PATCH /orders/:id                 | JwtAuthGuard + AdminGuard |
+| `health`           | GET /health                                    | —                         |
 
 ### Format de réponse standard
 
@@ -100,24 +100,24 @@ Les guards utilisent `useAuthStore` depuis `@carre-ivoire/stores`.
 
 ```typescript
 // Auth
-import { useAuthStore } from '@carre-ivoire/stores'
-import { useAuth } from '@carre-ivoire/composables'
+import { useAuthStore } from "@carre-ivoire/stores";
+import { useAuth } from "@carre-ivoire/composables";
 
 // API
-import { useApi } from '@carre-ivoire/composables'
+import { useApi } from "@carre-ivoire/composables";
 
 // Notifications
-import { useNotification } from '@carre-ivoire/composables'
-import { useNotificationStore } from '@carre-ivoire/stores'
+import { useNotification } from "@carre-ivoire/composables";
+import { useNotificationStore } from "@carre-ivoire/stores";
 
 // Chargement
-import { useLoading } from '@carre-ivoire/composables'
+import { useLoading } from "@carre-ivoire/composables";
 
 // Composants UI
-import { Button, Badge, Card, Modal } from '@carre-ivoire/ui'
+import { Button, Badge, Card, Modal } from "@carre-ivoire/ui";
 
 // Types
-import type { ProductResponse, OrderResponse } from '@carre-ivoire/types'
+import type { ProductResponse, OrderResponse } from "@carre-ivoire/types";
 ```
 
 ---
@@ -141,6 +141,7 @@ packages/config/
 ```
 
 Chaque app étend depuis ce package :
+
 ```json
 // apps/front-office/tsconfig.json
 { "extends": "@carre-ivoire/config/typescript/vue" }
@@ -172,54 +173,55 @@ packages/ui/src/components/
 ```
 
 Usage :
+
 ```typescript
-import { Button, Badge, Card, Modal } from '@carre-ivoire/ui'
+import { Button, Badge, Card, Modal } from "@carre-ivoire/ui";
 ```
 
 ### packages/composables
 
 Logiques Vue partagées entre les deux apps.
 
-| Composable | Description |
-|---|---|
-| `useAuth()` | Accès au store auth (token, user, isAdmin, setAuth, logout) |
-| `useApi()` | Instance Axios avec intercepteur JWT + gestion d'erreur |
-| `useNotification()` | API toast (success, error, warning, info) |
-| `useLoading()` | État chargement + helper `withLoading<T>(fn)` |
+| Composable          | Description                                                 |
+| ------------------- | ----------------------------------------------------------- |
+| `useAuth()`         | Accès au store auth (token, user, isAdmin, setAuth, logout) |
+| `useApi()`          | Instance Axios avec intercepteur JWT + gestion d'erreur     |
+| `useNotification()` | API toast (success, error, warning, info)                   |
+| `useLoading()`      | État chargement + helper `withLoading<T>(fn)`               |
 
 ### packages/stores
 
 Stores Pinia partagés.
 
-| Store | État | Persisté |
-|---|---|---|
-| `useAuthStore` | token, user, isAuthenticated, isAdmin, fullName | Oui (pinia-plugin-persistedstate) |
-| `useNotificationStore` | notifications[], addNotification, removeNotification | Non |
+| Store                  | État                                                 | Persisté                          |
+| ---------------------- | ---------------------------------------------------- | --------------------------------- |
+| `useAuthStore`         | token, user, isAuthenticated, isAdmin, fullName      | Oui (pinia-plugin-persistedstate) |
+| `useNotificationStore` | notifications[], addNotification, removeNotification | Non                               |
 
 ---
 
-## Design System (ai_design/)
+## Design System (packages/config/ + packages/ui/)
 
 Source de vérité absolue pour toute l'UI.
 
 ### Tokens couleur
 
-| Classe Tailwind | CSS var | Usage |
-|---|---|---|
-| `bg-ivoire` | `--ivoire` | Fond dominant |
-| `bg-rose-poudre` | `--rose-poudre` | Surfaces secondaires |
-| `bg-beige-doux` | `--beige-doux` | Cartes, thumbnails |
-| `text-brun-cacao` / `bg-brun-cacao` | `--brun-cacao` | Texte, boutons primaires |
-| `text-dore` | `--dore` | Prix, labels accent |
-| `bg-papier` | `--papier` | Fond images produit |
+| Classe Tailwind                     | CSS var         | Usage                    |
+| ----------------------------------- | --------------- | ------------------------ |
+| `bg-ivoire`                         | `--ivoire`      | Fond dominant            |
+| `bg-rose-poudre`                    | `--rose-poudre` | Surfaces secondaires     |
+| `bg-beige-doux`                     | `--beige-doux`  | Cartes, thumbnails       |
+| `text-brun-cacao` / `bg-brun-cacao` | `--brun-cacao`  | Texte, boutons primaires |
+| `text-dore`                         | `--dore`        | Prix, labels accent      |
+| `bg-papier`                         | `--papier`      | Fond images produit      |
 
 ### Typographie
 
-| Rôle | Classe Tailwind | Police |
-|---|---|---|
-| Titres / Display | `font-display` | Cormorant Garamond |
-| Corps / UI / Nav | `font-body` | Inter |
-| Labels eyebrow | `font-label` | Inter uppercase |
+| Rôle             | Classe Tailwind | Police             |
+| ---------------- | --------------- | ------------------ |
+| Titres / Display | `font-display`  | Cormorant Garamond |
+| Corps / UI / Nav | `font-body`     | Inter              |
+| Labels eyebrow   | `font-label`    | Inter uppercase    |
 
 ### Règles non négociables
 
@@ -234,19 +236,19 @@ Source de vérité absolue pour toute l'UI.
 
 ### Profils
 
-| Profil | Active |
-|---|---|
-| (aucun) | front-office + API + DB |
-| `back-office` | Ajoute le portail admin |
-| `nginx` | Ajoute nginx en dev (port 80) |
+| Profil        | Active                        |
+| ------------- | ----------------------------- |
+| (aucun)       | front-office + API + DB       |
+| `back-office` | Ajoute le portail admin       |
+| `nginx`       | Ajoute nginx en dev (port 80) |
 
 ### Stages Dockerfile
 
-| Stage | Usage |
-|---|---|
+| Stage         | Usage                      |
+| ------------- | -------------------------- |
 | `development` | Hot-reload, volumes montés |
-| `build` | Compilation production |
-| `production` | Image minimale Nginx/Node |
+| `build`       | Compilation production     |
+| `production`  | Image minimale Nginx/Node  |
 
 ### Volumes nommés
 
