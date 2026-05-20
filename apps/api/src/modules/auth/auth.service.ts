@@ -49,11 +49,11 @@ export class AuthService {
     const user = await this.usersRepository.findByEmail(dto.email)
     if (!user || !user.is_active) INVALID_CREDENTIALS()
 
-    const passwordValid = await bcrypt.compare(dto.password, user.password_hash)
+    const passwordValid = await bcrypt.compare(dto.password, user!.password_hash)
     if (!passwordValid) INVALID_CREDENTIALS()
 
-    const tokens = this.generateTokens(user)
-    return { ...tokens, user: this.toAuthUserDto(user) }
+    const tokens = this.generateTokens(user!)
+    return { ...tokens, user: this.toAuthUserDto(user!) }
   }
 
   async refresh(refreshToken: string | undefined): Promise<{ accessToken: string }> {
