@@ -13,6 +13,9 @@
   "scripts": {
     "build": "vue-tsc --noEmit"
   },
+  "dependencies": {
+    "@carre-ivoire/stores": "*"
+  },
   "peerDependencies": {
     "vue": "^3.4.0"
   },

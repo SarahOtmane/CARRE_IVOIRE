@@ -9,14 +9,22 @@
     "./auth": "./src/auth.store.ts",
     "./notification": "./src/notification.store.ts"
   },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "peerDependencies": {
     "pinia": "^2.1.0",
     "vue": "^3.4.0"
   },
   "devDependencies": {
+    "@pinia/testing": "^0.1.6",
     "@types/node": "^20.0.0",
+    "@vue/test-utils": "^2.4.0",
+    "happy-dom": "^14.0.0",
     "pinia": "^2.1.0",
     "typescript": "^5.0.0",
+    "vitest": "^1.6.0",
     "vue": "^3.4.0"
   }
 }

@@ -17,7 +17,8 @@
     "pinia": "^2.1.0",
     "pinia-plugin-persistedstate": "^3.2.0",
     "vue": "^3.4.0",
-    "vue-router": "^4.2.0"
+    "vue-router": "^4.2.0",
+    "@unhead/vue": "^1.9.0"
   },
   "devDependencies": {
     "@carre-ivoire/config": "*",
