@@ -66,6 +66,16 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/mot-de-passe-oublie',
+    name: 'mot-de-passe-oublie',
+    component: () => import('@/pages/mot-de-passe-oublie.vue'),
+  },
+  {
+    path: '/reinitialiser-mot-de-passe',
+    name: 'reinitialiser-mot-de-passe',
+    component: () => import('@/pages/reinitialiser-mot-de-passe.vue'),
+  },
+  {
     path: '/compte',
     component: () => import('@/layouts/AccountLayout.vue'),
     meta: { requiresAuth: true },
