@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsBoolean,
   IsInt,
+  IsIn,
   Min,
 } from 'class-validator'
 
@@ -55,6 +56,15 @@ export class UpdateProductDto {
   @IsInt()
   @Min(0)
   stock?: number
+
+  @IsOptional()
+  @IsIn(['in_stock', 'out_of_stock'])
+  stockStatus?: 'in_stock' | 'out_of_stock'
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  taxRateId?: number | null
 
   @IsOptional()
   @IsBoolean()
