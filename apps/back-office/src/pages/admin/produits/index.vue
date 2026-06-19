@@ -4,7 +4,13 @@ import { useRouter } from "vue-router";
 import { useAdminProducts, useAdminCategories } from "@carre-ivoire/composables";
 
 const router = useRouter();
-const { products, isLoading, fetchAll } = useAdminProducts();
+const { products, isLoading, fetchAll, update } = useAdminProducts();
+
+async function toggleAvailability(product: { id: number; stockStatus: string }, event: Event) {
+  event.stopPropagation();
+  const next = product.stockStatus === 'out_of_stock' ? 'in_stock' : 'out_of_stock';
+  await update(product.id, { stockStatus: next as 'in_stock' | 'out_of_stock' });
+}
 const { categories } = useAdminCategories();
 
 const search = ref("");
@@ -86,12 +92,12 @@ function openProduct(productId: number) {
 
     <section v-else class="overflow-hidden border border-cocoa/12 bg-ivory">
       <div
-        class="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.4fr)_108px_92px_110px_84px] border-b border-cocoa/12 px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
+        class="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.4fr)_108px_130px_110px_84px] border-b border-cocoa/12 px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
       >
         <span>Nom</span>
         <span>Catégorie</span>
         <span class="text-right">Prix</span>
-        <span class="text-right">Stock</span>
+        <span>Disponibilité</span>
         <span>Statut</span>
         <span class="text-right">Action</span>
       </div>
@@ -100,7 +106,7 @@ function openProduct(productId: number) {
         v-for="product in filteredProducts"
         :key="product.id"
         type="button"
-        class="grid w-full grid-cols-[minmax(0,2.2fr)_minmax(0,1.4fr)_108px_92px_110px_84px] items-center gap-4 border-b border-cocoa/8 px-6 py-5 text-left transition-colors duration-200 hover:bg-beige/50 last:border-b-0"
+        class="grid w-full grid-cols-[minmax(0,2.2fr)_minmax(0,1.4fr)_108px_130px_110px_84px] items-center gap-4 border-b border-cocoa/8 px-6 py-5 text-left transition-colors duration-200 hover:bg-beige/50 last:border-b-0"
         @click="openProduct(product.id)"
       >
         <span class="min-w-0">
@@ -109,10 +115,16 @@ function openProduct(productId: number) {
         </span>
         <span class="font-body text-sm text-cocoa">{{ product.category?.name ?? "—" }}</span>
         <span class="text-right font-body text-sm tabular-nums text-gold">{{ formatPrice(product.price) }}</span>
-        <span
-          class="text-right font-body text-sm tabular-nums"
-          :class="product.stock < 10 ? 'text-red-700' : 'text-cocoa'"
-        >{{ product.stock }}</span>
+        <button
+          type="button"
+          class="w-fit border px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] transition-colors duration-200"
+          :class="product.stockStatus === 'out_of_stock'
+            ? 'border-red-700/30 text-red-700 hover:border-red-700 hover:bg-red-700/5'
+            : 'border-cocoa/20 text-cocoa hover:border-cocoa/50'"
+          @click="toggleAvailability(product, $event)"
+        >
+          {{ product.stockStatus === 'out_of_stock' ? 'Rupture' : 'En stock' }}
+        </button>
         <span class="border border-cocoa/12 px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cocoa/70">
           {{ product.isActive ? "Actif" : "Inactif" }}
         </span>
