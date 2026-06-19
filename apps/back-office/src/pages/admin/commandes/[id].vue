@@ -148,7 +148,7 @@ async function changeStatus(event: Event) {
           <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45">Statut</div>
           <select
             :value="current.status"
-            class="mt-4 w-full border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+            class="mt-4 w-full border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
             @change="changeStatus"
           >
             <option v-for="opt in STATUS_OPTIONS" :key="opt.value" :value="opt.value">

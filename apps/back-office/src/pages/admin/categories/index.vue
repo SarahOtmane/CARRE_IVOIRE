@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { useAdminCategories } from "@carre-ivoire/composables";
+import { useAdminCategories, useImageUpload } from "@carre-ivoire/composables";
 import { Button } from "@carre-ivoire/ui";
 import type { CategoryResponse } from "@carre-ivoire/types";
 
 const { categories, isLoading, create, update, remove } = useAdminCategories();
+const { upload, isUploading } = useImageUpload();
 
 const draft = ref<Partial<CategoryResponse> & { name: string; slug: string } | null>(null);
 const isCreating = ref(false);
@@ -32,6 +33,7 @@ function createNew() {
     name: "",
     slug: "",
     description: "",
+    imageUrl: "",
     displayOrder: categories.value.length + 1,
     isActive: true,
   };
@@ -49,6 +51,14 @@ function onNameBlur() {
   }
 }
 
+async function onImageChange(e: Event) {
+  if (!draft.value) return;
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  const url = await upload(file);
+  if (url) draft.value.imageUrl = url;
+}
+
 async function save() {
   if (!draft.value?.name.trim() || !draft.value?.slug.trim()) return;
 
@@ -57,6 +67,7 @@ async function save() {
       name: draft.value.name,
       slug: draft.value.slug,
       description: draft.value.description || undefined,
+      imageUrl: draft.value.imageUrl || undefined,
       displayOrder: draft.value.displayOrder,
       isActive: draft.value.isActive ?? true,
     });
@@ -65,6 +76,7 @@ async function save() {
       name: draft.value.name,
       slug: draft.value.slug,
       description: draft.value.description || undefined,
+      imageUrl: draft.value.imageUrl || undefined,
       displayOrder: draft.value.displayOrder,
       isActive: draft.value.isActive,
     });
@@ -103,9 +115,9 @@ async function deleteCategory() {
 
     <section v-else class="overflow-hidden border border-cocoa/12 bg-ivory">
       <div
-        class="grid grid-cols-[60px_minmax(0,2fr)_minmax(0,2fr)_80px_120px_80px] border-b border-cocoa/12 px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
+        class="grid grid-cols-[48px_minmax(0,2fr)_minmax(0,2fr)_80px_120px_80px] border-b border-cocoa/12 px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
       >
-        <span>Ordre</span>
+        <span>Img</span>
         <span>Nom</span>
         <span>Description</span>
         <span class="text-right">Slug</span>
@@ -116,10 +128,15 @@ async function deleteCategory() {
       <div
         v-for="cat in orderedCategories"
         :key="cat.id"
-        class="grid grid-cols-[60px_minmax(0,2fr)_minmax(0,2fr)_80px_120px_80px] items-center gap-4 border-b border-cocoa/8 px-6 py-5 last:border-b-0"
+        class="grid grid-cols-[48px_minmax(0,2fr)_minmax(0,2fr)_80px_120px_80px] items-center gap-4 border-b border-cocoa/8 px-6 py-5 last:border-b-0"
       >
-        <div class="font-body text-sm tabular-nums text-cocoa/55">
-          {{ String(cat.displayOrder).padStart(2, "0") }}
+        <div class="h-10 w-10 border border-cocoa/12 bg-beige/30">
+          <img
+            v-if="cat.imageUrl"
+            :src="cat.imageUrl"
+            :alt="cat.name"
+            class="h-full w-full object-cover"
+          />
         </div>
         <div class="font-display text-xl text-cocoa">{{ cat.name }}</div>
         <div class="font-body text-sm italic text-cocoa/60">{{ cat.description || "—" }}</div>
@@ -176,7 +193,7 @@ async function deleteCategory() {
               v-model="draft.name"
               type="text"
               required
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+              class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
               @blur="onNameBlur"
             />
           </label>
@@ -187,7 +204,7 @@ async function deleteCategory() {
               v-model="draft.slug"
               type="text"
               required
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+              class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
             />
           </label>
 
@@ -196,9 +213,48 @@ async function deleteCategory() {
             <input
               v-model="draft.description"
               type="text"
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+              class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
             />
           </label>
+
+          <!-- Image de la catégorie -->
+          <div class="grid gap-3">
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Image</span>
+            <div class="flex items-start gap-4">
+              <div
+                v-if="draft.imageUrl"
+                class="h-20 w-20 flex-shrink-0 border border-cocoa/12 bg-beige/30"
+              >
+                <img :src="draft.imageUrl" alt="" class="h-full w-full object-cover" />
+              </div>
+              <div
+                v-else
+                class="flex h-20 w-20 flex-shrink-0 items-center justify-center border border-dashed border-cocoa/20 bg-beige/10"
+              >
+                <span class="font-body text-[9px] uppercase tracking-[0.14em] text-cocoa/35">Vide</span>
+              </div>
+              <div class="flex flex-col gap-2">
+                <label class="cursor-pointer border border-cocoa/25 px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-cocoa transition-colors hover:border-cocoa">
+                  <span>{{ isUploading ? "Envoi…" : draft.imageUrl ? "Changer" : "Choisir" }}</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    class="sr-only"
+                    :disabled="isUploading"
+                    @change="onImageChange"
+                  />
+                </label>
+                <button
+                  v-if="draft.imageUrl"
+                  type="button"
+                  class="font-body text-[10px] uppercase tracking-[0.14em] text-cocoa/40 hover:text-cocoa"
+                  @click="draft.imageUrl = ''"
+                >
+                  Retirer
+                </button>
+              </div>
+            </div>
+          </div>
 
           <div class="grid gap-6 sm:grid-cols-2">
             <label class="grid gap-2">
@@ -207,7 +263,7 @@ async function deleteCategory() {
                 v-model.number="draft.displayOrder"
                 type="number"
                 min="1"
-                class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+                class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
               />
             </label>
 
@@ -215,7 +271,7 @@ async function deleteCategory() {
               <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Statut</span>
               <select
                 v-model="draft.isActive"
-                class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+                class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
               >
                 <option :value="true">Actif</option>
                 <option :value="false">Inactif</option>
@@ -228,21 +284,21 @@ async function deleteCategory() {
           <button
             v-if="!isCreating"
             type="button"
-            class="border border-red-700/30 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-red-700"
+            class="border border-red-700/50 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-red-700"
             @click="deleteCategory"
           >
             Supprimer
           </button>
           <button
             type="button"
-            class="border border-cocoa/25 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa"
+            class="border border-cocoa/40 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa"
             @click="close"
           >
             Annuler
           </button>
           <button
             type="submit"
-            :disabled="isLoading"
+            :disabled="isLoading || isUploading"
             class="border border-cocoa bg-cocoa px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-ivory disabled:opacity-50"
           >
             {{ isLoading ? "Enregistrement…" : "Enregistrer" }}
