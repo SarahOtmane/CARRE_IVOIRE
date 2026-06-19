@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useAdminProducts, useAdminCategories, useAdminTaxRates, useImageUpload } from "@carre-ivoire/composables";
+import {
+  useAdminProducts,
+  useAdminCategories,
+  useAdminTaxRates,
+  useImageUpload,
+  useAdminProductVariants,
+} from "@carre-ivoire/composables";
 
 const route = useRoute();
 const router = useRouter();
@@ -9,8 +15,41 @@ const { products, fetchAll, update, remove, isLoading } = useAdminProducts();
 const { categories } = useAdminCategories();
 const { taxRates } = useAdminTaxRates();
 const { upload, isUploading } = useImageUpload();
+const {
+  variants,
+  fetchAll: fetchVariants,
+  create: createVariant,
+  update: updateVariant,
+  remove: removeVariant,
+} = useAdminProductVariants();
 
 const productId = computed(() => Number(route.params.id));
+
+const newVariant = ref({ label: "", weightGrams: 0, price: 0, stock: 0 });
+
+async function addVariant() {
+  if (!newVariant.value.label.trim() || newVariant.value.price <= 0) return;
+  await createVariant(productId.value, {
+    label: newVariant.value.label,
+    weightGrams: newVariant.value.weightGrams || undefined,
+    price: Math.round(newVariant.value.price * 100),
+    stock: newVariant.value.stock,
+  });
+  newVariant.value = { label: "", weightGrams: 0, price: 0, stock: 0 };
+}
+
+function onVariantStockStatusChange(variantId: number, stockStatus: "in_stock" | "out_of_stock") {
+  updateVariant(productId.value, variantId, { stockStatus });
+}
+
+function onVariantStockChange(variantId: number, stock: number) {
+  updateVariant(productId.value, variantId, { stock });
+}
+
+async function deleteVariant(variantId: number) {
+  if (!confirm("Supprimer cette variante ?")) return;
+  await removeVariant(productId.value, variantId);
+}
 
 const draft = ref({
   name: "",
@@ -32,6 +71,7 @@ const found = ref(false);
 
 onMounted(async () => {
   await fetchAll();
+  await fetchVariants(productId.value);
 });
 
 watch(
@@ -238,6 +278,82 @@ async function deleteProduct() {
             class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
           />
         </label>
+
+        <div class="grid gap-4 border-t border-cocoa/12 pt-6">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Variantes (poids / prix)</span>
+
+          <div v-if="variants.length" class="grid gap-3">
+            <div
+              v-for="variant in variants"
+              :key="variant.id"
+              class="grid grid-cols-[1fr_90px_90px_110px_auto] items-center gap-3 border border-cocoa/12 bg-beige/20 p-3"
+            >
+              <span class="font-body text-sm text-cocoa">{{ variant.label }}</span>
+              <span class="font-body text-sm text-cocoa/70">{{ (variant.price / 100).toFixed(2).replace(".", ",") }} €</span>
+              <input
+                type="number"
+                min="0"
+                :value="variant.stock"
+                class="border border-cocoa/25 bg-ivory px-2 py-1.5 font-body text-sm text-cocoa outline-none focus:border-cocoa/60"
+                @change="onVariantStockChange(variant.id, Number(($event.target as HTMLInputElement).value))"
+              />
+              <select
+                :value="variant.stockStatus"
+                class="border border-cocoa/25 bg-ivory px-2 py-1.5 font-body text-sm text-cocoa outline-none focus:border-cocoa/60"
+                @change="onVariantStockStatusChange(variant.id, ($event.target as HTMLSelectElement).value as 'in_stock' | 'out_of_stock')"
+              >
+                <option value="in_stock">En stock</option>
+                <option value="out_of_stock">Rupture</option>
+              </select>
+              <button
+                type="button"
+                class="font-body text-[11px] uppercase tracking-[0.14em] text-red-700"
+                @click="deleteVariant(variant.id)"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+          <p v-else class="font-body text-sm italic text-cocoa/45">Aucune variante — le produit utilise son prix unique.</p>
+
+          <div class="grid grid-cols-[1fr_90px_90px_90px_auto] items-center gap-3">
+            <input
+              v-model="newVariant.label"
+              type="text"
+              placeholder="Libellé (ex. 250g)"
+              class="border border-cocoa/25 bg-beige/20 px-2 py-1.5 font-body text-sm text-cocoa outline-none focus:border-cocoa/60"
+            />
+            <input
+              v-model.number="newVariant.weightGrams"
+              type="number"
+              min="0"
+              placeholder="Poids (g)"
+              class="border border-cocoa/25 bg-beige/20 px-2 py-1.5 font-body text-sm text-cocoa outline-none focus:border-cocoa/60"
+            />
+            <input
+              v-model.number="newVariant.price"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="Prix (€)"
+              class="border border-cocoa/25 bg-beige/20 px-2 py-1.5 font-body text-sm text-cocoa outline-none focus:border-cocoa/60"
+            />
+            <input
+              v-model.number="newVariant.stock"
+              type="number"
+              min="0"
+              placeholder="Stock"
+              class="border border-cocoa/25 bg-beige/20 px-2 py-1.5 font-body text-sm text-cocoa outline-none focus:border-cocoa/60"
+            />
+            <button
+              type="button"
+              class="border border-cocoa/40 px-3 py-1.5 font-body text-[11px] uppercase tracking-[0.14em] text-cocoa"
+              @click="addVariant"
+            >
+              Ajouter
+            </button>
+          </div>
+        </div>
       </div>
 
       <aside class="space-y-6 border-t border-cocoa/12 pt-6 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
