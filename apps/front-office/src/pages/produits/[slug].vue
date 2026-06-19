@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 import { useProduct, useProducts } from '@carre-ivoire/composables'
 import { useCartStore } from '@carre-ivoire/stores'
 import ProductCard from '@/components/product/ProductCard.vue'
@@ -14,6 +15,17 @@ const { product, isLoading } = useProduct(slug)
 
 const { result: relatedResult } = useProducts({ limit: 3 })
 
+useHead(computed(() => ({
+  title: product.value ? `${product.value.name} — Carré Ivoire` : 'Carré Ivoire',
+  meta: [
+    { name: 'description', content: product.value?.shortDescription ?? 'Chocolaterie artisanale Carré Ivoire.' },
+    { property: 'og:title', content: product.value?.name ?? 'Carré Ivoire' },
+    { property: 'og:description', content: product.value?.shortDescription ?? '' },
+    { property: 'og:image', content: product.value?.imageUrl ?? '' },
+    { property: 'og:type', content: 'product' },
+  ],
+})))
+
 const relatedProducts = computed(() => {
   if (!product.value) return relatedResult.value.items.slice(0, 3)
   return relatedResult.value.items.filter((p) => p.id !== product.value!.id).slice(0, 3)
@@ -22,6 +34,24 @@ const relatedProducts = computed(() => {
 const quantity = ref(1)
 const tab = ref<'composition' | 'degustation' | 'conservation'>('composition')
 const added = ref(false)
+const selectedVariantId = ref<number | null>(null)
+
+watch(
+  () => product.value?.variants,
+  (variants) => {
+    if (!variants || variants.length === 0) {
+      selectedVariantId.value = null
+      return
+    }
+    const firstAvailable = variants.find((v) => v.stockStatus !== 'out_of_stock') ?? variants[0]
+    selectedVariantId.value = firstAvailable.id
+  },
+  { immediate: true },
+)
+
+const selectedVariant = computed(() =>
+  product.value?.variants.find((v) => v.id === selectedVariantId.value) ?? null,
+)
 
 const compositionItems = computed(() => {
   if (!product.value?.ingredients) return []
@@ -32,19 +62,20 @@ function formatPrice(centimes: number) {
   return `${(centimes / 100).toFixed(2).replace('.', ',')} €`
 }
 
-const unitTotal = computed(() => {
-  if (!product.value) return 0
-  return product.value.price * quantity.value
-})
+const activePrice = computed(() => selectedVariant.value?.price ?? product.value?.price ?? 0)
+
+const unitTotal = computed(() => activePrice.value * quantity.value)
 
 function addToCart() {
   if (!product.value) return
   cartStore.addItem({
     productId: product.value.id,
+    variantId: selectedVariant.value?.id,
     name: product.value.name,
     imageUrl: product.value.imageUrl ?? '',
-    price: product.value.price / 100,
+    price: activePrice.value / 100,
     quantity: quantity.value,
+    format: selectedVariant.value?.label,
   })
   added.value = true
   setTimeout(() => { added.value = false }, 2000)
@@ -124,6 +155,29 @@ function addToCart() {
           {{ product.shortDescription }}
         </p>
 
+        <!-- Variantes -->
+        <div v-if="product.variants.length > 0" class="mt-8 border-t pt-6" style="border-color: var(--cacao-a12)">
+          <span class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2">Format</span>
+          <div class="mt-4 flex flex-wrap gap-3">
+            <button
+              v-for="variant in product.variants"
+              :key="variant.id"
+              type="button"
+              :disabled="variant.stockStatus === 'out_of_stock'"
+              class="border px-4 py-3 font-sans text-[13px] transition-all duration-180 disabled:cursor-not-allowed disabled:opacity-40"
+              :class="
+                selectedVariantId === variant.id
+                  ? 'border-brun-cacao bg-brun-cacao text-ivoire'
+                  : 'border-brun-cacao text-brun-cacao'
+              "
+              @click="selectedVariantId = variant.id"
+            >
+              {{ variant.label }} — {{ formatPrice(variant.price) }}
+              <span v-if="variant.stockStatus === 'out_of_stock'" class="ml-1 text-[11px] italic">(rupture)</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Quantité + panier -->
         <div class="mt-8 border-t pt-6" style="border-color: var(--cacao-a12)">
           <div class="flex items-center gap-5">
@@ -150,7 +204,8 @@ function addToCart() {
           <div class="mt-8 flex flex-wrap items-center gap-4">
             <button
               type="button"
-              class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
+              :disabled="selectedVariant?.stockStatus === 'out_of_stock'"
+              class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40"
               @click="addToCart"
             >
               Ajouter au panier — {{ formatPrice(unitTotal) }}

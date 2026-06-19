@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 import { useProducts, useCategories } from '@carre-ivoire/composables'
 import ProductCard from '@/components/product/ProductCard.vue'
 
@@ -15,6 +16,15 @@ const slug = computed(() => route.params.categorie as string)
 const currentCategory = computed(() =>
   categories.value.find((c) => c.slug === slug.value) ?? null,
 )
+
+useHead(computed(() => ({
+  title: currentCategory.value ? `${currentCategory.value.name} — Carré Ivoire` : 'Boutique — Carré Ivoire',
+  meta: [
+    { name: 'description', content: currentCategory.value?.description ?? 'Chocolats artisanaux Carré Ivoire.' },
+    { property: 'og:title', content: currentCategory.value?.name ?? 'Carré Ivoire' },
+    { property: 'og:type', content: 'website' },
+  ],
+})))
 
 watch(
   [categories, slug],
