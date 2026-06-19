@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ProductResponse } from '@carre-ivoire/types'
 
-defineProps<{ product: ProductResponse }>()
+const props = defineProps<{ product: ProductResponse }>()
 const router = useRouter()
 
 const hovered = ref(false)
@@ -11,6 +11,12 @@ const hovered = ref(false)
 function formatPrice(centimes: number) {
   return `${(centimes / 100).toFixed(2).replace('.', ',')} €`
 }
+
+const displayPrice = computed(() => {
+  if (props.product.variants.length === 0) return formatPrice(props.product.price)
+  const cheapest = Math.min(...props.product.variants.map((v) => v.price))
+  return `À partir de ${formatPrice(cheapest)}`
+})
 
 const badgeVariants: Record<string, string> = {
   'NOUVEAU':         'bg-papier text-brun-cacao border border-[var(--cacao-a24)]',
@@ -40,6 +46,10 @@ const badgeVariants: Record<string, string> = {
       <img
         :src="product.imageUrl ?? '/assets/placeholder.svg'"
         :alt="product.name"
+        loading="lazy"
+        decoding="async"
+        width="400"
+        height="400"
         class="h-full w-full object-cover transition-transform duration-800"
         :style="{ transform: hovered ? 'scale(1.03)' : 'scale(1)' }"
       />
@@ -60,7 +70,7 @@ const badgeVariants: Record<string, string> = {
         {{ product.name }}
       </div>
       <div class="mt-2 font-sans text-[13px] text-dore" style="letter-spacing: 0.02em; font-variant-numeric: tabular-nums">
-        {{ formatPrice(product.price) }}
+        {{ displayPrice }}
       </div>
     </div>
   </article>
