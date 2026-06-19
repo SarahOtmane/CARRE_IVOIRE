@@ -25,6 +25,7 @@ export interface OrderItem {
   id: number
   orderId: number
   productId: number
+  variantId?: number
   product?: Product
   quantity: number
   unitPrice: number
@@ -47,6 +48,7 @@ export type OrderResponse = Order
 
 export interface CartItem {
   productId: number
+  variantId?: number
   name: string
   imageUrl: string
   price: number
@@ -57,6 +59,7 @@ export interface CartItem {
 export interface CreateOrderDto {
   items: Array<{
     productId: number
+    variantId?: number
     quantity: number
     format?: string
   }>

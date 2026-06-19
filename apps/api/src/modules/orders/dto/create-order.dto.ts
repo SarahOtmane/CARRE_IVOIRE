@@ -20,6 +20,11 @@ class OrderItemDto {
   quantity: number
 
   @IsOptional()
+  @IsInt()
+  @Min(1)
+  variantId?: number
+
+  @IsOptional()
   @IsString()
   @MaxLength(100)
   format?: string

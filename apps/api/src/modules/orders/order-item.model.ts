@@ -11,6 +11,7 @@ import {
 } from 'sequelize-typescript'
 import { Order } from './order.model'
 import { Product } from '@/modules/products/product.model'
+import { ProductVariant } from '@/modules/products/product-variant.model'
 
 @Table({ tableName: 'order_items', timestamps: false })
 export class OrderItem extends Model<OrderItem> {
@@ -34,6 +35,14 @@ export class OrderItem extends Model<OrderItem> {
 
   @BelongsTo(() => Product)
   declare product: Product
+
+  @ForeignKey(() => ProductVariant)
+  @AllowNull(true)
+  @Column({ type: DataType.INTEGER.UNSIGNED, field: 'variant_id' })
+  declare variantId: number | null
+
+  @BelongsTo(() => ProductVariant)
+  declare variant: ProductVariant | null
 
   @AllowNull(false)
   @Column(DataType.INTEGER)

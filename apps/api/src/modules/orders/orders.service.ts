@@ -5,7 +5,9 @@ import { Op } from 'sequelize'
 import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
 import { Product } from '@/modules/products/product.model'
+import { ProductVariant } from '@/modules/products/product-variant.model'
 import { ProductsRepository } from '@/modules/products/products.repository'
+import { ProductVariantsRepository } from '@/modules/products/product-variants.repository'
 import { OrdersRepository } from './orders.repository'
 import { StripeService } from './stripe.service'
 import { MailService } from '@/modules/mail/mail.service'
@@ -21,7 +23,9 @@ export class OrdersService {
   constructor(
     @InjectConnection() private readonly sequelize: Sequelize,
     @InjectModel(Product) private readonly productModel: typeof Product,
+    @InjectModel(ProductVariant) private readonly variantModel: typeof ProductVariant,
     private readonly productsRepository: ProductsRepository,
+    private readonly productVariantsRepository: ProductVariantsRepository,
     private readonly ordersRepository: OrdersRepository,
     private readonly stripeService: StripeService,
     private readonly mailService: MailService,
@@ -35,8 +39,38 @@ export class OrdersService {
 
     return this.sequelize.transaction(async (t) => {
       // 1. Décrémenter le stock atomiquement — rowsAffected === 0 → rollback
+      //    Stock par variante si l'item en cible une, sinon stock du produit (inchangé)
+      const variantsById = new Map<number, ProductVariant>()
       for (const item of dto.items) {
         const safeQuantity = Math.floor(Math.abs(Number(item.quantity)))
+
+        if (item.variantId) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
+          const [rowsAffected] = await this.variantModel.update(
+            { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
+            {
+              where: {
+                id: item.variantId,
+                productId: item.productId,
+                stock: { [Op.gte]: item.quantity },
+                isActive: 1,
+              },
+              transaction: t,
+            },
+          )
+
+          if (rowsAffected === 0) {
+            throwApiError(ErrorCodes.VARIANT_OUT_OF_STOCK, `Stock insuffisant pour la variante ${item.variantId}`)
+          }
+
+          const variant = await this.variantModel.findByPk(item.variantId, { transaction: t })
+          if (!variant) {
+            throwApiError(ErrorCodes.VARIANT_OUT_OF_STOCK, `Variante ${item.variantId} introuvable`)
+          }
+          variantsById.set(item.variantId, variant)
+          continue
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
         const [rowsAffected] = await this.productModel.update(
           { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
@@ -68,6 +102,8 @@ export class OrdersService {
       }
 
       const totalAmount = dto.items.reduce((acc, item) => {
+        const variant = item.variantId ? variantsById.get(item.variantId) : undefined
+        if (variant) return acc + variant.price * item.quantity
         const product = products.find((p) => p.id === item.productId)
         if (!product) return acc
         return acc + product.price * item.quantity
@@ -86,12 +122,14 @@ export class OrdersService {
           if (!product) {
             throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, `Produit ${item.productId} introuvable`)
           }
+          const variant = item.variantId ? variantsById.get(item.variantId) : undefined
           return {
             orderId: order.id,
             productId: item.productId,
+            variantId: item.variantId ?? null,
             quantity: item.quantity,
-            unitPrice: product.price,
-            format: item.format ?? null,
+            unitPrice: variant ? variant.price : product.price,
+            format: variant ? variant.label : item.format ?? null,
             productName: product.name,
           }
         }),
@@ -170,7 +208,11 @@ export class OrdersService {
 
     await this.sequelize.transaction(async (t) => {
       for (const item of (fullOrder.items ?? []) as OrderItem[]) {
-        await this.productsRepository.incrementStock(item.productId, item.quantity, t)
+        if (item.variantId) {
+          await this.productVariantsRepository.incrementStock(item.variantId, item.quantity, t)
+        } else {
+          await this.productsRepository.incrementStock(item.productId, item.quantity, t)
+        }
       }
       await this.ordersRepository.update(order.id, { status: 'cancelled' }, t)
     })
@@ -187,6 +229,7 @@ export class OrdersService {
       items: ((order.items ?? []) as OrderItem[]).map((item) => ({
         id: item.id,
         productId: item.productId,
+        variantId: item.variantId ?? undefined,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         format: item.format ?? undefined,

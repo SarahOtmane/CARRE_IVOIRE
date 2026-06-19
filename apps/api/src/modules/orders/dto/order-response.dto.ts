@@ -1,6 +1,7 @@
 export interface OrderItemResponseDto {
   id: number
   productId: number
+  variantId?: number
   quantity: number
   unitPrice: number
   format?: string

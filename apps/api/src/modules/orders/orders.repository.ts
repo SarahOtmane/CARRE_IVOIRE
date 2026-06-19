@@ -13,6 +13,7 @@ interface CreateOrderData {
 interface CreateOrderItemData {
   orderId: number
   productId: number
+  variantId: number | null
   quantity: number
   unitPrice: number
   format: string | null
