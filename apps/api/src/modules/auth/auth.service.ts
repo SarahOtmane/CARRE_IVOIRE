@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
+import * as crypto from 'crypto'
 import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
 import { UsersRepository } from '@/modules/users/users.repository'
+import { MailService } from '@/modules/mail/mail.service'
 import type { User } from '@/modules/users/users.model'
 import type { RegisterDto } from './dto/register.dto'
 import type { LoginDto } from './dto/login.dto'
@@ -20,6 +22,7 @@ export class AuthService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) { }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto & TokenPair> {
@@ -73,6 +76,36 @@ export class AuthService {
     } catch {
       throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token invalide ou expiré')
     }
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.usersRepository.findByEmail(email)
+    // Réponse identique qu'il y ait un compte ou non (anti-énumération)
+    if (!user || !user.is_active) return
+
+    const token = crypto.randomBytes(32).toString('hex')
+    const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000) // 6h
+
+    await this.usersRepository.setResetToken(user.id, token, expiresAt)
+
+    const frontUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
+    const resetUrl = `${frontUrl}/reinitialiser-mot-de-passe?token=${token}`
+
+    this.mailService.sendPasswordReset({
+      to: user.email,
+      firstName: user.first_name,
+      resetUrl,
+    }).catch(() => { /* ne jamais bloquer sur un échec email */ })
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.usersRepository.findByResetToken(token)
+    if (!user) {
+      throwApiError(ErrorCodes.INVALID_TOKEN, 'Lien de réinitialisation invalide ou expiré')
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 12)
+    await this.usersRepository.clearResetToken(user!.id, newHash)
   }
 
   private generateTokens(user: User): TokenPair {
