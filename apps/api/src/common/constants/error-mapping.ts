@@ -8,6 +8,7 @@ export const ErrorHttpStatus: Record<ErrorCode, number> = {
     [ErrorCodes.REFRESH_TOKEN_INVALID]: 401,
 
     [ErrorCodes.PRODUCT_NOT_FOUND]: 404,
+    [ErrorCodes.VARIANT_NOT_FOUND]: 404,
     [ErrorCodes.CATEGORY_NOT_FOUND]: 404,
     [ErrorCodes.CATEGORY_SLUG_EXISTS]: 409,
     [ErrorCodes.USER_NOT_FOUND]: 404,
@@ -15,6 +16,7 @@ export const ErrorHttpStatus: Record<ErrorCode, number> = {
 
     [ErrorCodes.CART_EMPTY]: 400,
     [ErrorCodes.OUT_OF_STOCK]: 409,
+    [ErrorCodes.VARIANT_OUT_OF_STOCK]: 409,
     [ErrorCodes.ORDER_NOT_FOUND]: 404,
     [ErrorCodes.INVALID_ORDER_STATUS]: 400,
 
