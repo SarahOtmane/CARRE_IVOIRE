@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
+import { Op } from 'sequelize'
 import { ErrorCodes } from '@/common/constants'
 import { User } from './users.model'
 import throwApiError from '@/common/errors/throw-api-error'
@@ -61,7 +62,6 @@ export class UsersRepository {
   }
 
   async findByResetToken(token: string): Promise<User | null> {
-    const { Op } = await import('sequelize')
     return this.userModel.findOne({
       where: {
         resetToken: token,
