@@ -178,7 +178,7 @@ function handlePaymentSubmit() {
         >
           <div
             v-for="item in cartStore.items"
-            :key="`${item.productId}-${item.format ?? 'default'}`"
+            :key="`${item.productId}-${item.variantId ?? 'default'}`"
             class="flex justify-between gap-4 font-sans text-[13px]"
           >
             <span class="text-brun-cacao-2">

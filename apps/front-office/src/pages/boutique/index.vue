@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useHead } from '@unhead/vue'
 import { useProducts, useCategories } from '@carre-ivoire/composables'
 import ProductCard from '@/components/product/ProductCard.vue'
+
+useHead({
+  title: 'Boutique — Carré Ivoire',
+  meta: [
+    { name: 'description', content: 'Découvrez notre catalogue de chocolats artisanaux : carrés signature, tablettes grand cru, ganaches et gourmandises.' },
+    { property: 'og:title', content: 'Boutique — Carré Ivoire' },
+    { property: 'og:type', content: 'website' },
+  ],
+})
 
 const { result, isLoading, fetch } = useProducts({ limit: 12 })
 const { categories } = useCategories()
