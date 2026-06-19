@@ -59,4 +59,25 @@ export class UsersRepository {
     const count = await this.userModel.count({ where: { email } })
     return count > 0
   }
+
+  async findByResetToken(token: string): Promise<User | null> {
+    const { Op } = await import('sequelize')
+    return this.userModel.findOne({
+      where: {
+        resetToken: token,
+        resetTokenExpires: { [Op.gt]: new Date() },
+      },
+    })
+  }
+
+  async setResetToken(id: number, token: string, expiresAt: Date): Promise<void> {
+    await this.userModel.update({ resetToken: token, resetTokenExpires: expiresAt } as any, { where: { id } })
+  }
+
+  async clearResetToken(id: number, newPasswordHash: string): Promise<void> {
+    await this.userModel.update(
+      { password_hash: newPasswordHash, resetToken: null, resetTokenExpires: null } as any,
+      { where: { id } },
+    )
+  }
 }

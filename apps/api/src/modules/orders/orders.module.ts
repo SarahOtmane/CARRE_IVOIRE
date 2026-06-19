@@ -9,9 +9,10 @@ import { OrdersService } from './orders.service'
 import { OrdersController } from './orders.controller'
 import { StripeService } from './stripe.service'
 import { StripeController } from './stripe.controller'
+import { UsersModule } from '@/modules/users/users.module'
 
 @Module({
-  imports: [SequelizeModule.forFeature([Order, OrderItem, Product]), ProductsModule],
+  imports: [SequelizeModule.forFeature([Order, OrderItem, Product]), ProductsModule, UsersModule],
   providers: [OrdersRepository, OrdersService, StripeService],
   controllers: [OrdersController, StripeController],
   exports: [OrdersService],

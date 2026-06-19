@@ -8,6 +8,8 @@ import { Product } from '@/modules/products/product.model'
 import { ProductsRepository } from '@/modules/products/products.repository'
 import { OrdersRepository } from './orders.repository'
 import { StripeService } from './stripe.service'
+import { MailService } from '@/modules/mail/mail.service'
+import { UsersRepository } from '@/modules/users/users.repository'
 import type { Order } from './order.model'
 import type { OrderItem } from './order-item.model'
 import type { CreateOrderDto } from './dto/create-order.dto'
@@ -22,6 +24,8 @@ export class OrdersService {
     private readonly productsRepository: ProductsRepository,
     private readonly ordersRepository: OrdersRepository,
     private readonly stripeService: StripeService,
+    private readonly mailService: MailService,
+    private readonly usersRepository: UsersRepository,
   ) { }
 
   async createOrder(dto: CreateOrderDto, userId: number): Promise<OrderCreatedResponseDto> {
@@ -136,8 +140,24 @@ export class OrdersService {
 
   async confirmByPaymentIntent(paymentIntentId: string): Promise<void> {
     const order = await this.ordersRepository.findByPaymentIntentId(paymentIntentId)
-    if (order) {
-      await this.ordersRepository.update(order.id, { status: 'confirmed' })
+    if (!order) return
+
+    await this.ordersRepository.update(order.id, { status: 'confirmed' })
+
+    const fullOrder = await this.ordersRepository.findById(order.id)
+    const user = await this.usersRepository.findById(order.userId)
+    if (fullOrder && user) {
+      this.mailService.sendOrderConfirmation({
+        to: user.email,
+        firstName: user.first_name,
+        orderNumber: (fullOrder as any).orderNumber ?? `#${fullOrder.id}`,
+        totalAmount: fullOrder.totalAmount,
+        items: ((fullOrder.items ?? []) as OrderItem[]).map((item) => ({
+          productName: (item as any).productName ?? `Produit ${item.productId}`,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        })),
+      }).catch(() => { /* ne jamais bloquer sur un échec email */ })
     }
   }
 
