@@ -14,12 +14,16 @@ import { TaxRatesModule } from './modules/tax-rates/tax-rates.module'
 import { UploadsModule } from './modules/uploads/uploads.module'
 import { FavoritesModule } from './modules/favorites/favorites.module'
 import { MailModule } from './modules/mail/mail.module'
+import { SitemapModule } from './modules/sitemap/sitemap.module'
+import { envValidationSchema } from './config/env.validation'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+      validationSchema: envValidationSchema,
+      validationOptions: { abortEarly: false },
     }),
     ThrottlerModule.forRoot([{
       ttl: 60000,
@@ -38,6 +42,7 @@ import { MailModule } from './modules/mail/mail.module'
     ProductsModule,
     OrdersModule,
     FavoritesModule,
+    SitemapModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
