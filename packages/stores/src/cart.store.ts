@@ -13,7 +13,7 @@ export const useCartStore = defineStore(
 
     function addItem(item: CartItem) {
       const existing = items.value.find(
-        (i) => i.productId === item.productId && i.format === item.format,
+        (i) => i.productId === item.productId && i.variantId === item.variantId,
       )
       if (existing) {
         existing.quantity += item.quantity
@@ -22,14 +22,14 @@ export const useCartStore = defineStore(
       }
     }
 
-    function updateQuantity(productId: number, quantity: number, format?: string) {
-      const item = items.value.find((i) => i.productId === productId && i.format === format)
+    function updateQuantity(productId: number, quantity: number, variantId?: number) {
+      const item = items.value.find((i) => i.productId === productId && i.variantId === variantId)
       if (item) item.quantity = quantity
     }
 
-    function removeItem(productId: number, format?: string) {
+    function removeItem(productId: number, variantId?: number) {
       items.value = items.value.filter(
-        (i) => !(i.productId === productId && i.format === format),
+        (i) => !(i.productId === productId && i.variantId === variantId),
       )
     }
 
