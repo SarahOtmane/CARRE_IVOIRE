@@ -214,13 +214,12 @@ function goToAccount() {
               >
                 {{ loading ? "Connexion…" : "Se connecter" }}
               </button>
-              <button
-                type="button"
+              <RouterLink
+                to="/mot-de-passe-oublie"
                 class="border-b border-brun-cacao pb-px font-sans text-[13px] text-brun-cacao transition-opacity duration-180 hover:opacity-60"
-                @click="router.push('/contact')"
               >
-                Besoin d'aide ?
-              </button>
+                Mot de passe oublié ?
+              </RouterLink>
             </div>
 
             <p
