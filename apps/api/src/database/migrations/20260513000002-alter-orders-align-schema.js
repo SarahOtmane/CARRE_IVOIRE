@@ -2,15 +2,19 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // Add shipping_address JSON (replaces separate address columns for new orders)
-    await queryInterface.addColumn('orders', 'shipping_address', {
-      type: Sequelize.JSON,
-      allowNull: true,
-      after: 'total_amount',
-    })
+    const desc = await queryInterface.describeTable('orders')
 
-    // Rename stripe_pi_id → stripe_payment_intent_id
-    await queryInterface.renameColumn('orders', 'stripe_pi_id', 'stripe_payment_intent_id')
+    if (!desc.shipping_address) {
+      await queryInterface.addColumn('orders', 'shipping_address', {
+        type: Sequelize.JSON,
+        allowNull: true,
+        after: 'total_amount',
+      })
+    }
+
+    if (desc.stripe_pi_id && !desc.stripe_payment_intent_id) {
+      await queryInterface.renameColumn('orders', 'stripe_pi_id', 'stripe_payment_intent_id')
+    }
 
     // Update status ENUM: replace 'paid' with 'confirmed'
     await queryInterface.changeColumn('orders', 'status', {
