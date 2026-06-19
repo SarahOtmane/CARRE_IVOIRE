@@ -1,3 +1,5 @@
+import type { VariantResponseDto } from './variant-response.dto'
+
 export interface TaxRateDto {
   id: number
   label: string
@@ -28,6 +30,7 @@ export interface ProductResponseDto {
   ingredients?: string
   allergens?: string
   weightGrams?: number
+  variants: VariantResponseDto[]
   createdAt: string
   updatedAt: string
 }

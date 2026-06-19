@@ -30,11 +30,38 @@ export interface Product {
   ingredients?: string
   allergens?: string
   weightGrams?: number
+  variants: ProductVariant[]
   createdAt: string
   updatedAt: string
 }
 
 export type ProductResponse = Product
+
+export interface ProductVariant {
+  id: number
+  productId: number
+  label: string
+  weightGrams?: number
+  price: number
+  stock: number
+  stockStatus: StockStatus
+  displayOrder: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateVariantDto {
+  label: string
+  weightGrams?: number
+  price: number
+  stock?: number
+  stockStatus?: 'in_stock' | 'out_of_stock'
+  displayOrder?: number
+  isActive?: boolean
+}
+
+export type UpdateVariantDto = Partial<CreateVariantDto>
 
 export interface CreateProductDto {
   name: string

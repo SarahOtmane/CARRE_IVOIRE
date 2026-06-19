@@ -8,6 +8,8 @@ import type { CreateProductDto } from './dto/create-product.dto'
 import type { UpdateProductDto } from './dto/update-product.dto'
 import type { ProductQueryDto } from './dto/product-query.dto'
 import type { ProductResponseDto } from './dto/product-response.dto'
+import type { VariantResponseDto } from './dto/variant-response.dto'
+import type { ProductVariant } from './product-variant.model'
 
 export interface PaginatedProducts {
   items: ProductResponseDto[]
@@ -101,8 +103,25 @@ export class ProductsService {
       ingredients: p.ingredients ?? undefined,
       allergens: p.allergens ?? undefined,
       weightGrams: p.weightGrams ?? undefined,
+      variants: ((p.variants ?? []) as ProductVariant[]).map((v) => this.toVariantResponseDto(v)),
       createdAt: p.created_at?.toISOString(),
       updatedAt: p.updated_at?.toISOString(),
+    }
+  }
+
+  private toVariantResponseDto(v: ProductVariant): VariantResponseDto {
+    return {
+      id: v.id,
+      productId: v.productId,
+      label: v.label,
+      weightGrams: v.weightGrams ?? undefined,
+      price: v.price,
+      stock: v.stock,
+      stockStatus: v.stockStatus,
+      displayOrder: v.displayOrder,
+      isActive: v.isActive === 1,
+      createdAt: v.created_at?.toISOString(),
+      updatedAt: v.updated_at?.toISOString(),
     }
   }
 }

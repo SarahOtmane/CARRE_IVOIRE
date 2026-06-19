@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize'
 import { Sequelize } from 'sequelize-typescript'
 import type { Transaction } from 'sequelize'
 import { Product } from './product.model'
+import { ProductVariant } from './product-variant.model'
 import { Category } from '@/modules/categories/category.model'
 import { TaxRate } from '@/modules/tax-rates/tax-rate.model'
 import type { CreateProductDto } from './dto/create-product.dto'
@@ -29,6 +30,7 @@ export class ProductsRepository {
       include: [
         { model: Category, attributes: ['id', 'name', 'slug'] },
         { model: TaxRate, attributes: ['id', 'label', 'rate', 'is_default'] },
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
       ],
       limit,
       offset: (page - 1) * limit,
@@ -43,12 +45,22 @@ export class ProductsRepository {
   async findBySlug(slug: string): Promise<Product | null> {
     return this.db.findOne({
       where: { slug, isActive: 1 },
-      include: [Category, TaxRate],
+      include: [
+        Category,
+        TaxRate,
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
+      ],
     })
   }
 
   async findById(id: number): Promise<Product | null> {
-    return this.db.findByPk(id, { include: [Category, TaxRate] })
+    return this.db.findByPk(id, {
+      include: [
+        Category,
+        TaxRate,
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
+      ],
+    })
   }
 
   async findAllByIds(ids: number[], t?: Transaction): Promise<Product[]> {
@@ -112,6 +124,10 @@ export class ProductsRepository {
     if (dto.allergens !== undefined) data.allergens = dto.allergens
     if (dto.weightGrams !== undefined) data.weightGrams = dto.weightGrams
     return data
+  }
+
+  async findAllActive(): Promise<Product[]> {
+    return this.db.findAll({ where: { isActive: 1 }, attributes: ['slug', 'updated_at'] })
   }
 
   async incrementStock(productId: number, quantity: number, t?: Transaction): Promise<void> {

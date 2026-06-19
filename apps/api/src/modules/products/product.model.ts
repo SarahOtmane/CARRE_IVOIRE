@@ -10,9 +10,11 @@ import {
   AllowNull,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript'
 import { Category } from '@/modules/categories/category.model'
 import { TaxRate } from '@/modules/tax-rates/tax-rate.model'
+import { ProductVariant } from './product-variant.model'
 
 @Table({
   tableName: 'products',
@@ -115,6 +117,9 @@ export class Product extends Model<Product> {
   @AllowNull(true)
   @Column({ type: DataType.INTEGER.UNSIGNED, field: 'weight_grams' })
   declare weightGrams: number | null
+
+  @HasMany(() => ProductVariant)
+  declare variants: ProductVariant[]
 
   declare created_at: Date
   declare updated_at: Date
