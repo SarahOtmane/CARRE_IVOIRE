@@ -1,22 +1,42 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useCategories } from '@carre-ivoire/composables'
 import CategoryGlyph from './CategoryGlyph.vue'
 
 const router = useRouter()
 const hoveredSlug = ref<string | null>(null)
 
-const categories = [
-  { slug: 'carres-signature', num: '01', label: 'Carrés Signature', tagline: 'bonbons au chocolat',        bg: 'var(--brun-cacao)',   fg: 'var(--ivoire)',     featured: true },
-  { slug: 'mini-carres',      num: '02', label: 'Mini Carrés',       tagline: 'format dégustation',         bg: 'var(--rose-poudre)', fg: 'var(--brun-cacao)' },
-  { slug: 'tablettes',        num: '03', label: 'Tablettes',          tagline: 'pur cacao, grand format',    bg: 'var(--beige-doux)',  fg: 'var(--brun-cacao)' },
-  { slug: 'gourmandises',     num: '04', label: 'Gourmandises',       tagline: 'praliné, caramel, noisette', bg: 'var(--ivoire-deep)', fg: 'var(--brun-cacao)' },
-  { slug: 'sables',           num: '05', label: 'Sablés',             tagline: 'biscuits au beurre',         bg: 'var(--rose-poudre)', fg: 'var(--brun-cacao)' },
-  { slug: 'mendiants',        num: '06', label: 'Mendiants',          tagline: 'fruits secs & cacao',        bg: 'var(--beige-doux)',  fg: 'var(--brun-cacao)' },
-  { slug: 'oursons',          num: '07', label: 'Oursons',            tagline: 'guimauve enrobée',           bg: 'var(--ivoire-deep)', fg: 'var(--brun-cacao)' },
-  { slug: 'chocobombs',       num: '08', label: 'Chocobombs',         tagline: 'édition printemps',          bg: 'var(--brun-cacao-2)', fg: 'var(--ivoire)' },
-  { slug: 'pates-a-tartiner', num: '09', label: 'Pâtes à tartiner',   tagline: 'noisette & cacao',           bg: 'var(--rose-poudre)', fg: 'var(--brun-cacao)' },
-]
+const { categories: apiCategories } = useCategories()
+
+const categoryMeta: Record<string, { num: string; tagline: string; bg: string; fg: string; featured?: boolean }> = {
+  'carres-signature': { num: '01', tagline: 'bonbons au chocolat',        bg: 'var(--brun-cacao)',    fg: 'var(--ivoire)',     featured: true },
+  'mini-carres':      { num: '02', tagline: 'format dégustation',         bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
+  'tablettes':        { num: '03', tagline: 'pur cacao, grand format',    bg: 'var(--beige-doux)',   fg: 'var(--brun-cacao)' },
+  'gourmandises':     { num: '04', tagline: 'praliné, caramel, noisette', bg: 'var(--ivoire-deep)',  fg: 'var(--brun-cacao)' },
+  'sables':           { num: '05', tagline: 'biscuits au beurre',         bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
+  'mendiants':        { num: '06', tagline: 'fruits secs & cacao',        bg: 'var(--beige-doux)',   fg: 'var(--brun-cacao)' },
+  'oursons':          { num: '07', tagline: 'guimauve enrobée',           bg: 'var(--ivoire-deep)',  fg: 'var(--brun-cacao)' },
+  'chocobombs':       { num: '08', tagline: 'édition printemps',          bg: 'var(--brun-cacao-2)', fg: 'var(--ivoire)'     },
+  'pates-a-tartiner': { num: '09', tagline: 'noisette & cacao',           bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
+}
+
+const FALLBACK_COLORS = ['var(--rose-poudre)', 'var(--beige-doux)', 'var(--ivoire-deep)']
+
+const categories = computed(() =>
+  apiCategories.value.map((cat, i) => {
+    const meta = categoryMeta[cat.slug]
+    return {
+      slug: cat.slug,
+      label: cat.name,
+      num: meta?.num ?? String(i + 1).padStart(2, '0'),
+      tagline: meta?.tagline ?? '',
+      bg: meta?.bg ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
+      fg: meta?.fg ?? 'var(--brun-cacao)',
+      featured: meta?.featured ?? false,
+    }
+  }),
+)
 </script>
 
 <template>
