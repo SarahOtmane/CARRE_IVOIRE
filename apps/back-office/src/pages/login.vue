@@ -117,7 +117,7 @@ onMounted(() => {
           <input
             v-model="email"
             type="email"
-            class="border-b border-cocoa/25 bg-transparent py-3 font-body text-base text-cocoa outline-none transition-colors duration-200 focus:border-cocoa"
+            class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none transition-colors duration-200 focus:border-cocoa"
             autocomplete="email"
           />
         </label>
@@ -130,7 +130,7 @@ onMounted(() => {
           <input
             v-model="password"
             type="password"
-            class="border-b border-cocoa/25 bg-transparent py-3 font-body text-base text-cocoa outline-none transition-colors duration-200 focus:border-cocoa"
+            class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none transition-colors duration-200 focus:border-cocoa"
             autocomplete="current-password"
           />
         </label>

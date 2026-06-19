@@ -15,7 +15,6 @@ const { categories } = useAdminCategories();
 
 onMounted(() => Promise.all([fetchProducts(), fetchOrders()]));
 
-const lowStockCount = computed(() => products.value.filter((p) => p.stock < 10).length);
 const pendingOrdersCount = computed(() =>
   orders.value.filter(
     (o) => o.status === OrderStatus.PENDING || o.status === OrderStatus.PAYMENT_PENDING,
@@ -27,10 +26,9 @@ const navItems = computed(() => [
   { name: "admin-categories", label: "Catégories", badge: categories.value.length || undefined, code: "01" },
   { name: "admin-produits", label: "Produits", badge: products.value.length || undefined, code: "02" },
   { name: "admin-commandes", label: "Commandes", badge: orders.value.length || undefined, code: "03" },
-  { name: "admin-stocks", label: "Stocks", badge: lowStockCount.value || undefined, code: "04" },
-  { name: "admin-pages", label: "Pages", badge: undefined, code: "05" },
-  { name: "admin-clients", label: "Clients", badge: undefined, code: "06" },
-  { name: "admin-parametres", label: "Paramètres", badge: undefined, code: "07" },
+  { name: "admin-pages", label: "Pages", badge: undefined, code: "04" },
+  { name: "admin-clients", label: "Clients", badge: undefined, code: "05" },
+  { name: "admin-parametres", label: "Paramètres", badge: undefined, code: "06" },
 ]);
 
 function isActive(name: string) {
