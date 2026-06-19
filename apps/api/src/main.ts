@@ -1,12 +1,15 @@
 import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
+import { NestExpressApplication } from '@nestjs/platform-express'
+import { join } from 'path'
 import cookieParser from 'cookie-parser'
 import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 import { TransformInterceptor } from './common/interceptors/transform.interceptor'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { rawBody: true })
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true })
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' })
 
   app.setGlobalPrefix('api/v1', {
     exclude: ['api/health'],
