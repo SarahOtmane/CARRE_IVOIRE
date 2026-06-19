@@ -17,6 +17,7 @@ services:
       - ./apps/api/package.json:/app/package.json
       - ./packages:/app/packages
       - node_modules_api:/app/node_modules
+      - ./apps/api/uploads:/app/uploads
     environment:
       NODE_ENV: development
     ports:
