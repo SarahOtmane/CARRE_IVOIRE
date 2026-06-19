@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
+import { Sequelize } from 'sequelize-typescript'
 import type { Transaction } from 'sequelize'
 import { Product } from './product.model'
 import { Category } from '@/modules/categories/category.model'
@@ -111,6 +112,14 @@ export class ProductsRepository {
     if (dto.allergens !== undefined) data.allergens = dto.allergens
     if (dto.weightGrams !== undefined) data.weightGrams = dto.weightGrams
     return data
+  }
+
+  async incrementStock(productId: number, quantity: number, t?: Transaction): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
+    await this.db.update(
+      { stock: Sequelize.literal(`stock + ${Math.floor(Math.abs(quantity))}`) } as any,
+      { where: { id: productId }, transaction: t },
+    )
   }
 
   async delete(id: number): Promise<void> {

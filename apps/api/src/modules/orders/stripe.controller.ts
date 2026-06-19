@@ -25,6 +25,11 @@ export class StripeController {
       await this.ordersService.confirmByPaymentIntent(paymentIntent.id)
     }
 
+    if (event.type === 'payment_intent.payment_failed') {
+      const paymentIntent = event.data.object as Stripe.PaymentIntent
+      await this.ordersService.cancelByPaymentIntent(paymentIntent.id)
+    }
+
     return { received: true }
   }
 }

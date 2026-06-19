@@ -141,6 +141,21 @@ export class OrdersService {
     }
   }
 
+  async cancelByPaymentIntent(paymentIntentId: string): Promise<void> {
+    const order = await this.ordersRepository.findByPaymentIntentId(paymentIntentId)
+    if (!order) return
+
+    const fullOrder = await this.ordersRepository.findById(order.id)
+    if (!fullOrder) return
+
+    await this.sequelize.transaction(async (t) => {
+      for (const item of (fullOrder.items ?? []) as OrderItem[]) {
+        await this.productsRepository.incrementStock(item.productId, item.quantity, t)
+      }
+      await this.ordersRepository.update(order.id, { status: 'cancelled' }, t)
+    })
+  }
+
   private toResponseDto(order: Order): OrderResponseDto {
     return {
       id: order.id,
