@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useAdminProducts, useAdminCategories } from "@carre-ivoire/composables";
+import { useAdminProducts, useAdminCategories, useAdminTaxRates, useImageUpload } from "@carre-ivoire/composables";
 
 const route = useRoute();
 const router = useRouter();
 const { products, fetchAll, update, remove, isLoading } = useAdminProducts();
 const { categories } = useAdminCategories();
+const { taxRates } = useAdminTaxRates();
+const { upload, isUploading } = useImageUpload();
 
 const productId = computed(() => Number(route.params.id));
 
@@ -15,13 +17,15 @@ const draft = ref({
   slug: "",
   categoryId: 0,
   price: 0,
-  stock: 0,
+  stockStatus: 'in_stock' as 'in_stock' | 'out_of_stock',
+  taxRateId: null as number | null,
   shortDescription: "",
   description: "",
   isActive: true,
   ingredients: "",
   allergens: "",
   weightGrams: 0,
+  imageUrl: "",
 });
 
 const found = ref(false);
@@ -41,18 +45,27 @@ watch(
         slug: product.slug,
         categoryId: product.categoryId,
         price: product.price / 100,
-        stock: product.stock,
+        stockStatus: product.stockStatus === 'out_of_stock' ? 'out_of_stock' : 'in_stock',
+        taxRateId: product.taxRateId ?? null,
         shortDescription: product.shortDescription ?? "",
         description: product.description ?? "",
         isActive: product.isActive,
         ingredients: product.ingredients ?? "",
         allergens: product.allergens ?? "",
         weightGrams: product.weightGrams ?? 0,
+        imageUrl: product.imageUrl ?? "",
       };
     }
   },
   { immediate: true },
 );
+
+async function onImageChange(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  const url = await upload(file);
+  if (url) draft.value.imageUrl = url;
+}
 
 async function save() {
   if (!draft.value.name.trim() || !draft.value.slug.trim()) return;
@@ -61,13 +74,15 @@ async function save() {
     slug: draft.value.slug,
     categoryId: draft.value.categoryId,
     price: Math.round(draft.value.price * 100),
-    stock: draft.value.stock,
+    stockStatus: draft.value.stockStatus,
+    taxRateId: draft.value.taxRateId,
     shortDescription: draft.value.shortDescription || undefined,
     description: draft.value.description || undefined,
     isActive: draft.value.isActive,
     ingredients: draft.value.ingredients || undefined,
     allergens: draft.value.allergens || undefined,
     weightGrams: draft.value.weightGrams || undefined,
+    imageUrl: draft.value.imageUrl || undefined,
   });
   router.push({ name: "admin-produits" });
 }
@@ -113,7 +128,7 @@ async function deleteProduct() {
           <input
             v-model="draft.name"
             type="text"
-            class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+            class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
           />
         </label>
 
@@ -122,7 +137,7 @@ async function deleteProduct() {
           <input
             v-model="draft.slug"
             type="text"
-            class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+            class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
           />
         </label>
 
@@ -131,7 +146,7 @@ async function deleteProduct() {
             <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Catégorie</span>
             <select
               v-model.number="draft.categoryId"
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+              class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
             >
               <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
             </select>
@@ -141,7 +156,7 @@ async function deleteProduct() {
             <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Statut</span>
             <select
               v-model="draft.isActive"
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+              class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
             >
               <option :value="true">Actif</option>
               <option :value="false">Inactif</option>
@@ -157,19 +172,19 @@ async function deleteProduct() {
               type="number"
               min="0"
               step="0.01"
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+              class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
             />
           </label>
 
           <label class="grid gap-2">
-            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Stock</span>
-            <input
-              v-model.number="draft.stock"
-              type="number"
-              min="0"
-              step="1"
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
-            />
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Disponibilité</span>
+            <select
+              v-model="draft.stockStatus"
+              class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
+            >
+              <option value="in_stock">En stock</option>
+              <option value="out_of_stock">Rupture de stock</option>
+            </select>
           </label>
 
           <label class="grid gap-2">
@@ -179,17 +194,30 @@ async function deleteProduct() {
               type="number"
               min="0"
               step="1"
-              class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+              class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
             />
           </label>
         </div>
+
+        <label class="grid gap-2">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">TVA applicable</span>
+          <select
+            v-model.number="draft.taxRateId"
+            class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
+          >
+            <option :value="null">Aucune TVA</option>
+            <option v-for="tva in taxRates" :key="tva.id" :value="tva.id">
+              {{ tva.label }} — {{ tva.rate }} %
+            </option>
+          </select>
+        </label>
 
         <label class="grid gap-2">
           <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Accroche courte</span>
           <input
             v-model="draft.shortDescription"
             type="text"
-            class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+            class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
           />
         </label>
 
@@ -198,7 +226,7 @@ async function deleteProduct() {
           <textarea
             v-model="draft.description"
             rows="4"
-            class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base leading-7 text-cocoa outline-none"
+            class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base leading-7 text-cocoa outline-none focus:border-cocoa/60"
           />
         </label>
 
@@ -207,12 +235,49 @@ async function deleteProduct() {
           <input
             v-model="draft.ingredients"
             type="text"
-            class="border-b border-cocoa/20 bg-transparent py-3 font-body text-base text-cocoa outline-none"
+            class="border border-cocoa/25 bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
           />
         </label>
       </div>
 
       <aside class="space-y-6 border-t border-cocoa/12 pt-6 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+        <!-- Image -->
+        <div class="space-y-3">
+          <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45">Image du produit</div>
+          <div
+            v-if="draft.imageUrl"
+            class="relative aspect-square w-full max-w-[200px] border border-cocoa/12 bg-beige/30"
+          >
+            <img :src="draft.imageUrl" alt="" class="h-full w-full object-cover" />
+          </div>
+          <div
+            v-else
+            class="flex aspect-square w-full max-w-[200px] items-center justify-center border border-dashed border-cocoa/20 bg-beige/10"
+          >
+            <span class="font-body text-[10px] uppercase tracking-[0.18em] text-cocoa/35">Aucune image</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <label class="cursor-pointer border border-cocoa/25 px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-cocoa transition-colors hover:border-cocoa">
+              <span>{{ isUploading ? "Envoi…" : draft.imageUrl ? "Changer" : "Choisir" }}</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="sr-only"
+                :disabled="isUploading"
+                @change="onImageChange"
+              />
+            </label>
+            <button
+              v-if="draft.imageUrl"
+              type="button"
+              class="font-body text-[10px] uppercase tracking-[0.14em] text-cocoa/40 hover:text-cocoa"
+              @click="draft.imageUrl = ''"
+            >
+              Retirer
+            </button>
+          </div>
+        </div>
+
         <div class="border border-cocoa/12 bg-beige/50 p-5">
           <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45">Aperçu prix</div>
           <div class="mt-3 font-display text-4xl text-gold">
@@ -226,28 +291,28 @@ async function deleteProduct() {
         <div class="flex flex-wrap gap-3">
           <button
             type="button"
-            class="border border-cocoa/25 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa"
+            class="border border-cocoa/40 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa"
             @click="router.push({ name: 'admin-produits' })"
           >
             Annuler
           </button>
           <button
             type="button"
-            class="border border-cocoa/25 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa"
+            class="border border-cocoa/40 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa"
             @click="archive"
           >
             Désactiver
           </button>
           <button
             type="button"
-            class="border border-red-700/30 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-red-700"
+            class="border border-red-700/50 px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-red-700"
             @click="deleteProduct"
           >
             Supprimer
           </button>
           <button
             type="button"
-            :disabled="isLoading"
+            :disabled="isLoading || isUploading"
             class="border border-cocoa bg-cocoa px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-ivory disabled:opacity-50"
             @click="save"
           >
