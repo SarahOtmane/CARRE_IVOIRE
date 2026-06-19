@@ -43,7 +43,14 @@ export class ProductsService {
   }
 
   async create(dto: CreateProductDto): Promise<ProductResponseDto> {
-    const product = await this.productsRepository.create(dto)
+    const enriched = { ...dto }
+    if (enriched.stockStatus === undefined) {
+      enriched.stockStatus = 'in_stock'
+    }
+    if (enriched.stock === undefined) {
+      enriched.stock = enriched.stockStatus === 'out_of_stock' ? 0 : 999
+    }
+    const product = await this.productsRepository.create(enriched)
     return this.toResponseDto(product)
   }
 
@@ -52,7 +59,11 @@ export class ProductsService {
     if (!existing) {
       throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, 'Produit introuvable')
     }
-    const updated = await this.productsRepository.update(id, dto)
+    const enriched = { ...dto }
+    if (enriched.stockStatus !== undefined && enriched.stock === undefined) {
+      enriched.stock = enriched.stockStatus === 'out_of_stock' ? 0 : 999
+    }
+    const updated = await this.productsRepository.update(id, enriched)
     return this.toResponseDto(updated!)
   }
 
@@ -66,6 +77,7 @@ export class ProductsService {
 
   private toResponseDto(p: Product): ProductResponseDto {
     const cat = p.category as Category | undefined
+    const tax = p.taxRate as import('@/modules/tax-rates/tax-rate.model').TaxRate | undefined | null
     return {
       id: p.id,
       name: p.name,
@@ -80,6 +92,8 @@ export class ProductsService {
       category: cat ? { id: cat.id, name: cat.name, slug: cat.slug } : undefined,
       stock: p.stock,
       stockStatus: p.stockStatus,
+      taxRateId: p.taxRateId ?? undefined,
+      taxRate: tax ? { id: tax.id, label: tax.label, rate: Number(tax.rate), isDefault: tax.isDefault === 1 } : undefined,
       isActive: p.isActive === 1,
       isSeasonal: p.isSeasonal === 1,
       displayOrder: p.displayOrder,

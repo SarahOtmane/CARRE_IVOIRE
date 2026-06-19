@@ -1,4 +1,5 @@
 import type { CategoryResponse } from './category.types'
+import type { TaxRate } from './tax-rate.types'
 
 export enum StockStatus {
   IN_STOCK = 'in_stock',
@@ -16,6 +17,8 @@ export interface Product {
   discountPrice?: number
   stock: number
   stockStatus: StockStatus
+  taxRateId?: number
+  taxRate?: TaxRate
   imageUrl?: string
   images?: string[]
   categoryId: number
@@ -44,6 +47,8 @@ export interface CreateProductDto {
   images?: string[]
   categoryId: number
   stock?: number
+  stockStatus?: 'in_stock' | 'out_of_stock'
+  taxRateId?: number | null
   isActive?: boolean
   isSeasonal?: boolean
   displayOrder?: number

@@ -12,6 +12,7 @@ import {
   BelongsTo,
 } from 'sequelize-typescript'
 import { Category } from '@/modules/categories/category.model'
+import { TaxRate } from '@/modules/tax-rates/tax-rate.model'
 
 @Table({
   tableName: 'products',
@@ -75,6 +76,14 @@ export class Product extends Model<Product> {
   @AllowNull(false)
   @Column({ type: DataType.ENUM('in_stock', 'low_stock', 'out_of_stock'), field: 'stock_status' })
   declare stockStatus: 'in_stock' | 'low_stock' | 'out_of_stock'
+
+  @ForeignKey(() => TaxRate)
+  @AllowNull(true)
+  @Column({ type: DataType.INTEGER.UNSIGNED, field: 'tax_rate_id' })
+  declare taxRateId: number | null
+
+  @BelongsTo(() => TaxRate)
+  declare taxRate: TaxRate | null
 
   @Default(1)
   @AllowNull(false)

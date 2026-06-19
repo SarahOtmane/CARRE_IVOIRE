@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize'
 import type { Transaction } from 'sequelize'
 import { Product } from './product.model'
 import { Category } from '@/modules/categories/category.model'
+import { TaxRate } from '@/modules/tax-rates/tax-rate.model'
 import type { CreateProductDto } from './dto/create-product.dto'
 import type { UpdateProductDto } from './dto/update-product.dto'
 import type { ProductQueryDto } from './dto/product-query.dto'
@@ -24,7 +25,10 @@ export class ProductsRepository {
 
     return this.db.findAndCountAll({
       where,
-      include: [{ model: Category, attributes: ['id', 'name', 'slug'] }],
+      include: [
+        { model: Category, attributes: ['id', 'name', 'slug'] },
+        { model: TaxRate, attributes: ['id', 'label', 'rate', 'is_default'] },
+      ],
       limit,
       offset: (page - 1) * limit,
       order: [
@@ -38,12 +42,12 @@ export class ProductsRepository {
   async findBySlug(slug: string): Promise<Product | null> {
     return this.db.findOne({
       where: { slug, isActive: 1 },
-      include: [Category],
+      include: [Category, TaxRate],
     })
   }
 
   async findById(id: number): Promise<Product | null> {
-    return this.db.findByPk(id)
+    return this.db.findByPk(id, { include: [Category, TaxRate] })
   }
 
   async findAllByIds(ids: number[], t?: Transaction): Promise<Product[]> {
@@ -67,6 +71,8 @@ export class ProductsRepository {
       imageUrl: dto.imageUrl ?? null,
       categoryId: dto.categoryId,
       stock: dto.stock ?? 0,
+      stockStatus: dto.stockStatus ?? 'in_stock',
+      taxRateId: dto.taxRateId ?? null,
       isActive: dto.isActive !== false ? 1 : 0,
       isSeasonal: dto.isSeasonal ? 1 : 0,
       displayOrder: dto.displayOrder ?? 0,
@@ -95,6 +101,8 @@ export class ProductsRepository {
     if (dto.imageUrl !== undefined) data.imageUrl = dto.imageUrl
     if (dto.categoryId !== undefined) data.categoryId = dto.categoryId
     if (dto.stock !== undefined) data.stock = dto.stock
+    if (dto.stockStatus !== undefined) data.stockStatus = dto.stockStatus
+    if (dto.taxRateId !== undefined) data.taxRateId = dto.taxRateId ?? null
     if (dto.isActive !== undefined) data.isActive = dto.isActive ? 1 : 0
     if (dto.isSeasonal !== undefined) data.isSeasonal = dto.isSeasonal ? 1 : 0
     if (dto.displayOrder !== undefined) data.displayOrder = dto.displayOrder

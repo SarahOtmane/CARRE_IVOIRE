@@ -1,3 +1,10 @@
+export interface TaxRateDto {
+  id: number
+  label: string
+  rate: number
+  isDefault: boolean
+}
+
 export interface ProductResponseDto {
   id: number
   name: string
@@ -12,6 +19,8 @@ export interface ProductResponseDto {
   category?: { id: number; name: string; slug: string }
   stock: number
   stockStatus: string
+  taxRateId?: number
+  taxRate?: TaxRateDto
   isActive: boolean
   isSeasonal: boolean
   displayOrder: number
