@@ -36,6 +36,9 @@ export const ErrorCodes = {
     FORBIDDEN: 'FORBIDDEN',
     ADMIN_ONLY: 'ADMIN_ONLY',
 
+    // Favorites errors
+    FAVORITE_ALREADY_EXISTS: 'FAVORITE_ALREADY_EXISTS',
+
     // General errors
     INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
     NOT_FOUND: 'NOT_FOUND',

@@ -27,6 +27,8 @@ export const ErrorHttpStatus: Record<ErrorCode, number> = {
     [ErrorCodes.FORBIDDEN]: 403,
     [ErrorCodes.ADMIN_ONLY]: 403,
 
+    [ErrorCodes.FAVORITE_ALREADY_EXISTS]: 409,
+
     [ErrorCodes.INTERNAL_SERVER_ERROR]: 500,
     [ErrorCodes.NOT_FOUND]: 404,
     [ErrorCodes.CONFLICT]: 409,
