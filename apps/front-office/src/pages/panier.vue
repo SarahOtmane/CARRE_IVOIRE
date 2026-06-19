@@ -90,13 +90,13 @@ function goToCheckout() {
           <div class="border-t" style="border-color: var(--cacao-a12)">
             <CartItem
               v-for="item in cartStore.items"
-              :key="`${item.productId}-${item.format ?? 'default'}`"
+              :key="`${item.productId}-${item.variantId ?? 'default'}`"
               :item="item"
               @increment="
                 cartStore.updateQuantity(
                   item.productId,
                   item.quantity + 1,
-                  item.format,
+                  item.variantId,
                 )
               "
               @decrement="
@@ -104,11 +104,11 @@ function goToCheckout() {
                   ? cartStore.updateQuantity(
                       item.productId,
                       item.quantity - 1,
-                      item.format,
+                      item.variantId,
                     )
-                  : cartStore.removeItem(item.productId, item.format)
+                  : cartStore.removeItem(item.productId, item.variantId)
               "
-              @remove="cartStore.removeItem(item.productId, item.format)"
+              @remove="cartStore.removeItem(item.productId, item.variantId)"
             />
           </div>
         </div>
