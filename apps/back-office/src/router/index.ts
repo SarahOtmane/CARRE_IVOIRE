@@ -66,12 +66,6 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true, requiresAdmin: true },
       },
       {
-        path: 'stocks',
-        name: 'admin-stocks',
-        component: () => import('@/pages/admin/stocks/index.vue'),
-        meta: { requiresAuth: true, requiresAdmin: true },
-      },
-      {
         path: 'pages',
         name: 'admin-pages',
         component: () => import('@/pages/admin/pages/index.vue'),
