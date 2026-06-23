@@ -177,7 +177,7 @@
 - **Critères de validation** : un paiement test Stripe (carte de test officielle) aboutit à une commande `status=paid` en base, avec décrément réel du stock et email de confirmation envoyé une seule fois.
 - **Tests à réaliser** : test manuel end-to-end avec `stripe listen`, puis test e2e automatisé (TEST-003) une fois le pipeline e2e en place.
 
-#### SEC-001 — Corriger la configuration CORS en production
+#### SEC-001 — Corriger la configuration CORS en production ✅ Fait
 
 - **Description** : Lire la variable d'environnement `CORS_ORIGIN` (liste d'origines séparées par virgules) dans `main.ts` au lieu du hardcoding actuel, et supprimer le fallback `'http://localhost:5174'` qui reste actif même en production.
 - **Pourquoi** : `.env.example` documente `CORS_ORIGIN` comme configurable, mais le code l'ignore totalement ; une origine de développement reste autorisée avec `credentials: true` sur l'API de production, élargissant la surface d'attaque CSRF/vol de session.
