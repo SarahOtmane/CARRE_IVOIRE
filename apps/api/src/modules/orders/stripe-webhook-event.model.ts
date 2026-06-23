@@ -19,7 +19,7 @@ export class StripeWebhookEvent extends Model<StripeWebhookEvent> {
   @Column(DataType.INTEGER.UNSIGNED)
   declare id: number
 
-  @Unique
+  @Unique('event_id')
   @AllowNull(false)
   @Column({ type: DataType.STRING(255), field: 'event_id' })
   declare eventId: string
