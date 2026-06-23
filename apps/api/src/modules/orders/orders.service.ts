@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { InjectConnection, InjectModel } from '@nestjs/sequelize'
+import { InjectConnection } from '@nestjs/sequelize'
 import { Sequelize } from 'sequelize-typescript'
-import { Op } from 'sequelize'
 import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
-import { Product } from '@/modules/products/product.model'
-import { ProductVariant } from '@/modules/products/product-variant.model'
+import type { ProductVariant } from '@/modules/products/product-variant.model'
 import { ProductsRepository } from '@/modules/products/products.repository'
 import { ProductVariantsRepository } from '@/modules/products/product-variants.repository'
 import { OrdersRepository } from './orders.repository'
@@ -22,8 +20,6 @@ import type { OrderResponseDto, OrderCreatedResponseDto } from './dto/order-resp
 export class OrdersService {
   constructor(
     @InjectConnection() private readonly sequelize: Sequelize,
-    @InjectModel(Product) private readonly productModel: typeof Product,
-    @InjectModel(ProductVariant) private readonly variantModel: typeof ProductVariant,
     private readonly productsRepository: ProductsRepository,
     private readonly productVariantsRepository: ProductVariantsRepository,
     private readonly ordersRepository: OrdersRepository,
@@ -37,33 +33,24 @@ export class OrdersService {
       throwApiError(ErrorCodes.CART_EMPTY, 'Le panier est vide')
     }
 
-    return this.sequelize.transaction(async (t) => {
-      // 1. Décrémenter le stock atomiquement — rowsAffected === 0 → rollback
-      //    Stock par variante si l'item en cible une, sinon stock du produit (inchangé)
+    // 1. Réservation atomique du stock + création de la commande (statut payment_pending),
+    //    dans une transaction courte qui ne contient aucun appel réseau externe.
+    const { order, totalAmount } = await this.sequelize.transaction(async (t) => {
       const variantsById = new Map<number, ProductVariant>()
+
       for (const item of dto.items) {
-        const safeQuantity = Math.floor(Math.abs(Number(item.quantity)))
-
         if (item.variantId) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
-          const [rowsAffected] = await this.variantModel.update(
-            { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
-            {
-              where: {
-                id: item.variantId,
-                productId: item.productId,
-                stock: { [Op.gte]: item.quantity },
-                isActive: 1,
-              },
-              transaction: t,
-            },
+          const rowsAffected = await this.productVariantsRepository.decrementStock(
+            item.variantId,
+            item.productId,
+            item.quantity,
+            t,
           )
-
           if (rowsAffected === 0) {
             throwApiError(ErrorCodes.VARIANT_OUT_OF_STOCK, `Stock insuffisant pour la variante ${item.variantId}`)
           }
 
-          const variant = await this.variantModel.findByPk(item.variantId, { transaction: t })
+          const variant = await this.productVariantsRepository.findById(item.variantId, t)
           if (!variant) {
             throwApiError(ErrorCodes.VARIANT_OUT_OF_STOCK, `Variante ${item.variantId} introuvable`)
           }
@@ -71,25 +58,13 @@ export class OrdersService {
           continue
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
-        const [rowsAffected] = await this.productModel.update(
-          { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
-          {
-            where: {
-              id: item.productId,
-              stock: { [Op.gte]: item.quantity },
-              isActive: 1,
-            },
-            transaction: t,
-          },
-        )
-
+        const rowsAffected = await this.productsRepository.decrementStock(item.productId, item.quantity, t)
         if (rowsAffected === 0) {
           throwApiError(ErrorCodes.OUT_OF_STOCK, `Stock insuffisant pour le produit ${item.productId}`)
         }
       }
 
-      // 2. Relire les prix depuis la BDD — jamais depuis le client
+      // Relire les prix depuis la BDD — jamais depuis le client
       const products = await this.productsRepository.findAllByIds(
         dto.items.map((i) => i.productId),
         t,
@@ -109,13 +84,11 @@ export class OrdersService {
         return acc + product.price * item.quantity
       }, 0)
 
-      // 3. Créer la commande
       const order = await this.ordersRepository.create(
         { userId, totalAmount, shippingAddress: dto.shippingAddress },
         t,
       )
 
-      // 4. Créer les order_items (snapshot du prix et du nom)
       await this.ordersRepository.createItems(
         dto.items.map((item) => {
           const product = products.find((p) => p.id === item.productId)
@@ -136,9 +109,14 @@ export class OrdersService {
         t,
       )
 
-      // 5. PaymentIntent Stripe — si Stripe échoue, la transaction rollback
+      return { order, totalAmount }
+    })
+
+    // 2. PaymentIntent Stripe — hors transaction DB. En cas d'échec, on compense
+    //    en libérant le stock réservé plutôt que de tenir les verrous DB pendant l'appel réseau.
+    try {
       const paymentIntent = await this.stripeService.createPaymentIntent(totalAmount, order.id)
-      await this.ordersRepository.update(order.id, { stripePaymentIntentId: paymentIntent.id }, t)
+      await this.ordersRepository.update(order.id, { stripePaymentIntentId: paymentIntent.id })
 
       return {
         orderId: order.id,
@@ -146,6 +124,25 @@ export class OrdersService {
         clientSecret: paymentIntent.client_secret,
         totalAmount,
       }
+    } catch (error) {
+      await this.releaseStockAndCancel(order.id, dto.items)
+      throw error
+    }
+  }
+
+  private async releaseStockAndCancel(
+    orderId: number,
+    items: CreateOrderDto['items'],
+  ): Promise<void> {
+    await this.sequelize.transaction(async (t) => {
+      for (const item of items) {
+        if (item.variantId) {
+          await this.productVariantsRepository.incrementStock(item.variantId, item.quantity, t)
+        } else {
+          await this.productsRepository.incrementStock(item.productId, item.quantity, t)
+        }
+      }
+      await this.ordersRepository.update(orderId, { status: 'cancelled' }, t)
     })
   }
 
