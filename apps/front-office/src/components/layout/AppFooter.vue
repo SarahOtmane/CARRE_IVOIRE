@@ -41,7 +41,7 @@ const cols = [
 </script>
 
 <template>
-  <footer class="bg-brun-cacao px-5 pb-12 pt-24 text-ivoire lg:px-[104px]">
+  <footer class="bg-cacao px-5 pb-12 pt-24 text-ivoire lg:px-[104px]">
     <div
       class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))_minmax(0,1.5fr)]"
     >
