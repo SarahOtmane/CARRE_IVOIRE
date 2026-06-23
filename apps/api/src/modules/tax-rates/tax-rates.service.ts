@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common'
+import type { TaxRate } from '@carre-ivoire/types'
 import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
 import { TaxRatesRepository } from './tax-rates.repository'
 import type { CreateTaxRateDto } from './dto/create-tax-rate.dto'
 import type { UpdateTaxRateDto } from './dto/update-tax-rate.dto'
 
-export interface TaxRateResponse {
-  id: number
-  label: string
-  rate: number
-  isDefault: boolean
-}
+export type TaxRateResponse = TaxRate
 
 @Injectable()
 export class TaxRatesService {
