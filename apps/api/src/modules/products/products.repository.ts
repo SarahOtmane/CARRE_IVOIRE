@@ -151,6 +151,23 @@ export class ProductsRepository {
     )
   }
 
+  async decrementStock(productId: number, quantity: number, t?: Transaction): Promise<number> {
+    const safeQuantity = Math.floor(Math.abs(quantity))
+    const [rowsAffected] = await this.db.update(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
+      { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
+      {
+        where: {
+          id: productId,
+          stock: { [Op.gte]: quantity },
+          isActive: 1,
+        },
+        transaction: t,
+      },
+    )
+    return rowsAffected
+  }
+
   async delete(id: number): Promise<void> {
     await this.db.destroy({ where: { id } })
   }
