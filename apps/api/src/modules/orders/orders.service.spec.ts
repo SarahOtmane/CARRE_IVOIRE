@@ -49,6 +49,7 @@ describe('OrdersService', () => {
             decrementStock: jest.fn().mockResolvedValue(1),
             incrementStock: jest.fn().mockResolvedValue(undefined),
             findById: jest.fn(),
+            findByProductId: jest.fn().mockResolvedValue([]),
           },
         },
         {
@@ -115,6 +116,20 @@ describe('OrdersService', () => {
       const dtoWithFakePrice = { items: [{ productId: 1, quantity: 1, unitPrice: 1 }], shippingAddress: {} }
       const result = await service.createOrder(dtoWithFakePrice as any, 1)
       expect(result.totalAmount).toBe(390) // prix BDD, pas 1
+    })
+
+    it('lève VARIANT_REQUIRED si le produit a des variantes actives et aucun variantId fourni', async () => {
+      variantsRepo.findByProductId.mockResolvedValue([{ id: 10, productId: 1, isActive: 1 } as any])
+      await expect(service.createOrder(dto as any, 1)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'VARIANT_REQUIRED' }),
+      })
+      expect(productsRepo.decrementStock).not.toHaveBeenCalled()
+    })
+
+    it("ne déclenche pas VARIANT_REQUIRED pour un produit sans variante", async () => {
+      variantsRepo.findByProductId.mockResolvedValue([])
+      const result = await service.createOrder(dto as any, 1)
+      expect(result.orderId).toBe(1)
     })
 
     it('libère le stock réservé et annule la commande si Stripe échoue (compensation hors transaction)', async () => {
