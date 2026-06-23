@@ -6,23 +6,24 @@
 
 ## Résumé exécutif
 
-**État actuel du projet** : architecture monorepo saine sur le papier (pattern Repository, Guards JWT/Admin, format de réponse `{success,data}`, design tokens cohérents), mais trois bloquants absolus empêchent une mise en production : absence de migrations Sequelize sur le disque, tunnel de paiement frontend entièrement simulé, et absence totale de CI/CD. S'y ajoutent une dette de cohérence (types dupliqués/divergents, triple aliasing de tokens, code mort) et une couverture de tests nulle sur les zones les plus sensibles (Stripe, Guards, controllers).
+**État actuel du projet** : architecture monorepo saine sur le papier (pattern Repository, Guards JWT/Admin, format de réponse `{success,data}`, design tokens cohérents), mais trois bloquants absolus empêchent une mise en production : schéma de base de données non maîtrisé (modèles Sequelize à fiabiliser, stratégie de migrations à réintroduire avant la prod), tunnel de paiement frontend entièrement simulé, et absence totale de CI/CD. S'y ajoutent une dette de cohérence (types dupliqués/divergents, triple aliasing de tokens, code mort) et une couverture de tests nulle sur les zones les plus sensibles (Stripe, Guards, controllers).
 
-**Nombre total de tâches** : 34
+**Nombre total de tâches** : 33
 
 **Répartition par priorité**
 
 | Priorité | Nombre de tâches |
-|---|---|
-| Critique | 6 |
-| Haute | 12 |
-| Moyenne | 11 |
-| Faible | 5 |
+| -------- | ---------------- |
+| Critique | 6                |
+| Haute    | 12               |
+| Moyenne  | 11               |
+| Faible   | 5                |
 
 **Estimation globale** : ~46 jours/homme (≈ 9-10 sprints d'une semaine pour une équipe de 1 développeur senior ; ÷2 à ÷3 avec une équipe de 2-3 personnes en parallélisant les domaines indépendants).
 
 **Principaux risques**
-- Reconstituer les migrations sans dump SQL de référence peut introduire des écarts de schéma si le dev local diverge déjà de la prod imaginée (vérifier d'abord via `Sequelize.sync({alter:false})` en lecture).
+
+- Le projet n'a pas encore d'environnement de production : la stratégie retenue pour Phase 1 est de piloter le schéma directement depuis les modèles Sequelize (`sync({ alter: true })`) en local, sans système de migrations. Cette décision devra être révisée **avant** tout premier déploiement en production (un système de migrations redevient alors nécessaire pour des évolutions de schéma maîtrisées sur des données réelles) — à inscrire comme prérequis de mise en production, hors périmètre de cette roadmap tant qu'il n'y a pas de prod.
 - L'intégration Stripe réelle (Phase 1) est sur le chemin critique et bloque toute la Phase 3 commerciale — à démarrer en priorité absolue.
 - La refonte des types partagés (ARCH-003) touche transversalement API + frontend + packages/stores : risque de régression large si non accompagnée de tests de contrat.
 
@@ -30,43 +31,42 @@
 
 ## Vue d'ensemble
 
-| ID | Domaine | Tâche | Priorité | Effort | Dépendances |
-|---|---|---|---|---|---|
-| PREP-001 | Préparation | Auditer et figer l'état réel du schéma DB | Critique | S | — |
-| PREP-002 | Préparation | Mettre à jour CLAUDE.md (composables/stores, back-office fusionné) | Haute | XS | — |
-| PREP-003 | Préparation | Vérifier l'exécution des suites de tests existantes (npm install, CI locale) | Haute | XS | — |
-| DB-001 | Base de données | Reconstituer les migrations Sequelize | Critique | L | PREP-001 |
-| BACK-001 | Backend | Idempotence du webhook Stripe | Critique | M | — |
-| BACK-002 | Backend | Remplacer `throw new Error` natif par `HttpException` dans Stripe | Haute | XS | — |
-| FRONT-001 | Frontend | Intégration Stripe Elements réelle (paiement) | Critique | L | BACK-001 |
-| SEC-001 | Sécurité | Corriger la configuration CORS en production | Critique | S | — |
-| SEC-002 | Sécurité | Ajouter un header CSP dans les configs Nginx | Haute | S | FRONT-001 |
-| SEC-003 | Sécurité | Remplacer `ADMIN_PASSWORD` par un placeholder non exploitable | Haute | XS | — |
-| SEC-004 | Sécurité | Rendre `HttpExceptionFilter` catch-all | Haute | S | — |
-| ARCH-001 | Architecture | Sortir Sequelize direct d'`orders.service.ts` (decrementStock) | Haute | M | — |
-| ARCH-002 | Architecture | Sortir l'appel Stripe de la transaction DB | Haute | M | ARCH-001 |
-| ARCH-003 | Architecture | Unifier les types `User`/`Order`/`Product` (packages/types ↔ DTO API ↔ stores) | Haute | L | — |
-| ARCH-004 | Architecture | Supprimer le triple aliasing de tokens Tailwind | Moyenne | M | — |
-| ARCH-005 | Architecture | Nettoyer le code mort frontend | Moyenne | S | — |
-| ARCH-006 | Architecture | Supprimer les fichiers backend morts | Faible | XS | — |
-| ARCH-007 | Architecture | Unifier les secrets JWT | Haute | XS | — |
-| ARCH-008 | Architecture | Dédupliquer les mappings/DTOs dupliqués (TaxRateDto, toVariantResponseDto) | Moyenne | S | ARCH-003 |
-| BACK-003 | Backend | Garde-fou stock produit vs variante | Haute | M | ARCH-001 |
-| BACK-004 | Backend | Transaction atomique sur le taux de TVA par défaut | Moyenne | S | — |
-| FRONT-002 | Frontend | Câbler les favoris côté UI | Haute | S | — |
-| FRONT-003 | Frontend | Réparer le burger menu mobile | Moyenne | S | — |
-| FRONT-004 | Frontend | Handler fonctionnel pour le formulaire newsletter | Faible | XS | — |
-| FRONT-005 | Frontend | Corriger les variables CSS inexistantes (`--ivoire-a40/a15`) | Faible | XS | — |
-| TEST-001 | Tests | Tests Guards JWT/Admin | Critique | M | — |
-| TEST-002 | Tests | Tests Stripe (signature webhook, idempotence) | Critique | M | BACK-001 |
-| TEST-003 | Tests | Tests e2e controllers (au moins les flux critiques) | Haute | L | TEST-001 |
-| TEST-004 | Tests | Tests repositories (incrementStock/decrementStock) | Haute | S | ARCH-001 |
-| TEST-005 | Tests | Tests frontend composables/stores additionnels | Moyenne | M | ARCH-003 |
-| INFRA-001 | Infrastructure | Pipeline CI (lint + test + build) | Critique | M | PREP-003 |
-| INFRA-002 | Infrastructure | Scan de vulnérabilités (npm audit / Dependabot) | Moyenne | XS | INFRA-001 |
-| INFRA-003 | Infrastructure | Ajouter le champ `engines` aux package.json | Faible | XS | — |
-| DOC-001 | Documentation | Mettre à jour ai_docs/*.md (Turborepo, migrations, back-office) | Moyenne | S | DB-001 |
-| DOC-002 | Documentation | Harmoniser les messages de commit (Conventional Commits) | Faible | XS | — |
+| ID        | Domaine         | Tâche                                                                          | Priorité | Effort | Dépendances |
+| --------- | --------------- | ------------------------------------------------------------------------------ | -------- | ------ | ----------- |
+| PREP-002  | Préparation     | Mettre à jour CLAUDE.md (composables/stores, back-office fusionné)             | Haute    | XS     | —           |
+| PREP-003  | Préparation     | Vérifier l'exécution des suites de tests existantes (npm install, CI locale)   | Haute    | XS     | —           |
+| DB-001    | Base de données | Synchroniser le schéma DB directement depuis les modèles Sequelize             | Critique | M      | —           |
+| BACK-001  | Backend         | Idempotence du webhook Stripe                                                  | Critique | M      | —           |
+| BACK-002  | Backend         | Remplacer `throw new Error` natif par `HttpException` dans Stripe              | Haute    | XS     | —           |
+| FRONT-001 | Frontend        | Intégration Stripe Elements réelle (paiement)                                  | Critique | L      | BACK-001    |
+| SEC-001   | Sécurité        | Corriger la configuration CORS en production                                   | Critique | S      | —           |
+| SEC-002   | Sécurité        | Ajouter un header CSP dans les configs Nginx                                   | Haute    | S      | FRONT-001   |
+| SEC-003   | Sécurité        | Remplacer `ADMIN_PASSWORD` par un placeholder non exploitable                  | Haute    | XS     | —           |
+| SEC-004   | Sécurité        | Rendre `HttpExceptionFilter` catch-all                                         | Haute    | S      | —           |
+| ARCH-001  | Architecture    | Sortir Sequelize direct d'`orders.service.ts` (decrementStock)                 | Haute    | M      | —           |
+| ARCH-002  | Architecture    | Sortir l'appel Stripe de la transaction DB                                     | Haute    | M      | ARCH-001    |
+| ARCH-003  | Architecture    | Unifier les types `User`/`Order`/`Product` (packages/types ↔ DTO API ↔ stores) | Haute    | L      | —           |
+| ARCH-004  | Architecture    | Supprimer le triple aliasing de tokens Tailwind                                | Moyenne  | M      | —           |
+| ARCH-005  | Architecture    | Nettoyer le code mort frontend                                                 | Moyenne  | S      | —           |
+| ARCH-006  | Architecture    | Supprimer les fichiers backend morts                                           | Faible   | XS     | —           |
+| ARCH-007  | Architecture    | Unifier les secrets JWT                                                        | Haute    | XS     | —           |
+| ARCH-008  | Architecture    | Dédupliquer les mappings/DTOs dupliqués (TaxRateDto, toVariantResponseDto)     | Moyenne  | S      | ARCH-003    |
+| BACK-003  | Backend         | Garde-fou stock produit vs variante                                            | Haute    | M      | ARCH-001    |
+| BACK-004  | Backend         | Transaction atomique sur le taux de TVA par défaut                             | Moyenne  | S      | —           |
+| FRONT-002 | Frontend        | Câbler les favoris côté UI                                                     | Haute    | S      | —           |
+| FRONT-003 | Frontend        | Réparer le burger menu mobile                                                  | Moyenne  | S      | —           |
+| FRONT-004 | Frontend        | Handler fonctionnel pour le formulaire newsletter                              | Faible   | XS     | —           |
+| FRONT-005 | Frontend        | Corriger les variables CSS inexistantes (`--ivoire-a40/a15`)                   | Faible   | XS     | —           |
+| TEST-001  | Tests           | Tests Guards JWT/Admin                                                         | Critique | M      | —           |
+| TEST-002  | Tests           | Tests Stripe (signature webhook, idempotence)                                  | Critique | M      | BACK-001    |
+| TEST-003  | Tests           | Tests e2e controllers (au moins les flux critiques)                            | Haute    | L      | TEST-001    |
+| TEST-004  | Tests           | Tests repositories (incrementStock/decrementStock)                             | Haute    | S      | ARCH-001    |
+| TEST-005  | Tests           | Tests frontend composables/stores additionnels                                 | Moyenne  | M      | ARCH-003    |
+| INFRA-001 | Infrastructure  | Pipeline CI (lint + test + build)                                              | Critique | M      | PREP-003    |
+| INFRA-002 | Infrastructure  | Scan de vulnérabilités (npm audit / Dependabot)                                | Moyenne  | XS     | INFRA-001   |
+| INFRA-003 | Infrastructure  | Ajouter le champ `engines` aux package.json                                    | Faible   | XS     | —           |
+| DOC-001   | Documentation   | Mettre à jour ai_docs/\*.md (Turborepo, stratégie de schéma DB, back-office)   | Moyenne  | S      | DB-001      |
+| DOC-002   | Documentation   | Harmoniser les messages de commit (Conventional Commits)                       | Faible   | XS     | —           |
 
 ---
 
@@ -74,22 +74,8 @@
 
 ### Tâches détaillées
 
-#### PREP-001 — Auditer et figer l'état réel du schéma DB
-- **Description** : Avant de reconstituer les migrations, dumper le schéma MySQL actuellement utilisé en développement (`mysqldump --no-data`) et le comparer aux modèles Sequelize présents dans le code, pour établir une base de vérité fiable.
-- **Pourquoi** : Les migrations ont disparu du disque ; reconstituer sans référence fiable risque de créer un schéma divergent de celui réellement utilisé en dev (via `synchronize`).
-- **Fichiers concernés** : `apps/api/src/modules/**/*.model.ts`, `docker/mysql/init/`
-- **Dossiers concernés** : `apps/api/src/database/`
-- **Modifications précises** : générer `docker/mysql/init/schema_reference.sql` (dump de référence, non versionné comme migration mais comme snapshot de contrôle).
-- **Fichiers à créer** : `docker/mysql/init/schema_reference.sql` (temporaire, supprimé après DB-001)
-- **Fichiers à supprimer** : aucun
-- **Priorité** : Critique
-- **Effort** : S (1-4h)
-- **Dépendances** : aucune
-- **Risques** : si l'environnement de dev local a lui-même dérivé (migrations appliquées partiellement puis supprimées), le dump peut ne pas refléter l'intention métier d'origine — croiser avec `ai_docs/database.md` (даté mais informatif) et les seeders.
-- **Critères de validation** : dump généré, toutes les tables/colonnes utilisées par les modèles Sequelize actuels sont présentes dans le dump.
-- **Tests à réaliser** : aucun test automatisé ; vérification manuelle table par table.
+#### PREP-002 — Mettre à jour CLAUDE.md (composables/stores, back-office fusionné) ✅ Fait
 
-#### PREP-002 — Mettre à jour CLAUDE.md (composables/stores, back-office fusionné)
 - **Description** : Ajouter `packages/composables` et `packages/stores` au tableau du monorepo dans CLAUDE.md, et corriger la mention d'`apps/back-office` (supprimé, fusionné dans `apps/front-office/src/pages/admin/`).
 - **Pourquoi** : CLAUDE.md est la source de vérité lue en premier par toute personne (humaine ou IA) travaillant sur le projet ; il décrit une architecture qui n'existe plus, créant un risque de confusion immédiat.
 - **Fichiers concernés** : `CLAUDE.md`
@@ -104,7 +90,9 @@
 - **Critères de validation** : relecture du fichier confirme la cohérence avec `ls apps/` et `ls packages/` réels.
 - **Tests à réaliser** : aucun (documentation).
 
-#### PREP-003 — Vérifier l'exécution des suites de tests existantes
+#### PREP-003 — Vérifier l'exécution des suites de tests existantes ✅ Fait
+
+- **Résultat** : `npm install` à la racine restaure correctement les workspaces (511 paquets). `apps/api` (Jest) : 5 suites / 34 tests, tous au vert. `packages/stores` (Vitest) : 2 fichiers / 18 tests, tous au vert. `npm run test --workspaces --if-present` exécute bien les deux en une seule commande (les autres workspaces n'ont pas de script `test`, ignorés via `--if-present`). Aucune correction nécessaire — prêt pour INFRA-001.
 - **Description** : Lancer `npm install` à la racine du monorepo et exécuter chaque suite de tests existante (`apps/api` Jest, `packages/stores` Vitest) pour confirmer qu'elles passent réellement en local, condition préalable à la mise en place de la CI (INFRA-001).
 - **Pourquoi** : L'audit n'a pas pu exécuter les tests faute de `node_modules` installés ; il faut valider qu'ils passent avant de les intégrer dans un pipeline automatisé.
 - **Fichiers concernés** : `apps/api/jest.config.js`, `packages/stores/vitest.config.ts`
@@ -125,37 +113,40 @@
 
 ### Tâches détaillées
 
-#### DB-001 — Reconstituer les migrations Sequelize
-- **Description** : Recréer l'intégralité des fichiers de migration manquants (`create-categories`, `create-products`, `create-users`, `create-orders`, `create-order-items`, `create-favorites`, `alter-products-align-schema`, `alter-orders-align-schema`, `create-tax-rates`, `alter-products-add-tax-rate`, `alter-users-add-reset-token`, `create-product-variants`, `alter-order-items-add-variant`, `drop-products-formats-column`) à partir du schéma de référence établi en PREP-001, en respectant l'ordre de dépendance des tables.
-- **Pourquoi** : Sans ces migrations, aucun environnement (CI, staging, prod, recovery après incident) ne peut provisionner la base de données. C'est le bloquant n°1 du projet avant toute mise en production.
-- **Fichiers concernés** : tous les modèles dans `apps/api/src/modules/**/*.model.ts`
-- **Dossiers concernés** : `apps/api/src/database/migrations/`
-- **Modifications précises** : créer chaque fichier de migration avec `up()`/`down()` cohérents avec l'état actuel des modèles Sequelize (colonnes, types, contraintes FK, index, enums).
-- **Fichiers à créer** : les 14 fichiers de migration listés ci-dessus (timestamps à adapter à l'ordre réel de dépendance)
-- **Fichiers à supprimer** : `docker/mysql/init/schema_reference.sql` (une fois les migrations validées)
+#### DB-001 — Synchroniser le schéma DB directement depuis les modèles Sequelize
+
+- **Description** : Pas de système de migrations pour l'instant (le projet n'a qu'un environnement local, pas de production) : le schéma MySQL est piloté directement par les modèles Sequelize via `sequelize.sync({ alter: true })` au démarrage en développement. La tâche consiste à (1) auditer chaque modèle (`@Column`, `@ForeignKey`, `@Index`, `@AllowNull`, `@Default`) pour s'assurer qu'il reflète fidèlement l'intention métier actuelle (colonnes utilisées par les services/DTOs, contraintes FK entre `Product`/`ProductVariant`/`Order`/`OrderItem`/`Category`/`User`/`Favorite`/`TaxRate`), (2) corriger les divergences trouvées directement dans les fichiers `*.model.ts`, (3) relancer `sync({ alter: true })` sur la base locale et vérifier que le schéma résultant correspond aux attentes (index, types, valeurs par défaut), (4) supprimer le dossier `apps/api/src/database/migrations/` (vide) et le script `db:migrate` du `package.json` pour ne pas laisser une fausse impression qu'un système de migrations est actif.
+- **Pourquoi** : Reconstituer un système de migrations n'a pas de sens sans production à faire évoluer ; en local, la source de vérité la plus simple et la moins risquée est le modèle Sequelize lui-même, synchronisé directement. Cela évite aussi la dérive observée actuellement entre seeders/modèles et un dossier de migrations vide.
+- **Fichiers concernés** : tous les modèles `apps/api/src/modules/**/*.model.ts`, `apps/api/src/config/database.config.ts` (vérifier que `synchronize`/`alter` est bien actif en dev), `apps/api/package.json` (script `db:migrate`)
+- **Dossiers concernés** : `apps/api/src/database/`
+- **Modifications précises** : revue et correction des décorateurs Sequelize sur chaque modèle pour qu'ils reflètent l'état métier réel ; confirmer `database.config.ts` utilise `sync({ alter: true })` uniquement quand `NODE_ENV=development` ; suppression du dossier `migrations/` vide et nettoyage des scripts associés.
+- **Fichiers à créer** : aucun
+- **Fichiers à supprimer** : `apps/api/src/database/migrations/` (dossier vide), script `db:migrate` dans `apps/api/package.json` si présent
 - **Priorité** : Critique
-- **Effort** : L (1-3 jours)
-- **Dépendances** : PREP-001
-- **Risques** : oubli d'une contrainte ou d'un index présent dans le schéma de référence mais non explicite dans les modèles Sequelize (décorateurs `@Index`, `@ForeignKey` à vérifier un par un).
-- **Critères de validation** : `npx sequelize-cli db:migrate` sur une base vide produit un schéma identique au dump de référence ; les seeders s'exécutent ensuite sans erreur.
-- **Tests à réaliser** : test d'intégration "provisioning from scratch" — `db:migrate` puis `db:seed:all` sur une base MySQL neuve dans un conteneur CI.
+- **Effort** : M (0,5-1 jour)
+- **Dépendances** : aucune
+- **Risques** : `alter: true` peut être destructif sur certains changements de type de colonne (Sequelize droppe parfois puis recrée) — toujours tester sur une copie de la base locale avant d'appliquer sur les données de dev importantes (ex. catalogue produit déjà saisi). Avant tout futur déploiement en production, un système de migrations versionnées devra être réintroduit (ne pas utiliser `alter: true` sur des données réelles) — à traiter dans une roadmap ultérieure, hors périmètre ici.
+- **Critères de validation** : démarrer l'API en local sur une base vide crée automatiquement un schéma cohérent avec tous les modèles ; les seeders s'exécutent ensuite sans erreur ; le dossier `migrations/` n'existe plus.
+- **Tests à réaliser** : test manuel "provisioning from scratch" — base MySQL vide, démarrage de l'API, puis `npm run db:seed:all`, vérification de l'absence d'erreur et de la cohérence des données.
 
 #### BACK-001 — Idempotence du webhook Stripe
+
 - **Description** : Ajouter une table `stripe_webhook_events` (colonnes `event_id` UNIQUE, `type`, `processed_at`) et vérifier l'idempotence avant tout traitement d'événement Stripe entrant.
 - **Pourquoi** : Stripe peut renvoyer un même événement plusieurs fois (timeout, retry) ; sans garde-fou, un replay de `payment_intent.succeeded` ou `payment_intent.payment_failed` peut décrémenter le stock une seconde fois ou renvoyer un email de confirmation en double.
 - **Fichiers concernés** : `apps/api/src/modules/orders/stripe.controller.ts`, `apps/api/src/modules/orders/stripe.service.ts`, `apps/api/src/modules/orders/orders.service.ts`
-- **Dossiers concernés** : `apps/api/src/modules/orders/`, `apps/api/src/database/migrations/`
-- **Modifications précises** : dans `stripe.controller.ts`, avant d'appeler `ordersService.confirmByPaymentIntent`/`cancelByPaymentIntent`, vérifier l'existence de `event.id` dans `stripe_webhook_events` ; insérer l'événement avant traitement (idempotence par contrainte UNIQUE en DB, pas par simple check applicatif pour éviter une race condition).
-- **Fichiers à créer** : `apps/api/src/database/migrations/<timestamp>-create-stripe-webhook-events.js`, `apps/api/src/modules/orders/stripe-webhook-event.model.ts`
+- **Dossiers concernés** : `apps/api/src/modules/orders/`
+- **Modifications précises** : créer le modèle Sequelize `StripeWebhookEvent` (colonnes `event_id` UNIQUE NOT NULL, `type`, `processed_at`) ; il sera créé en base automatiquement via `sync({ alter: true })` (DB-001), sans fichier de migration séparé. Dans `stripe.controller.ts`, avant d'appeler `ordersService.confirmByPaymentIntent`/`cancelByPaymentIntent`, vérifier l'existence de `event.id` dans `stripe_webhook_events` ; insérer l'événement avant traitement (idempotence par contrainte UNIQUE en DB, pas par simple check applicatif pour éviter une race condition).
+- **Fichiers à créer** : `apps/api/src/modules/orders/stripe-webhook-event.model.ts`
 - **Fichiers à supprimer** : aucun
 - **Priorité** : Critique
 - **Effort** : M (0,5-1 jour)
-- **Dépendances** : aucune (peut être fait avant DB-001 si la migration est ajoutée au lot reconstitué)
-- **Risques** : si DB-001 n'est pas encore fait, cette migration doit être ajoutée manuellement en plus du lot reconstitué.
+- **Dépendances** : DB-001 (la stratégie de schéma direct-par-modèle doit être en place)
+- **Risques** : s'assurer que le modèle est bien enregistré dans le module NestJS (`SequelizeModule.forFeature([StripeWebhookEvent])`) pour que `sync` le prenne en compte.
 - **Critères de validation** : envoyer deux fois le même événement Stripe (via `stripe trigger` ou replay manuel) ne déclenche le traitement métier qu'une seule fois.
 - **Tests à réaliser** : TEST-002 (test unitaire + test d'intégration de replay).
 
 #### BACK-002 — Remplacer `throw new Error` natif par `HttpException` dans Stripe
+
 - **Description** : Dans `stripe.service.ts:15`, remplacer `throw new Error('STRIPE_SECRET_KEY environment variable is not set')` par une `InternalServerErrorException` (ou équivalent NestJS) pour respecter le contrat `{success:false,error:{code,message}}`.
 - **Pourquoi** : Toute erreur native échappe au `HttpExceptionFilter` global (`@Catch(HttpException)`), cassant le contrat de réponse API uniforme exigé par CLAUDE.md.
 - **Fichiers concernés** : `apps/api/src/modules/orders/stripe.service.ts`
@@ -171,6 +162,7 @@
 - **Tests à réaliser** : test unitaire vérifiant le type d'exception levée.
 
 #### FRONT-001 — Intégration Stripe Elements réelle
+
 - **Description** : Remplacer le formulaire de paiement simulé (`StripePaymentForm.vue`, carte `4242 4242 4242 4242` en dur, `setTimeout`) par une intégration Stripe.js/Elements réelle : création d'un PaymentIntent côté backend, confirmation côté client, gestion des états d'échec (carte refusée, 3D Secure, timeout réseau).
 - **Pourquoi** : En l'état, aucune commande réelle ne peut être passée ni payée — c'est un bloquant absolu pour toute mise en production, masqué par une UI qui donne l'illusion d'une fonctionnalité complète.
 - **Fichiers concernés** : `apps/front-office/src/components/checkout/StripePaymentForm.vue`, `apps/front-office/src/pages/commande/index.vue`, `packages/composables/src/useApi.ts` (ou nouveau composable `useCheckout.ts`)
@@ -186,6 +178,7 @@
 - **Tests à réaliser** : test manuel end-to-end avec `stripe listen`, puis test e2e automatisé (TEST-003) une fois le pipeline e2e en place.
 
 #### SEC-001 — Corriger la configuration CORS en production
+
 - **Description** : Lire la variable d'environnement `CORS_ORIGIN` (liste d'origines séparées par virgules) dans `main.ts` au lieu du hardcoding actuel, et supprimer le fallback `'http://localhost:5174'` qui reste actif même en production.
 - **Pourquoi** : `.env.example` documente `CORS_ORIGIN` comme configurable, mais le code l'ignore totalement ; une origine de développement reste autorisée avec `credentials: true` sur l'API de production, élargissant la surface d'attaque CSRF/vol de session.
 - **Fichiers concernés** : `apps/api/src/main.ts`, `.env.example`, `apps/api/src/config/env.validation.ts`
@@ -207,6 +200,7 @@
 ### Tâches détaillées
 
 #### SEC-002 — Ajouter un header CSP dans les configs Nginx
+
 - **Description** : Définir un header `Content-Security-Policy` dans `docker/nginx/nginx.conf`, `nginx.prod.conf` et `spa.conf`, autorisant explicitement `js.stripe.com`, `api.stripe.com` et les origines propres du site.
 - **Pourquoi** : Le site embarque (désormais réellement, après FRONT-001) Stripe Elements ; l'absence totale de CSP est un risque XSS non négligeable pour une plateforme qui manipule des données de paiement.
 - **Fichiers concernés** : `docker/nginx/nginx.conf`, `docker/nginx/nginx.prod.conf`, `docker/nginx/spa.conf`
@@ -222,6 +216,7 @@
 - **Tests à réaliser** : test manuel avec DevTools (onglet Security/Console) sur chaque page, en particulier `commande/index.vue`.
 
 #### SEC-003 — Remplacer `ADMIN_PASSWORD` par un placeholder non exploitable
+
 - **Description** : Dans `.env.example`, remplacer `ADMIN_PASSWORD=Admin1234!` par `ADMIN_PASSWORD=CHANGE_ME_BEFORE_PROD`.
 - **Pourquoi** : Un déployeur copiant `.env.example` → `.env` sans modification laisserait un mot de passe admin trivial et public (visible dans tout clone du repo).
 - **Fichiers concernés** : `.env.example`
@@ -237,6 +232,7 @@
 - **Tests à réaliser** : aucun (config).
 
 #### SEC-004 — Rendre `HttpExceptionFilter` catch-all
+
 - **Description** : Étendre `apps/api/src/common/filters/http-exception.filter.ts` pour catcher toutes les exceptions (`@Catch()` sans argument), mapper les erreurs non-`HttpException` (Sequelize, `TypeError`, etc.) vers un code générique `INTERNAL_ERROR` sans exposer la stack trace en production.
 - **Pourquoi** : Actuellement, seules les `HttpException` sont catchées ; toute erreur imprévue (bug Sequelize, erreur de typage runtime) casse le contrat `{success:false,error:{code,message}}` et peut fuiter des détails techniques au client.
 - **Fichiers concernés** : `apps/api/src/common/filters/http-exception.filter.ts`
@@ -252,6 +248,7 @@
 - **Tests à réaliser** : test unitaire du filter avec une erreur native en entrée.
 
 #### ARCH-001 — Sortir Sequelize direct d'`orders.service.ts`
+
 - **Description** : Ajouter `decrementStock(id, quantity, transaction)` dans `ProductsRepository` et `ProductVariantsRepository`, et retirer les `@InjectModel(Product)`/`@InjectModel(ProductVariant)` directs d'`orders.service.ts`.
 - **Pourquoi** : Violation du pattern Repository sur le module le plus critique du projet (gestion du stock/argent) — règle absolue n°1 de CLAUDE.md ("Pattern Repository obligatoire — jamais de Sequelize direct dans un Service").
 - **Fichiers concernés** : `apps/api/src/modules/orders/orders.service.ts`, `apps/api/src/modules/products/products.repository.ts`, `apps/api/src/modules/products/product-variants.repository.ts`
@@ -267,6 +264,7 @@
 - **Tests à réaliser** : TEST-004 (tests dédiés aux repositories), non-régression sur `orders.service.spec.ts`.
 
 #### ARCH-002 — Sortir l'appel Stripe de la transaction DB
+
 - **Description** : Restructurer `orders.service.ts` pour que la création du PaymentIntent Stripe (appel réseau externe) se fasse **avant** ou **après** la transaction Sequelize de décrément de stock, jamais à l'intérieur.
 - **Pourquoi** : Un appel HTTP externe tenu pendant une transaction DB prolonge les verrous (risque de contention sous charge) et peut créer un PaymentIntent Stripe orphelin sans commande correspondante si la transaction échoue après l'appel.
 - **Fichiers concernés** : `apps/api/src/modules/orders/orders.service.ts`
@@ -282,6 +280,7 @@
 - **Tests à réaliser** : test d'intégration simulant un échec de l'appel Stripe après réservation du stock.
 
 #### ARCH-003 — Unifier les types `User`/`Order`/`Product`
+
 - **Description** : Faire de `packages/types` la source unique des contrats API, importée à la fois par `apps/api` (DTOs) et `apps/front-office`/`packages/stores`. Corriger les divergences identifiées : `User` (manque `customerNumber`, `addressStreet/City/Zip/Country`, `isActive`, `updatedAt`), `Order.shippingAddress` (typé `object` côté API, doit être `ShippingAddress` strict), `Product.category` (sous-ensemble incohérent), `TaxRateDto` dupliqué.
 - **Pourquoi** : Trois définitions divergentes de `User` coexistent actuellement (packages/types, DTO API, store Pinia `auth.store.ts`), créant un risque de champs `undefined` silencieux en runtime sans erreur de compilation.
 - **Fichiers concernés** : `packages/types/src/user.types.ts`, `packages/types/src/order.types.ts`, `packages/types/src/product.types.ts`, `apps/api/src/modules/users/dto/user-response.dto.ts`, `apps/api/src/modules/orders/dto/order-response.dto.ts`, `apps/api/src/modules/products/dto/product-response.dto.ts`, `packages/stores/src/auth.store.ts`
@@ -297,6 +296,7 @@
 - **Tests à réaliser** : TEST-005, plus vérification manuelle de l'affichage des champs précédemment manquants (téléphone, adresse, numéro client) dans les pages compte/admin.
 
 #### ARCH-004 — Supprimer le triple aliasing de tokens Tailwind
+
 - **Description** : Dans `packages/config/tailwind/preset.js`, supprimer les alias `cocoa`, `ivory`, `beige`, `gold`, `brun-cacao` et ne conserver que les noms canoniques (`cacao`, `ivoire`, `beige-doux`, `dore`) ; migrer toutes les pages admin (`apps/front-office/src/pages/admin/**`, `AdminSidebar.vue`) qui utilisent les alias.
 - **Pourquoi** : Trois façons d'écrire la même couleur créent une dérive stylistique inévitable et une incohérence visuelle déjà identifiée entre le site public et le back-office, violant l'exigence CLAUDE.md de noms canoniques.
 - **Fichiers concernés** : `packages/config/tailwind/preset.js`, toutes les pages sous `apps/front-office/src/pages/admin/`, `apps/front-office/src/components/layout/AdminSidebar.vue`
@@ -312,6 +312,7 @@
 - **Tests à réaliser** : revue visuelle de toutes les pages admin après migration (capture d'écran avant/après).
 
 #### ARCH-005 — Nettoyer le code mort frontend
+
 - **Description** : Supprimer les composants et store jamais montés/importés : `ProductDetail.vue`, `CartDrawer.vue`, `AppNav.vue` (stub vide), `ProductGrid.vue` (stub vide), `apps/front-office/src/stores/product.store.ts`, ainsi que les ré-exports vides `apps/front-office/src/stores/{auth,cart}.store.ts`.
 - **Pourquoi** : ~450 lignes de code mort créent un risque de double-maintenance (quelqu'un modifie le mauvais fichier en le croyant actif) et de confusion architecturale (deux systèmes d'état produit non synchronisés).
 - **Fichiers concernés** : voir liste ci-dessus
@@ -327,6 +328,7 @@
 - **Tests à réaliser** : build complet + smoke test manuel des pages panier/produit/auth.
 
 #### ARCH-006 — Supprimer les fichiers backend morts
+
 - **Description** : Supprimer `apps/api/src/config/jwt.config.ts` (jamais utilisé) et `apps/api/src/common/pipes/validation.pipe.ts` (fichier vide).
 - **Pourquoi** : Code mort qui complique la lecture et entretient la confusion sur la configuration JWT réelle (voir ARCH-007).
 - **Fichiers concernés** : `apps/api/src/config/jwt.config.ts`, `apps/api/src/common/pipes/validation.pipe.ts`
@@ -342,6 +344,7 @@
 - **Tests à réaliser** : build complet.
 
 #### ARCH-007 — Unifier les secrets JWT
+
 - **Description** : Choisir une seule variable d'environnement (`JWT_SECRET`) et l'utiliser de façon cohérente dans `auth.module.ts`, `auth.service.ts`, `jwt.strategy.ts` et `env.validation.ts`, en supprimant la référence à `JWT_ACCESS_TOKEN_SECRET` non alignée.
 - **Pourquoi** : `auth.module.ts` configure une variable jamais lue ailleurs (`JWT_ACCESS_TOKEN_SECRET`) tandis que le reste du code utilise `JWT_SECRET` — latent aujourd'hui, mais dangereux si un futur appel passe par le `JwtService` mal configuré (signature avec un secret vide/différent).
 - **Fichiers concernés** : `apps/api/src/modules/auth/auth.module.ts`, `apps/api/src/modules/auth/auth.service.ts`, `apps/api/src/modules/auth/strategies/jwt.strategy.ts`, `apps/api/src/config/env.validation.ts`
@@ -357,6 +360,7 @@
 - **Tests à réaliser** : TEST-001 (couvre indirectement ce point), test manuel login → accès route protégée.
 
 #### ARCH-008 — Dédupliquer les mappings/DTOs dupliqués
+
 - **Description** : Importer `TaxRate`/`TaxRateDto` depuis `@carre-ivoire/types` dans `product-response.dto.ts` au lieu de le redéfinir localement ; extraire un mapper partagé `toVariantResponseDto` utilisé à la fois par `products.service.ts` et `product-variants.service.ts`.
 - **Pourquoi** : Deux définitions parallèles du même contrat (TaxRate) et deux implémentations dupliquées du même mapping créent un risque de divergence silencieuse si l'une évolue sans l'autre.
 - **Fichiers concernés** : `apps/api/src/modules/products/dto/product-response.dto.ts`, `apps/api/src/modules/products/products.service.ts`, `apps/api/src/modules/products/product-variants.service.ts`
@@ -378,6 +382,7 @@
 ### Tâches détaillées
 
 #### BACK-003 — Garde-fou stock produit vs variante
+
 - **Description** : Dans `orders.service.ts`, empêcher la commande d'un produit ayant des variantes actives sans `variantId` explicite — lever une erreur métier `VARIANT_REQUIRED` plutôt que de décrémenter le stock du parent par défaut.
 - **Pourquoi** : Actuellement, commander sans `variantId` un produit ayant des variantes décrémente le stock du parent au lieu de la variante réellement vendue, créant un risque réel de survente.
 - **Fichiers concernés** : `apps/api/src/modules/orders/orders.service.ts`, `apps/api/src/modules/orders/dto/create-order.dto.ts`
@@ -393,6 +398,7 @@
 - **Tests à réaliser** : test unitaire couvrant les deux cas (produit avec/sans variantes).
 
 #### BACK-004 — Transaction atomique sur le taux de TVA par défaut
+
 - **Description** : Englober `clearDefault()` puis `create()`/`update()` dans une transaction Sequelize unique dans `tax-rates.repository.ts`/`tax-rates.service.ts`.
 - **Pourquoi** : Actuellement non atomique — une requête concurrente entre les deux appels peut laisser deux taux de TVA marqués `isDefault=true` simultanément, ou aucun.
 - **Fichiers concernés** : `apps/api/src/modules/tax-rates/tax-rates.repository.ts`, `apps/api/src/modules/tax-rates/tax-rates.service.ts`
@@ -408,6 +414,7 @@
 - **Tests à réaliser** : test d'intégration avec deux promesses concurrentes.
 
 #### FRONT-002 — Câbler les favoris côté UI
+
 - **Description** : Importer et utiliser le composable `useFavorites()` (déjà fonctionnel côté backend et composable) dans `apps/front-office/src/pages/compte/favoris.vue`, et ajouter un bouton "cœur" toggle favori sur `ProductCard.vue` et la page produit `produits/[slug].vue`.
 - **Pourquoi** : Le backend et le composable sont complets et fonctionnels, mais la page favoris affiche un tableau vide en dur (`const favoris = []`) et aucun bouton ne permet d'ajouter un favori — fonctionnalité documentée dans `ai_docs/concept.md` mais totalement absente pour l'utilisateur final.
 - **Fichiers concernés** : `apps/front-office/src/pages/compte/favoris.vue`, `apps/front-office/src/components/product/ProductCard.vue`, `apps/front-office/src/pages/produits/[slug].vue`
@@ -423,6 +430,7 @@
 - **Tests à réaliser** : test manuel du cycle complet ajout/suppression/affichage ; test composable existant `useFavorites` à étendre si nécessaire.
 
 #### FRONT-003 — Réparer le burger menu mobile
+
 - **Description** : Ajouter le handler `@click` et l'état de menu mobile manquants sur l'icône burger dans `AppHeader.vue`.
 - **Pourquoi** : La navigation mobile est actuellement cassée — l'icône s'affiche mais ne fait rien, alors que `ai_docs/concept.md` revendique une expérience premium cross-device.
 - **Fichiers concernés** : `apps/front-office/src/components/layout/AppHeader.vue`
@@ -438,6 +446,7 @@
 - **Tests à réaliser** : test manuel responsive (DevTools mobile + clavier).
 
 #### FRONT-004 — Handler fonctionnel pour le formulaire newsletter
+
 - **Description** : Ajouter un `@submit`/handler au formulaire newsletter dans `AppFooter.vue`, avec appel à un endpoint d'inscription (à créer côté backend si inexistant, ou intégration à un service tiers).
 - **Pourquoi** : Le formulaire est actuellement purement décoratif (aucun handler), ce qui ne correspond pas à une fonctionnalité affichée comme disponible aux utilisateurs.
 - **Fichiers concernés** : `apps/front-office/src/components/layout/AppFooter.vue`
@@ -453,6 +462,7 @@
 - **Tests à réaliser** : test manuel de soumission si implémenté.
 
 #### FRONT-005 — Corriger les variables CSS inexistantes
+
 - **Description** : Remplacer `var(--ivoire-a40)` et `var(--ivoire-a15)` dans `AppFooter.vue` par des variables réellement définies dans `colors-and-type.css` (ex. `--cacao-a12` existant, ou ajouter `--ivoire-a40`/`--ivoire-a15` au fichier de tokens si la teinte ivoire-alpha est réellement voulue).
 - **Pourquoi** : Ces variables n'existent pas dans le design system — les bordures concernées sont actuellement invisibles/cassées silencieusement.
 - **Fichiers concernés** : `apps/front-office/src/components/layout/AppFooter.vue`, `packages/config/styles/colors-and-type.css`
@@ -474,6 +484,7 @@
 ### Tâches détaillées
 
 #### TEST-001 — Tests Guards JWT/Admin
+
 - **Description** : Créer `jwt-auth.guard.spec.ts` et `admin.guard.spec.ts` couvrant : token absent, token invalide, token expiré, token valide rôle client sur route admin (doit être refusé), token valide rôle admin sur route admin (doit passer).
 - **Pourquoi** : Le contrôle d'accès admin qui protège tout le back-office n'a actuellement aucun test — un bug de logique de rôle passerait inaperçu jusqu'en production.
 - **Fichiers concernés** : `apps/api/src/modules/auth/guards/jwt-auth.guard.ts`, `apps/api/src/modules/auth/guards/admin.guard.ts`
@@ -489,6 +500,7 @@
 - **Tests à réaliser** : les tests eux-mêmes constituent le livrable.
 
 #### TEST-002 — Tests Stripe (signature webhook, idempotence)
+
 - **Description** : Créer des tests unitaires pour `stripe.service.ts` (vérification de signature avec secret invalide → rejet, secret valide → acceptation) et un test d'intégration pour BACK-001 (envoi du même `event.id` deux fois → traitement métier une seule fois).
 - **Pourquoi** : Le point d'entrée de l'argent réel n'a actuellement aucun test ; un bug de vérification de signature webhook serait une vulnérabilité critique (falsification de confirmation de paiement).
 - **Fichiers concernés** : `apps/api/src/modules/orders/stripe.service.ts`, `apps/api/src/modules/orders/stripe.controller.ts`
@@ -504,6 +516,7 @@
 - **Tests à réaliser** : les tests eux-mêmes.
 
 #### TEST-003 — Tests e2e controllers
+
 - **Description** : Mettre en place une configuration Jest e2e (`apps/api/test/jest-e2e.json`) et écrire au moins les flux critiques : inscription → connexion → ajout panier → commande → paiement (mock Stripe) → vérification stock décrémenté ; accès admin refusé à un client ; accès admin autorisé à un admin.
 - **Pourquoi** : Aucun test e2e n'existe actuellement dans le repo ; les guards, pipes et décorateurs appliqués au niveau route ne sont jamais vérifiés en conditions réelles (seule la logique de service l'est).
 - **Fichiers concernés** : tous les controllers de `apps/api/src/modules/`
@@ -513,12 +526,13 @@
 - **Fichiers à supprimer** : aucun
 - **Priorité** : Haute
 - **Effort** : L (1-3 jours)
-- **Dépendances** : TEST-001, DB-001 (migrations nécessaires pour provisionner la base de test)
+- **Dépendances** : TEST-001, DB-001 (le schéma doit être fiabilisé pour provisionner la base de test)
 - **Risques** : effort sous-estimé si la gestion de la base de test (seed/reset entre tests) n'est pas anticipée — prévoir un `beforeEach` de reset transactionnel.
 - **Critères de validation** : les 3 flux e2e listés passent en local et en CI.
 - **Tests à réaliser** : les tests eux-mêmes constituent le livrable, intégrés à INFRA-001.
 
 #### TEST-004 — Tests repositories
+
 - **Description** : Créer des tests unitaires pour `ProductsRepository.incrementStock/decrementStock` et `ProductVariantsRepository.incrementStock/decrementStock`, couvrant le cas `rowsAffected===0` (stock insuffisant) et le cas de succès.
 - **Pourquoi** : Ces méthodes sont au cœur de la cohérence du stock et n'ont actuellement aucun test direct (seulement testées indirectement via `orders.service.spec.ts`).
 - **Fichiers concernés** : `apps/api/src/modules/products/products.repository.ts`, `apps/api/src/modules/products/product-variants.repository.ts`
@@ -534,6 +548,7 @@
 - **Tests à réaliser** : les tests eux-mêmes.
 
 #### TEST-005 — Tests frontend composables/stores additionnels
+
 - **Description** : Ajouter des tests Vitest pour `auth.store.ts`, `useApi.ts` (intercepteurs axios, gestion 401), `useAuth.ts`, `useCheckout.ts` (créé en FRONT-001).
 - **Pourquoi** : Seuls `cart.store.ts` et `notification.store.ts` sont testés actuellement ; l'authentification et les appels API centralisés n'ont aucune garantie automatisée.
 - **Fichiers concernés** : `packages/stores/src/auth.store.ts`, `packages/composables/src/useApi.ts`, `packages/composables/src/useAuth.ts`, `packages/composables/src/useCheckout.ts`
@@ -549,6 +564,7 @@
 - **Tests à réaliser** : les tests eux-mêmes.
 
 #### INFRA-001 — Pipeline CI (lint + test + build)
+
 - **Description** : Créer `.github/workflows/ci.yml` exécutant, sur chaque PR vers `main`/`dev` : `npm install`, lint (`eslint --workspaces`), build (`npm run build --workspaces`), tests (`npm run test --workspaces`), avec une base MySQL de service pour les tests d'intégration/e2e.
 - **Pourquoi** : Aucun pipeline n'existe actuellement (`.github/` ne contient qu'un template de PR) — aucune garantie automatique avant merge, le `pull_request_template.md` repose entièrement sur l'auto-déclaration humaine.
 - **Fichiers concernés** : `package.json` (scripts racine), tous les `package.json` de workspaces
@@ -564,6 +580,7 @@
 - **Tests à réaliser** : test du pipeline lui-même (PR volontairement cassée pour vérifier le blocage).
 
 #### INFRA-002 — Scan de vulnérabilités
+
 - **Description** : Ajouter `npm audit --audit-level=high` comme step du pipeline CI, et configurer Dependabot (`.github/dependabot.yml`) pour les mises à jour de sécurité automatiques.
 - **Pourquoi** : Aucun scan de dépendances n'est actuellement en place ; risque de vulnérabilités connues non détectées avant production.
 - **Fichiers concernés** : `.github/workflows/ci.yml`
@@ -579,6 +596,7 @@
 - **Tests à réaliser** : aucun (outillage).
 
 #### INFRA-003 — Ajouter le champ `engines`
+
 - **Description** : Ajouter `"engines": {"node": ">=20.0.0"}` dans `apps/api/package.json` et `apps/front-office/package.json` (et aux packages si pertinent).
 - **Pourquoi** : Seul le Dockerfile fixe Node 20 actuellement ; un développeur local avec une autre version n'est averti par aucun garde-fou npm.
 - **Fichiers concernés** : `apps/api/package.json`, `apps/front-office/package.json`
@@ -600,6 +618,7 @@
 ### Tâches détaillées
 
 #### DOC-001 — Mettre à jour la documentation technique
+
 - **Description** : Corriger `ai_docs/architecture.md` (retirer la mention Turborepo inexistante, ou l'installer réellement), `ai_docs/database.md` (refléter le schéma réel post-DB-001, inclure `tax-rates`, `product-variants`), `ARCHITECTURE.md` racine (confirmer et détailler la fusion back-office → front-office/admin).
 - **Pourquoi** : La documentation actuelle décrit un état du projet qui n'existe plus à plusieurs endroits, créant un risque de confusion pour l'onboarding et la maintenance future.
 - **Fichiers concernés** : `ai_docs/architecture.md`, `ai_docs/database.md`, `ARCHITECTURE.md`
@@ -615,6 +634,7 @@
 - **Tests à réaliser** : aucun (documentation).
 
 #### DOC-002 — Harmoniser les messages de commit
+
 - **Description** : Adopter et documenter (dans un `CONTRIBUTING.md` ou section CLAUDE.md) une convention stricte Conventional Commits en français (`feat:`, `fix:`, `chore:`, `test:`, `docs:`, `refactor:`), avec un commit-lint en CI si possible.
 - **Pourquoi** : 89% des commits récents suivent un format conventionnel mais avec une sur-utilisation de `feat:` même pour des changements de config/test, et au moins un commit en anglais sans préfixe rompant la convention française du projet.
 - **Fichiers concernés** : aucun fichier de code
@@ -630,6 +650,7 @@
 - **Tests à réaliser** : aucun.
 
 #### ARCH-009 — Adoption de `packages/ui`
+
 - **Description** : Remplacer progressivement les boutons/badges/cards Tailwind brut dupliqués dans les pages front-office par les composants `Button.vue`/`Badge.vue`/`Card.vue` de `packages/ui`, en commençant par les pages publiques à fort trafic (boutique, fiche produit).
 - **Pourquoi** : `packages/ui` est documenté comme "cible finale du design" mais n'est utilisé que dans 4 fichiers sur tout le frontend — la quasi-totalité des pages réimplémentent leur propre style, à l'opposé de l'objectif de cohérence/réutilisabilité du design system.
 - **Fichiers concernés** : `packages/ui/src/components/{Button,Badge,Card,Modal}.vue`, toutes les pages/composants front-office réimplémentant ces patterns
@@ -645,6 +666,7 @@
 - **Tests à réaliser** : revue visuelle systématique par page migrée.
 
 #### FINAL-001 — Checklist production ready et smoke test complet
+
 - **Description** : Exécuter formellement la checklist de fin de document (section suivante) et un smoke test manuel complet du parcours client (navigation → recherche → ajout panier → connexion → paiement réel test → confirmation) et du parcours admin (connexion admin → gestion produits/stock/commandes).
 - **Pourquoi** : Dernière étape de validation avant tout déploiement réel, garantissant que l'ensemble des corrections des phases précédentes fonctionne en conditions intégrées.
 - **Fichiers concernés** : aucun (validation transverse)
@@ -664,7 +686,8 @@
 ## Diagramme de dépendances
 
 ```
-PREP-001 ──> DB-001 ──> TEST-003
+DB-001 ──> BACK-001 ──> TEST-002
+DB-001 ──> TEST-003
 PREP-003 ──> INFRA-001 ──> INFRA-002
                 │
 BACK-001 ──> FRONT-001 ──> SEC-002
@@ -700,21 +723,21 @@ ARCH-004 ──> ARCH-009
 
 Hypothèse : 1 développeur senior à temps plein (ajuster en divisant par l'équipe disponible et en parallélisant les branches indépendantes du diagramme ci-dessus).
 
-| Sprint | Durée | Contenu |
-|---|---|---|
-| Sprint 0 | 2 jours | PREP-001, PREP-002, PREP-003, SEC-001, SEC-003, BACK-002, INFRA-003 |
-| Sprint 1 | 5 jours | DB-001 (cœur du sprint), DOC-001 (partiel, schéma) |
-| Sprint 2 | 5 jours | BACK-001, TEST-002, ARCH-007, SEC-004 |
-| Sprint 3 | 5 jours | FRONT-001 (intégration Stripe réelle) |
-| Sprint 4 | 5 jours | ARCH-001, ARCH-002, BACK-003, TEST-004, SEC-002 |
-| Sprint 5 | 5 jours | ARCH-003 (unification types — sprint dédié, fort impact transverse) |
-| Sprint 6 | 5 jours | ARCH-008, ARCH-004, ARCH-005, ARCH-006, FRONT-002 à FRONT-005 |
-| Sprint 7 | 5 jours | TEST-001, TEST-005, INFRA-001, INFRA-002 |
-| Sprint 8 | 5 jours | TEST-003 (e2e — sprint dédié) |
-| Sprint 9 | 3 jours | ARCH-009 (démarrage), DOC-002, DOC-001 (finalisation) |
-| Sprint 10 | 2 jours | FINAL-001 (checklist + smoke test complet) |
+| Sprint    | Durée   | Contenu                                                             |
+| --------- | ------- | ------------------------------------------------------------------- |
+| Sprint 0  | 2 jours | PREP-002, PREP-003, SEC-001, SEC-003, BACK-002, INFRA-003           |
+| Sprint 1  | 5 jours | DB-001 (cœur du sprint), DOC-001 (partiel, schéma)                  |
+| Sprint 2  | 5 jours | BACK-001, TEST-002, ARCH-007, SEC-004                               |
+| Sprint 3  | 5 jours | FRONT-001 (intégration Stripe réelle)                               |
+| Sprint 4  | 5 jours | ARCH-001, ARCH-002, BACK-003, TEST-004, SEC-002                     |
+| Sprint 5  | 5 jours | ARCH-003 (unification types — sprint dédié, fort impact transverse) |
+| Sprint 6  | 5 jours | ARCH-008, ARCH-004, ARCH-005, ARCH-006, FRONT-002 à FRONT-005       |
+| Sprint 7  | 5 jours | TEST-001, TEST-005, INFRA-001, INFRA-002                            |
+| Sprint 8  | 5 jours | TEST-003 (e2e — sprint dédié)                                       |
+| Sprint 9  | 3 jours | ARCH-009 (démarrage), DOC-002, DOC-001 (finalisation)               |
+| Sprint 10 | 2 jours | FINAL-001 (checklist + smoke test complet)                          |
 
-**Durée totale estimée : ~9-10 semaines avec un développeur senior à temps plein**, réductible à 5-6 semaines avec 2 développeurs travaillant en parallèle sur les branches backend/frontend du diagramme de dépendances (ex. un dev sur DB-001/BACK-*/ARCH-001-002, un autre sur FRONT-001/ARCH-004-005/ARCH-009).
+**Durée totale estimée : ~9-10 semaines avec un développeur senior à temps plein**, réductible à 5-6 semaines avec 2 développeurs travaillant en parallèle sur les branches backend/frontend du diagramme de dépendances (ex. un dev sur DB-001/BACK-\*/ARCH-001-002, un autre sur FRONT-001/ARCH-004-005/ARCH-009).
 
 ---
 
@@ -725,6 +748,6 @@ Hypothèse : 1 développeur senior à temps plein (ajuster en divisant par l'éq
 - [ ] Gestion des erreurs complète — `HttpExceptionFilter` catch-all (`SEC-004`), aucune erreur native non catchée
 - [ ] Tests suffisants — `TEST-001` à `TEST-005` complétées, couverture sur Guards/Stripe/repositories/e2e critique
 - [ ] Documentation à jour — `DOC-001`, `DOC-002` complétées, CLAUDE.md et ai_docs reflètent l'état réel du code
-- [ ] Monitoring en place — *(hors périmètre de cette roadmap, à ajouter : logs structurés, alerting sur échecs de paiement/webhook — recommandation pour une roadmap V2)*
+- [ ] Monitoring en place — _(hors périmètre de cette roadmap, à ajouter : logs structurés, alerting sur échecs de paiement/webhook — recommandation pour une roadmap V2)_
 - [ ] Performance validée — `ARCH-009` en cours/terminée (réduction duplication), smoke test de charge basique sur le tunnel de commande
-- [ ] Déploiement sécurisé — migrations reconstituées (`DB-001`), pipeline CI actif (`INFRA-001`/`INFRA-002`), paiement réel fonctionnel et testé (`FRONT-001`/`TEST-002`)
+- [ ] Déploiement sécurisé — schéma DB fiabilisé localement (`DB-001`) avec stratégie de migrations à réintroduire avant tout déploiement réel, pipeline CI actif (`INFRA-001`/`INFRA-002`), paiement réel fonctionnel et testé (`FRONT-001`/`TEST-002`)
