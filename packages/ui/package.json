@@ -3,8 +3,18 @@
   "version": "1.0.0",
   "private": true,
   "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
   "scripts": {
     "build": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@carre-ivoire/stores": "*"
   },
   "peerDependencies": {
     "vue": "^3.4.0"

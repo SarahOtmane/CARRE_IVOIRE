@@ -2,8 +2,9 @@ import {
   Injectable,
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
 } from '@nestjs/common'
+import { ErrorCodes } from '@/common/constants'
+import throwApiError from '@/common/errors/throw-api-error'
 import type { JwtUser } from '../strategies/jwt.strategy'
 
 @Injectable()
@@ -13,10 +14,7 @@ export class AdminGuard implements CanActivate {
     const user = request.user
 
     if (!user || user.role !== 'admin') {
-      throw new ForbiddenException({
-        code: 'FORBIDDEN',
-        message: 'Accès réservé aux administrateurs',
-      })
+      throwApiError(ErrorCodes.FORBIDDEN, 'Accès réservé aux administrateurs')
     }
     return true
   }

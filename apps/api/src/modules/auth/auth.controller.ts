@@ -8,7 +8,23 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
+import { IsEmail, IsString, MinLength } from 'class-validator'
+
+class ForgotPasswordDto {
+  @IsEmail()
+  email: string
+}
+
+class ResetPasswordDto {
+  @IsString()
+  token: string
+
+  @IsString()
+  @MinLength(8)
+  newPassword: string
+}
 import type { Request, Response } from 'express'
+import { Throttle } from '@nestjs/throttler'
 import { AuthService } from './auth.service'
 import { RegisterDto } from './dto/register.dto'
 import { LoginDto } from './dto/login.dto'
@@ -40,6 +56,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -65,5 +82,19 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('refresh_token')
     return { message: 'Déconnecté avec succès' }
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.authService.forgotPassword(dto.email)
+    return { message: 'Si un compte existe avec cet email, un lien de réinitialisation vous a été envoyé.' }
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.authService.resetPassword(dto.token, dto.newPassword)
+    return { message: 'Mot de passe mis à jour avec succès.' }
   }
 }

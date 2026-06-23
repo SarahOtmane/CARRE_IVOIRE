@@ -1,18 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-interface Product {
-  id: number
-  name: string
-  slug: string
-  price: number
-  shortDesc?: string
-  imageUrl?: string
-  categoryId: number
-  stock: number
-  isActive: boolean
-  isSeasonal?: boolean
-}
+import type { Product } from '@carre-ivoire/types'
 
 interface ProductFilters {
   categorySlug?: string

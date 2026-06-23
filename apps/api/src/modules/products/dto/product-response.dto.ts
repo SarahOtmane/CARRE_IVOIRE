@@ -1,0 +1,36 @@
+import type { VariantResponseDto } from './variant-response.dto'
+
+export interface TaxRateDto {
+  id: number
+  label: string
+  rate: number
+  isDefault: boolean
+}
+
+export interface ProductResponseDto {
+  id: number
+  name: string
+  slug: string
+  shortDescription?: string
+  description?: string
+  price: number
+  discountPrice?: number
+  imageUrl?: string
+  images?: string[]
+  categoryId: number
+  category?: { id: number; name: string; slug: string }
+  stock: number
+  stockStatus: string
+  taxRateId?: number
+  taxRate?: TaxRateDto
+  isActive: boolean
+  isSeasonal: boolean
+  displayOrder: number
+  badge?: string
+  ingredients?: string
+  allergens?: string
+  weightGrams?: number
+  variants: VariantResponseDto[]
+  createdAt: string
+  updatedAt: string
+}

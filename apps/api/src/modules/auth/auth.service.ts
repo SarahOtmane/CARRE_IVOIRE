@@ -1,11 +1,11 @@
-import {
-  Injectable,
-  ConflictException,
-  UnauthorizedException,
-} from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
+import * as crypto from 'crypto'
+import { ErrorCodes } from '@/common/constants'
+import throwApiError from '@/common/errors/throw-api-error'
 import { UsersRepository } from '@/modules/users/users.repository'
+import { MailService } from '@/modules/mail/mail.service'
 import type { User } from '@/modules/users/users.model'
 import type { RegisterDto } from './dto/register.dto'
 import type { LoginDto } from './dto/login.dto'
@@ -22,15 +22,13 @@ export class AuthService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly mailService: MailService,
+  ) { }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto & TokenPair> {
     const exists = await this.usersRepository.emailExists(dto.email)
     if (exists) {
-      throw new ConflictException({
-        code: 'EMAIL_ALREADY_EXISTS',
-        message: 'Un compte existe déjà avec cette adresse email',
-      })
+      throwApiError(ErrorCodes.EMAIL_ALREADY_EXISTS, 'Un compte existe déjà avec cette adresse email')
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 12)
@@ -49,27 +47,21 @@ export class AuthService {
 
   async login(dto: LoginDto): Promise<AuthResponseDto & TokenPair> {
     // Même message d'erreur pour email inconnu ou mot de passe incorrect (anti-énumération)
-    const INVALID_CREDENTIALS = new UnauthorizedException({
-      code: 'UNAUTHORIZED',
-      message: 'Identifiants invalides',
-    })
+    const INVALID_CREDENTIALS = () => throwApiError(ErrorCodes.INVALID_CREDENTIALS, 'Identifiants invalides')
 
     const user = await this.usersRepository.findByEmail(dto.email)
-    if (!user || !user.is_active) throw INVALID_CREDENTIALS
+    if (!user || !user.is_active) INVALID_CREDENTIALS()
 
-    const passwordValid = await bcrypt.compare(dto.password, user.password_hash)
-    if (!passwordValid) throw INVALID_CREDENTIALS
+    const passwordValid = await bcrypt.compare(dto.password, user!.password_hash)
+    if (!passwordValid) INVALID_CREDENTIALS()
 
-    const tokens = this.generateTokens(user)
-    return { ...tokens, user: this.toAuthUserDto(user) }
+    const tokens = this.generateTokens(user!)
+    return { ...tokens, user: this.toAuthUserDto(user!) }
   }
 
   async refresh(refreshToken: string | undefined): Promise<{ accessToken: string }> {
     if (!refreshToken) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Refresh token manquant',
-      })
+      throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token manquant')
     }
     try {
       const payload = this.jwtService.verify<JwtPayload>(refreshToken, {
@@ -77,16 +69,43 @@ export class AuthService {
       })
       const user = await this.usersRepository.findById(payload.sub)
       if (!user || !user.is_active) {
-        throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Token invalide' })
+        throwApiError(ErrorCodes.UNAUTHORIZED, 'Token invalide')
       }
       const accessToken = this.signAccessToken(user)
       return { accessToken }
     } catch {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Refresh token invalide ou expiré',
-      })
+      throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token invalide ou expiré')
     }
+  }
+
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.usersRepository.findByEmail(email)
+    // Réponse identique qu'il y ait un compte ou non (anti-énumération)
+    if (!user || !user.is_active) return
+
+    const token = crypto.randomBytes(32).toString('hex')
+    const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000) // 6h
+
+    await this.usersRepository.setResetToken(user.id, token, expiresAt)
+
+    const frontUrl = process.env.FRONTEND_URL ?? 'http://localhost:5173'
+    const resetUrl = `${frontUrl}/reinitialiser-mot-de-passe?token=${token}`
+
+    this.mailService.sendPasswordReset({
+      to: user.email,
+      firstName: user.first_name,
+      resetUrl,
+    }).catch(() => { /* ne jamais bloquer sur un échec email */ })
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.usersRepository.findByResetToken(token)
+    if (!user) {
+      throwApiError(ErrorCodes.INVALID_TOKEN, 'Lien de réinitialisation invalide ou expiré')
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 12)
+    await this.usersRepository.clearResetToken(user!.id, newHash)
   }
 
   private generateTokens(user: User): TokenPair {

@@ -4,11 +4,11 @@ Plateforme e-commerce de chocolaterie artisanale premium.
 
 ## Stack
 
-| Couche | Technologie |
-|---|---|
-| Backend | NestJS 10 · Sequelize 6 · MySQL 8 · JWT · Bcrypt · Stripe |
+| Couche   | Technologie                                                  |
+| -------- | ------------------------------------------------------------ |
+| Backend  | NestJS 10 · Sequelize 6 · MySQL 8 · JWT · Bcrypt · Stripe    |
 | Frontend | Vue.js 3 (Composition API) · Pinia 2 · Tailwind CSS 3 · Vite |
-| Infra | Docker Compose · Nginx · Node 20 Alpine |
+| Infra    | Docker Compose · Nginx · Node 20 Alpine                      |
 
 ## Structure
 
@@ -16,15 +16,20 @@ Plateforme e-commerce de chocolaterie artisanale premium.
 carre_ivoire/
 ├── apps/
 │   ├── api/            → API REST (NestJS)
-│   ├── front-office/   → SPA client (Vue.js)
-│   └── back-office/    → SPA admin (Vue.js)
+│   └── front-office/   → SPA unique (Vue.js) — site client + espace admin (/admin)
 ├── packages/
 │   ├── types/          → Interfaces TypeScript partagées
 │   ├── ui/             → Composants Vue partagés
+│   ├── stores/         → Stores Pinia partagés (auth, notifications)
+│   ├── composables/    → Composables Vue partagés (useAuth, useApi...)
 │   └── config/         → Tailwind preset, ESLint, TypeScript config
 ├── docker/
 │   ├── nginx/          → Configuration Nginx (prod + SPA)
 │   └── mysql/          → Script d'initialisation MySQL
+├── scripts/
+│   ├── docker-dev.sh   → Démarrage dev
+│   ├── docker-prod.sh  → Démarrage prod
+│   └── docker-stop.sh  → Arrêt
 ├── docker-compose.yml
 ├── docker-compose.dev.yml
 └── docker-compose.prod.yml
@@ -45,58 +50,57 @@ cp .env.example .env
 
 Remplir les valeurs dans `.env` :
 
-| Variable | Description |
-|---|---|
-| `DB_PASSWORD` | Mot de passe MySQL |
-| `JWT_SECRET` | Secret JWT access token (min. 32 caractères) |
-| `REFRESH_TOKEN_SECRET` | Secret JWT refresh token (min. 32 caractères) |
-| `STRIPE_SECRET_KEY` | Clé secrète Stripe (`sk_test_...`) |
-| `STRIPE_WEBHOOK_SECRET` | Secret webhook Stripe (`whsec_...`) |
-| `ADMIN_EMAIL` | Email du compte admin initial |
-| `ADMIN_PASSWORD` | Mot de passe du compte admin initial |
+| Variable                | Description                                   |
+| ----------------------- | --------------------------------------------- |
+| `DB_PASSWORD`           | Mot de passe MySQL                            |
+| `JWT_SECRET`            | Secret JWT access token (min. 32 caractères)  |
+| `REFRESH_TOKEN_SECRET`  | Secret JWT refresh token (min. 32 caractères) |
+| `STRIPE_SECRET_KEY`     | Clé secrète Stripe (`sk_test_...`)            |
+| `STRIPE_WEBHOOK_SECRET` | Secret webhook Stripe (`whsec_...`)           |
+| `ADMIN_EMAIL`           | Email du compte admin initial                 |
+| `ADMIN_PASSWORD`        | Mot de passe du compte admin initial          |
 
 ### 2. Lancer l'environnement de développement
 
 ```bash
+# Script rapide
+./scripts/docker-dev.sh
+
+# Ou manuellement
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-### 3. Migrations et données initiales
+### 3. Données initiales
 
 Dans un second terminal, après que les conteneurs soient UP :
 
 ```bash
-# Appliquer les migrations
-docker compose exec backend npx sequelize-cli db:migrate
-
 # Injecter les catégories et l'utilisateur admin
-docker compose exec backend npx sequelize-cli db:seed:all
+npm --prefix apps/api run db:seed:all
+
+# Supprimer les seeds si besoin
+npm --prefix apps/api run db:seed:undo:all
 ```
 
 ### URLs locales
 
-| Service | URL |
-|---|---|
-| Front Office | http://localhost:5173 |
-| Back Office | http://localhost:5174 |
-| API | http://localhost:3000/api/v1 |
-| Health | http://localhost:3000/api/health |
-
-> **Back Office** : désactivé par défaut. Pour l'activer :
-> ```bash
-> docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile back-office up
-> ```
+| Service             | URL                                                     |
+| ------------------- | ------------------------------------------------------- |
+| Front Office        | http://localhost:5173                                   |
+| Back Office (admin) | http://localhost:5173/admin (compte avec `role: admin`) |
+| API                 | http://localhost:3000/api/v1                            |
+| Health              | http://localhost:3000/api/health                        |
 
 ## API
 
 ### Authentification
 
-| Méthode | Route | Description |
-|---|---|---|
-| `POST` | `/api/v1/auth/register` | Inscription client |
-| `POST` | `/api/v1/auth/login` | Connexion |
-| `POST` | `/api/v1/auth/refresh` | Rafraîchir le token |
-| `POST` | `/api/v1/auth/logout` | Déconnexion |
+| Méthode | Route                   | Description         |
+| ------- | ----------------------- | ------------------- |
+| `POST`  | `/api/v1/auth/register` | Inscription client  |
+| `POST`  | `/api/v1/auth/login`    | Connexion           |
+| `POST`  | `/api/v1/auth/refresh`  | Rafraîchir le token |
+| `POST`  | `/api/v1/auth/logout`   | Déconnexion         |
 
 ### Format des réponses
 
@@ -130,9 +134,6 @@ docker compose logs -f frontend
 docker compose exec backend sh
 docker compose exec database mysql -u carre_user -p carre_ivoire
 
-# Annuler la dernière migration
-docker compose exec backend npx sequelize-cli db:migrate:undo
-
 # Stripe webhooks en local
 stripe listen --forward-to localhost:3000/api/v1/stripe/webhook
 ```
@@ -140,5 +141,39 @@ stripe listen --forward-to localhost:3000/api/v1/stripe/webhook
 ## Production
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+# Script rapide
+./scripts/docker-prod.sh
+
+# Ou manuellement
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 ```
+
+## Profils Docker
+
+| Profil  | Usage                                           |
+| ------- | ----------------------------------------------- |
+| (aucun) | front-office (site + admin) + API + DB (défaut) |
+| `nginx` | Active nginx en mode dev (port 80)              |
+
+```bash
+# Arrêter
+./scripts/docker-stop.sh
+```
+
+## Volumes nommés (cache node_modules)
+
+Les volumes `node_modules_api`, `node_modules_front` persistent entre redémarrages pour éviter de réinstaller les dépendances à chaque `docker compose up`. Premier démarrage plus long, suivants en 30-60 sec.
+
+```bash
+# Rebuild complet (après changement de dépendances)
+./scripts/docker-dev.sh --clean
+```
+
+## Documentation
+
+| Document                               | Description                                                 |
+| -------------------------------------- | ----------------------------------------------------------- |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md)   | Structure du monorepo, couches, modules, flux de données    |
+| [`DEVELOPMENT.md`](DEVELOPMENT.md)     | Setup local, workflows courants, debugging, troubleshooting |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md)   | Conventions de code, commits, branches, revue               |
+| [`docs/patterns.md`](docs/patterns.md) | Patterns Repository, DTO, Guard, Composable, Store          |

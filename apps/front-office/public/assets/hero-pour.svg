@@ -1,0 +1,26 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" width="1600" height="1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="warm" cx="30%" cy="25%" r="90%">
+      <stop offset="0%" stop-color="#8A5A3C"></stop>
+      <stop offset="60%" stop-color="#4A2A1C"></stop>
+      <stop offset="100%" stop-color="#2A150C"></stop>
+    </radialGradient>
+    <radialGradient id="sheen" cx="35%" cy="30%" r="30%">
+      <stop offset="0%" stop-color="#C9A48A" stop-opacity="0.55"></stop>
+      <stop offset="100%" stop-color="#C9A48A" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#warm)"></rect>
+  
+  <path d="M 200 100 Q 600 300 500 520 T 900 800 Q 1100 900 1400 850" stroke="#2A150C" stroke-width="180" fill="none" stroke-linecap="round" opacity="0.55"></path>
+  <path d="M 200 100 Q 600 300 500 520 T 900 800 Q 1100 900 1400 850" stroke="#6B4430" stroke-width="140" fill="none" stroke-linecap="round" opacity="0.35"></path>
+  
+  <rect width="1600" height="1000" fill="url(#sheen)"></rect>
+  
+  <g fill="#FFFBF7" opacity="0.04">
+    <circle cx="300" cy="200" r="2"></circle><circle cx="800" cy="150" r="1.5"></circle><circle cx="1200" cy="300" r="2"></circle>
+    <circle cx="400" cy="600" r="1.5"></circle><circle cx="900" cy="500" r="2"></circle><circle cx="1300" cy="700" r="1.5"></circle>
+    <circle cx="600" cy="850" r="2"></circle><circle cx="1100" cy="920" r="1.5"></circle>
+  </g>
+</svg>

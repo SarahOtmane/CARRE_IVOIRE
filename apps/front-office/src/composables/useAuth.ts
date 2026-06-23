@@ -1,3 +1,1 @@
-export function useAuth() {
-  // TODO: login, register, logout, fetchMe
-}
+export { useAuth } from '@carre-ivoire/composables'

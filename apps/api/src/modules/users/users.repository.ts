@@ -1,6 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
+import { Op } from 'sequelize'
+import { ErrorCodes } from '@/common/constants'
 import { User } from './users.model'
+import throwApiError from '@/common/errors/throw-api-error'
 
 export interface CreateUserInput {
   email: string
@@ -15,7 +18,7 @@ export class UsersRepository {
   constructor(
     @InjectModel(User)
     private readonly userModel: typeof User,
-  ) {}
+  ) { }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ where: { email } })
@@ -49,12 +52,32 @@ export class UsersRepository {
 
   async update(id: number, data: Partial<User>): Promise<User> {
     const user = await this.findById(id)
-    if (!user) throw new NotFoundException({ code: 'USER_NOT_FOUND', message: 'Utilisateur introuvable' })
+    if (!user) throwApiError(ErrorCodes.USER_NOT_FOUND, 'Utilisateur introuvable')
     return user.update(data)
   }
 
   async emailExists(email: string): Promise<boolean> {
     const count = await this.userModel.count({ where: { email } })
     return count > 0
+  }
+
+  async findByResetToken(token: string): Promise<User | null> {
+    return this.userModel.findOne({
+      where: {
+        resetToken: token,
+        resetTokenExpires: { [Op.gt]: new Date() },
+      },
+    })
+  }
+
+  async setResetToken(id: number, token: string, expiresAt: Date): Promise<void> {
+    await this.userModel.update({ resetToken: token, resetTokenExpires: expiresAt } as any, { where: { id } })
+  }
+
+  async clearResetToken(id: number, newPasswordHash: string): Promise<void> {
+    await this.userModel.update(
+      { password_hash: newPasswordHash, resetToken: null, resetTokenExpires: null } as any,
+      { where: { id } },
+    )
   }
 }

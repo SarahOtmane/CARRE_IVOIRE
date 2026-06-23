@@ -5,21 +5,23 @@ import {
   HttpException,
 } from '@nestjs/common'
 import type { Response } from 'express'
+import { getHttpStatusFromErrorCode } from '@/common/constants'
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost): void {
     const ctx = host.switchToHttp()
     const response = ctx.getResponse<Response>()
-    const status = exception.getStatus()
-    const exceptionResponse = exception.getResponse() as Record<string, unknown>
+    const rawResponse = exception.getResponse() as Record<string, unknown>
+
+    const code = (rawResponse?.['code'] as string) ?? undefined
+    const status = code ? getHttpStatusFromErrorCode(code as any) : exception.getStatus()
 
     response.status(status).json({
       success: false,
       error: {
-        code: (exceptionResponse['code'] as string) ?? 'INTERNAL_ERROR',
-        message:
-          (exceptionResponse['message'] as string) ?? exception.message,
+        code: code ?? 'INTERNAL_SERVER_ERROR',
+        message: (rawResponse?.['message'] as string) ?? exception.message,
         statusCode: status,
       },
       timestamp: new Date().toISOString(),

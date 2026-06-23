@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { authGuard } from './guards'
+import { appGuard } from './guards'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -66,6 +66,16 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/mot-de-passe-oublie',
+    name: 'mot-de-passe-oublie',
+    component: () => import('@/pages/mot-de-passe-oublie.vue'),
+  },
+  {
+    path: '/reinitialiser-mot-de-passe',
+    name: 'reinitialiser-mot-de-passe',
+    component: () => import('@/pages/reinitialiser-mot-de-passe.vue'),
+  },
+  {
     path: '/compte',
     component: () => import('@/layouts/AccountLayout.vue'),
     meta: { requiresAuth: true },
@@ -103,6 +113,79 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/admin',
+    component: () => import('@/layouts/AdminLayout.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: '',
+        name: 'admin-dashboard',
+        component: () => import('@/pages/admin/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'categories',
+        name: 'admin-categories',
+        component: () => import('@/pages/admin/categories/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'produits',
+        name: 'admin-produits',
+        component: () => import('@/pages/admin/produits/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'produits/nouveau',
+        name: 'admin-produits-nouveau',
+        component: () => import('@/pages/admin/produits/nouveau.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'produits/:id/modifier',
+        name: 'admin-produits-modifier',
+        component: () => import('@/pages/admin/produits/[id]/modifier.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'commandes',
+        name: 'admin-commandes',
+        component: () => import('@/pages/admin/commandes/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'commandes/:id',
+        name: 'admin-commandes-detail',
+        component: () => import('@/pages/admin/commandes/[id].vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'pages',
+        name: 'admin-pages',
+        component: () => import('@/pages/admin/pages/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'clients',
+        name: 'admin-clients',
+        component: () => import('@/pages/admin/clients/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'parametres',
+        name: 'admin-parametres',
+        component: () => import('@/pages/admin/parametres/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'stocks',
+        name: 'admin-stocks',
+        component: () => import('@/pages/admin/stocks/index.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true },
+      },
+    ],
+  },
+  {
     path: '/commande',
     component: () => import('@/layouts/DefaultLayout.vue'),
     meta: { requiresAuth: true },
@@ -129,6 +212,6 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 })
 
-router.beforeEach(authGuard)
+router.beforeEach(appGuard)
 
 export default router

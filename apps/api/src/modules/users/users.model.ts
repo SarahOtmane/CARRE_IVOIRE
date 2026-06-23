@@ -76,6 +76,14 @@ export class User extends Model<User> {
   @Column(DataType.TINYINT)
   declare is_active: number
 
+  @AllowNull(true)
+  @Column({ type: DataType.STRING(64), field: 'reset_token' })
+  declare resetToken: string | null
+
+  @AllowNull(true)
+  @Column({ type: DataType.DATE, field: 'reset_token_expires' })
+  declare resetTokenExpires: Date | null
+
   declare created_at: Date
   declare updated_at: Date
 }

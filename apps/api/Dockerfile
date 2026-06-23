@@ -1,36 +1,46 @@
-# ─── Étape 1 : Dépendances production ────────────────────────────────
-FROM node:20-alpine AS deps
+# ─── Stage 1: Production dependencies (cacheable) ────────────────────
+FROM node:20-alpine AS dependencies
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --only=production
+# Copy root and app manifests + local packages so production dependencies can be resolved
+COPY package.json package-lock.json ./
+COPY apps/api/package*.json ./
+COPY packages ./packages
+RUN npm install --only=production --legacy-peer-deps
 
-# ─── Étape 2 : Build ─────────────────────────────────────────────────
-FROM node:20-alpine AS builder
+# ─── Stage 2: All dependencies (cacheable) ───────────────────────────
+FROM node:20-alpine AS build-deps
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
+# Copy manifests and local packages to resolve workspaces during build
+COPY package.json package-lock.json ./
+COPY apps/api/package*.json ./
+COPY packages ./packages
+RUN npm install --legacy-peer-deps
+
+# ─── Stage 3: Build (cacheable si src inchangé) ──────────────────────
+FROM build-deps AS build
+# Copy only the API app source into /app
+COPY apps/api .
 RUN npm run build
 
-# ─── Étape 3 : Développement (hot reload) ────────────────────────────
-FROM node:20-alpine AS development
+# ─── Stage 4: Development (hot reload nodemon) ───────────────────────
+FROM build-deps AS development
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
+# Mount or copy app source for development
+COPY apps/api .
 EXPOSE 3000
 CMD ["npm", "run", "start:dev"]
 
-# ─── Étape 4 : Production ────────────────────────────────────────────
+# ─── Stage 5: Production (image minimale) ────────────────────────────
 FROM node:20-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
+# Ensure production package.json is the app manifest
+COPY apps/api/package.json ./package.json
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup -g 1001 -S appgroup && adduser -S appuser -u 1001 -G appgroup
 USER appuser
 
 EXPOSE 3000

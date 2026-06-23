@@ -1,0 +1,315 @@
+/* ============================================================
+   CARRÉ IVOIRE — Colors & Type
+   Design tokens: raw palette + type + semantic roles.
+   Import this file at the top of every page.
+   ============================================================ */
+
+/* -- Fonts (substituted; see README "Font substitution flag") -- */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap");
+
+:root {
+  /* ----- Raw palette ----- */
+  --ivoire: #f6e8de; /* primary background */
+  --ivoire-deep: #eed9ca; /* subtle section break on ivoire */
+  --rose-poudre: #e8c9bc; /* secondary surface */
+  --rose-poudre-2: #ddb5a4; /* rosé hover */
+  --beige-doux: #d9bfa9; /* tertiary surface */
+  --beige-doux-2: #c9a98f; /* beige hover */
+  --brun-cacao: #3a1f14; /* ink, primary dark */
+  --brun-cacao-2: #5e3a2a; /* secondary text */
+  --brun-cacao-3: #8a6a58; /* tertiary text / disabled */
+  --dore: #b08a4f; /* accent — small doses */
+  --dore-deep: #8f6e3b; /* doré hover */
+  --papier: #fffbf7; /* image backdrop */
+  --papier-pur: #ffffff; /* genuine white — rarely used, only inside photos */
+
+  /* ----- Alpha scales (cacao on ivoire) ----- */
+  --cacao-a04: rgba(58, 31, 20, 0.04);
+  --cacao-a08: rgba(58, 31, 20, 0.08);
+  --cacao-a12: rgba(58, 31, 20, 0.12);
+  --cacao-a24: rgba(58, 31, 20, 0.24);
+  --cacao-a45: rgba(58, 31, 20, 0.45);
+  --cacao-a78: rgba(58, 31, 20, 0.78);
+
+  /* ----- Semantic color roles ----- */
+  --bg: var(--ivoire);
+  --bg-alt: var(--rose-poudre);
+  --bg-alt-2: var(--beige-doux);
+  --bg-paper: var(--papier);
+  --bg-inverse: var(--brun-cacao);
+
+  --fg: var(--brun-cacao);
+  --fg-muted: var(--brun-cacao-2);
+  --fg-subtle: var(--brun-cacao-3);
+  --fg-on-dark: var(--ivoire);
+  --fg-accent: var(--dore);
+
+  --border: var(--cacao-a12);
+  --border-strong: var(--brun-cacao);
+
+  --scrim: var(--cacao-a45);
+  --header-glass: rgba(246, 232, 222, 0.78);
+
+  /* ----- Type families ----- */
+  --font-serif:
+    "Cormorant Garamond", "EB Garamond", Georgia, "Times New Roman", serif;
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+
+  /* ----- Type scale (editorial fluid) ----- */
+  --fs-display: clamp(56px, 10vw, 160px);
+  --fs-h1: clamp(44px, 6vw, 72px);
+  --fs-h2: clamp(32px, 4vw, 48px);
+  --fs-h3: 28px;
+  --fs-h4: 20px;
+  --fs-body-l: 18px;
+  --fs-body: 15px;
+  --fs-caption: 13px;
+  --fs-label: 11px;
+
+  /* ----- Line heights ----- */
+  --lh-tight: 0.95;
+  --lh-display: 1;
+  --lh-heading: 1.1;
+  --lh-body: 1.6;
+  --lh-caption: 1.4;
+
+  /* ----- Tracking ----- */
+  --ls-display: -0.02em;
+  --ls-heading: -0.01em;
+  --ls-body: 0.005em;
+  --ls-label: 0.18em;
+
+  /* ----- Spacing (8pt system) ----- */
+  --sp-0: 0;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 16px;
+  --sp-4: 24px;
+  --sp-5: 32px;
+  --sp-6: 48px;
+  --sp-7: 64px;
+  --sp-8: 96px;
+  --sp-9: 128px;
+  --sp-10: 192px;
+
+  /* ----- Layout ----- */
+  --content-max: 1440px;
+  --gutter-lg: 104px;
+  --gutter-md: 48px;
+  --gutter-sm: 20px;
+  --col-gap: 32px;
+
+  /* ----- Radii (square brand — rarely anything other than 0) ----- */
+  --radius-0: 0;
+  --radius-full: 9999px; /* avatars only */
+
+  /* ----- Shadows (essentially none) ----- */
+  --shadow-none: none;
+  --shadow-lift: 0 24px 32px rgba(58, 31, 20, 0.08); /* product float on paper */
+
+  /* ----- Motion ----- */
+  --ease-ambient: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-ui: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 180ms;
+  --dur-med: 400ms;
+  --dur-slow: 800ms;
+
+  /* ----- Z ----- */
+  --z-header: 40;
+  --z-scrim: 80;
+  --z-drawer: 90;
+  --z-modal: 100;
+}
+
+/* ============================================================
+   Semantic base styles
+   Apply to bare HTML tags. Wrap in .ci-prose for article bodies.
+   ============================================================ */
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+}
+h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+}
+h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+}
+h4 {
+  font-size: var(--fs-h4);
+  line-height: var(--lh-heading);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+p {
+  margin: 0 0 1em 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  transition: color var(--dur-fast) var(--ease-ui);
+}
+
+a.ci-link {
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+}
+
+a:hover {
+  color: var(--dore-deep);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: var(--sp-6) 0;
+}
+
+small,
+.ci-caption {
+  font-size: var(--fs-caption);
+  color: var(--fg-muted);
+  line-height: var(--lh-caption);
+}
+
+/* ----- Utility type roles ----- */
+
+.ci-display {
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  font-weight: 400;
+}
+.ci-display-italic {
+  font-family: var(--font-serif);
+  font-size: var(--fs-display);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-display);
+  font-weight: 400;
+  font-style: italic;
+}
+.ci-h1 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h1);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+  font-weight: 500;
+}
+.ci-h2 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  font-weight: 500;
+}
+.ci-h3 {
+  font-family: var(--font-serif);
+  font-size: var(--fs-h3);
+  line-height: var(--lh-heading);
+  font-weight: 500;
+}
+.ci-body-l {
+  font-size: var(--fs-body-l);
+  line-height: 1.55;
+}
+.ci-body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+.ci-caption {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  color: var(--fg-muted);
+}
+.ci-label {
+  font-family: var(--font-sans);
+  font-size: var(--fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-label);
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+.ci-price {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--fg-accent);
+  letter-spacing: 0.02em;
+}
+.ci-eyebrow {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--fg-muted);
+  padding-bottom: var(--sp-3);
+}
+
+/* ----- Prose wrapper for article bodies (journal, storytelling) ----- */
+
+.ci-prose {
+  font-size: var(--fs-body-l);
+  line-height: 1.7;
+  color: var(--fg);
+  max-width: 62ch;
+}
+.ci-prose p + p {
+  margin-top: 1.2em;
+}
+.ci-prose h2 {
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+}
+.ci-prose em {
+  font-style: italic;
+  color: var(--fg-muted);
+}
+
+/* ----- Focus ----- */
+:focus-visible {
+  outline: 2px solid var(--dore);
+  outline-offset: 3px;
+}
+
+/* ----- Selection ----- */
+::selection {
+  background: var(--brun-cacao);
+  color: var(--ivoire);
+}

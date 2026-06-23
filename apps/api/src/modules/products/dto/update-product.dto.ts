@@ -1,0 +1,99 @@
+import {
+  IsString,
+  MinLength,
+  MaxLength,
+  Matches,
+  IsOptional,
+  IsBoolean,
+  IsInt,
+  IsIn,
+  Min,
+} from 'class-validator'
+
+export class UpdateProductDto {
+  @IsOptional()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(255)
+  name?: string
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^[a-z0-9-]+$/)
+  @MaxLength(255)
+  slug?: string
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  shortDescription?: string
+
+  @IsOptional()
+  @IsString()
+  description?: string
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  price?: number
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  discountPrice?: number
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  imageUrl?: string
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  categoryId?: number
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  stock?: number
+
+  @IsOptional()
+  @IsIn(['in_stock', 'out_of_stock'])
+  stockStatus?: 'in_stock' | 'out_of_stock'
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  taxRateId?: number | null
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean
+
+  @IsOptional()
+  @IsBoolean()
+  isSeasonal?: boolean
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  displayOrder?: number
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  badge?: string
+
+  @IsOptional()
+  @IsString()
+  ingredients?: string
+
+  @IsOptional()
+  @IsString()
+  allergens?: string
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  weightGrams?: number
+}
