@@ -1,13 +1,8 @@
-export class AuthUserDto {
-  id: number
-  email: string
-  firstName: string
-  lastName: string
-  customerNumber: string
-  role: string
-}
+import type { AuthUser } from '@carre-ivoire/types'
 
-export class AuthResponseDto {
+export type AuthUserDto = AuthUser
+
+export interface AuthResponseDto {
   accessToken: string
   user: AuthUserDto
 }
