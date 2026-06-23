@@ -38,8 +38,10 @@ async function login() {
       email: form.value.email.trim(),
       password: form.value.password,
     });
-    authStore.setAuth(res.data.data.token, res.data.data.user);
-    router.replace(redirectPath.value);
+    const { accessToken, user } = res.data.data;
+    authStore.setAuth(accessToken, user);
+    const target = user.role === "admin" && redirectPath.value === "/compte" ? "/admin" : redirectPath.value;
+    router.replace(target);
   } catch {
     error.value = "Email ou mot de passe incorrect.";
   } finally {
@@ -48,7 +50,7 @@ async function login() {
 }
 
 function goToAccount() {
-  router.push("/compte");
+  router.push(authStore.isAdmin ? "/admin" : "/compte");
 }
 </script>
 

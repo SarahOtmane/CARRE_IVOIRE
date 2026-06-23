@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useCartStore } from "@carre-ivoire/stores";
-import Button from "@carre-ivoire/ui/Button.vue";
+import { Button } from "@carre-ivoire/ui";
 import type { CartItem } from "@carre-ivoire/types";
 
 interface Props {
@@ -24,7 +24,7 @@ const total = computed(() =>
 const itemCount = computed(() => cartStore.items.length);
 
 function handleRemove(item: CartItem) {
-  cartStore.removeItem(item.productId, item.format);
+  cartStore.removeItem(item.productId, item.variantId);
 }
 
 function handleCheckout() {
@@ -103,9 +103,9 @@ function handleCheckout() {
           <!-- Product image -->
           <div class="h-22 w-22 flex-shrink-0 bg-papier">
             <img
-              v-if="item.image"
-              :src="item.image"
-              :alt="item.productName"
+              v-if="item.imageUrl"
+              :src="item.imageUrl"
+              :alt="item.name"
               class="h-full w-full object-cover"
             />
           </div>
@@ -113,7 +113,7 @@ function handleCheckout() {
           <!-- Product details -->
           <div class="flex-1">
             <h3 class="font-display text-lg font-medium text-cacao">
-              {{ item.productName }}
+              {{ item.name }}
             </h3>
             <p class="mt-1 text-label text-cacao/60">
               Format {{ item.format }} · qté {{ item.quantity }}
@@ -122,9 +122,7 @@ function handleCheckout() {
             <!-- Price & Remove -->
             <div class="mt-3 flex items-center justify-between">
               <p class="font-body text-sm font-medium text-dore">
-                {{
-                  (item.price * item.quantity).toFixed(2).replace(".", ",")
-                }}
+                {{ (item.price * item.quantity).toFixed(2).replace(".", ",") }}
                 €
               </p>
               <button

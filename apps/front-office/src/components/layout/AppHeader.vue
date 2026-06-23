@@ -2,11 +2,12 @@
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useCartStore } from "@/stores/cart.store";
-import type { ProductResponse } from "@carre-ivoire/types";
+import { useProductSearch } from "@carre-ivoire/composables";
 
 const router = useRouter();
 const route = useRoute();
 const cartStore = useCartStore();
+const { results: searchResults, isSearching, search: runSearch } = useProductSearch();
 
 const scrolled = ref(false);
 const hovered = ref(false);
@@ -75,8 +76,7 @@ const suggestions = [
 ];
 const familles = ["Tablettes", "Mini Carrés", "Mendiants", "Pâtes à tartiner"];
 
-// Search via API — à implémenter lors de la PRP dédiée
-const searchResults = computed<ProductResponse[]>(() => []);
+watch(query, (val) => runSearch(val));
 
 const hasQuery = computed(() => query.value.trim().length > 0);
 
@@ -453,6 +453,11 @@ function toggleSearch() {
               @click="navigateAndClose('/boutique')"
             >Découvrir la collection</a>
           </div>
+        </div>
+
+        <!-- ── Recherche en cours ───────────────────────────────────── -->
+        <div v-else-if="isSearching && searchResults.length === 0" class="mt-12 pb-8">
+          <span class="ci-eyebrow">Recherche</span>
         </div>
 
         <!-- ── Résultats ─────────────────────────────────────────────── -->
