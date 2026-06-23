@@ -144,12 +144,12 @@ const timeline = [
       <div class="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div>
           <div
-            class="font-sans text-[11px] uppercase tracking-[0.18em] text-brun-cacao-2"
+            class="font-sans text-[11px] uppercase tracking-[0.18em] text-cacao-2"
           >
             {{ order.id }}
           </div>
           <h2
-            class="mt-2 font-serif text-brun-cacao"
+            class="mt-2 font-serif text-cacao"
             style="
               font-size: clamp(32px, 4vw, 56px);
               line-height: 1;
@@ -166,7 +166,7 @@ const timeline = [
         </span>
       </div>
       <p
-        class="mt-5 max-w-[560px] font-sans text-[15px] leading-[1.7] text-brun-cacao-2"
+        class="mt-5 max-w-[560px] font-sans text-[15px] leading-[1.7] text-cacao-2"
       >
         Votre colis suit sa trajectoire. Articles, adresse, total et chronologie
         sont réunis ci-dessous.
@@ -176,7 +176,7 @@ const timeline = [
     <div class="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
       <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
         <div
-          class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           Chronologie
         </div>
@@ -193,7 +193,7 @@ const timeline = [
               {{ step.label }}
             </div>
             <div
-              class="mt-2 font-serif text-[18px] font-medium text-brun-cacao"
+              class="mt-2 font-serif text-[18px] font-medium text-cacao"
             >
               {{ step.value }}
             </div>
@@ -203,11 +203,11 @@ const timeline = [
 
       <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
         <div
-          class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           Livraison
         </div>
-        <p class="font-sans text-[14px] leading-relaxed text-brun-cacao-2">
+        <p class="font-sans text-[14px] leading-relaxed text-cacao-2">
           {{ order.livraison }}<br />{{ order.adresse }}
         </p>
       </div>
@@ -230,11 +230,11 @@ const timeline = [
         </div>
         <div class="flex flex-1 flex-col justify-between">
           <div>
-            <div class="font-serif text-[18px] font-medium text-brun-cacao">
+            <div class="font-serif text-[18px] font-medium text-cacao">
               {{ item.name }}
             </div>
             <div
-              class="mt-1 font-sans text-[11px] uppercase tracking-[0.18em] text-brun-cacao-2"
+              class="mt-1 font-sans text-[11px] uppercase tracking-[0.18em] text-cacao-2"
             >
               {{ item.origin }} · Format {{ item.format }} · Qté {{ item.qty }}
             </div>
@@ -252,28 +252,28 @@ const timeline = [
     <div class="mb-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
       <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
         <div
-          class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+          class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
         >
           Récapitulatif
         </div>
         <div class="flex justify-between py-2 font-sans text-[13px]">
-          <span class="text-brun-cacao-2">Sous-total</span>
+          <span class="text-cacao-2">Sous-total</span>
           <span
-            class="text-brun-cacao"
+            class="text-cacao"
             style="font-variant-numeric: tabular-nums"
           >
             {{ subtotal.toFixed(2).replace(".", ",") }} €
           </span>
         </div>
         <div class="flex justify-between py-2 font-sans text-[13px]">
-          <span class="text-brun-cacao-2">Livraison</span>
-          <span class="text-brun-cacao">Offerte</span>
+          <span class="text-cacao-2">Livraison</span>
+          <span class="text-cacao">Offerte</span>
         </div>
         <div
           class="flex justify-between border-t py-2 font-serif text-[18px] font-medium"
           style="border-color: var(--cacao-a12)"
         >
-          <span class="text-brun-cacao">Total</span>
+          <span class="text-cacao">Total</span>
           <span class="text-dore" style="font-variant-numeric: tabular-nums">
             {{ order.total.toFixed(2).replace(".", ",") }} €
           </span>
@@ -282,18 +282,18 @@ const timeline = [
 
       <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
         <div
-          class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+          class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
         >
           Adresse de livraison
         </div>
-        <p class="font-serif text-[18px] leading-[1.45] text-brun-cacao">
+        <p class="font-serif text-[18px] leading-[1.45] text-cacao">
           {{ order.adresse }}
         </p>
       </div>
     </div>
 
     <button
-      class="border-b border-brun-cacao pb-px font-sans text-[13px] text-brun-cacao transition-opacity duration-180 hover:opacity-60"
+      class="border-b border-cacao pb-px font-sans text-[13px] text-cacao transition-opacity duration-180 hover:opacity-60"
       @click="router.push('/compte/commandes')"
     >
       ← Retour aux commandes
@@ -303,11 +303,11 @@ const timeline = [
   <!-- Commande introuvable -->
   <div v-else class="py-16 text-center">
     <span class="ci-eyebrow">Introuvable</span>
-    <h2 class="mt-3 font-serif text-[28px] font-medium text-brun-cacao">
+    <h2 class="mt-3 font-serif text-[28px] font-medium text-cacao">
       Cette commande n'existe pas.
     </h2>
     <button
-      class="mt-6 border-b border-brun-cacao pb-px font-sans text-[13px] text-brun-cacao"
+      class="mt-6 border-b border-cacao pb-px font-sans text-[13px] text-cacao"
       @click="router.push('/compte/commandes')"
     >
       ← Retour aux commandes
