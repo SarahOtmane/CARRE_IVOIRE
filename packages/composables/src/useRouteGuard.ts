@@ -1,45 +1,20 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { useAuthStore } from '@carre-ivoire/stores'
 
-export function authGuard(
+export function appGuard(
   to: RouteLocationNormalized,
   _from: RouteLocationNormalized,
   next: NavigationGuardNext,
 ): void {
-  if (!to.meta.requiresAuth) {
-    next()
-    return
-  }
-
   const authStore = useAuthStore()
 
-  if (authStore.isAuthenticated) {
-    next()
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next({ name: 'connexion', query: { redirect: to.fullPath } })
     return
   }
 
-  next({ name: 'connexion', query: { redirect: to.fullPath } })
-}
-
-export function adminGuard(
-  to: RouteLocationNormalized,
-  _from: RouteLocationNormalized,
-  next: NavigationGuardNext,
-): void {
-  if (!to.meta.requiresAuth && !to.meta.requiresAdmin) {
-    next()
-    return
-  }
-
-  const authStore = useAuthStore()
-
-  if (!authStore.isAuthenticated) {
-    next({ name: 'login', query: { redirect: to.fullPath } })
-    return
-  }
-
-  if (!authStore.isAdmin) {
-    next({ name: 'login' })
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    next({ name: authStore.isAuthenticated ? 'home' : 'connexion' })
     return
   }
 

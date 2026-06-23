@@ -1,1 +1,1 @@
-export { authGuard } from '@carre-ivoire/composables'
+export { appGuard } from '@carre-ivoire/composables'
