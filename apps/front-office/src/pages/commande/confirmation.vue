@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@carre-ivoire/stores";
 
 const router = useRouter();
 const route = useRoute();
@@ -53,7 +53,7 @@ function formatPrice(value: number) {
     <section class="px-5 lg:px-[104px]">
       <span class="ci-eyebrow">Commande validée</span>
       <h1
-        class="mt-4 font-serif text-brun-cacao"
+        class="mt-4 font-serif text-cacao"
         style="
           font-size: clamp(44px, 7vw, 96px);
           line-height: 0.95;
@@ -63,7 +63,7 @@ function formatPrice(value: number) {
         Votre paiement a été reçu.
       </h1>
       <p
-        class="mt-6 max-w-[640px] font-sans text-[16px] leading-[1.7] text-brun-cacao-2"
+        class="mt-6 max-w-[640px] font-sans text-[16px] leading-[1.7] text-cacao-2"
       >
         Merci. Votre commande {{ orderNumber }} est en préparation. Un reçu a
         été envoyé à {{ authStore.user?.email ?? "votre adresse" }}.
@@ -77,43 +77,43 @@ function formatPrice(value: number) {
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
             <div
-              class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Commande
             </div>
             <div
-              class="mt-2 font-serif text-[22px] font-medium text-brun-cacao"
+              class="mt-2 font-serif text-[22px] font-medium text-cacao"
             >
               {{ orderNumber }}
             </div>
           </div>
           <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
             <div
-              class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Articles
             </div>
             <div
-              class="mt-2 font-serif text-[22px] font-medium text-brun-cacao"
+              class="mt-2 font-serif text-[22px] font-medium text-cacao"
             >
               {{ itemCount }}
             </div>
           </div>
           <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
             <div
-              class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Total
             </div>
             <div
-              class="mt-2 font-serif text-[22px] font-medium text-brun-cacao"
+              class="mt-2 font-serif text-[22px] font-medium text-cacao"
             >
               {{ formatPrice(total) }}
             </div>
           </div>
           <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
             <div
-              class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Statut
             </div>
@@ -125,11 +125,11 @@ function formatPrice(value: number) {
 
         <div class="mt-12 border-t pt-6" style="border-color: var(--cacao-a12)">
           <span class="ci-eyebrow">Votre colis</span>
-          <h2 class="mt-4 font-serif text-[28px] font-medium text-brun-cacao">
+          <h2 class="mt-4 font-serif text-[28px] font-medium text-cacao">
             Le coffret part en atelier.
           </h2>
           <p
-            class="mt-4 max-w-[620px] font-sans text-[15px] leading-[1.7] text-brun-cacao-2"
+            class="mt-4 max-w-[620px] font-sans text-[15px] leading-[1.7] text-cacao-2"
           >
             Vous pouvez suivre la commande dans votre espace client. Le colis
             est préparé à la main, puis remis au transporteur choisi.
@@ -138,13 +138,13 @@ function formatPrice(value: number) {
 
         <div class="mt-10 flex flex-wrap gap-4">
           <button
-            class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
+            class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
             @click="router.push('/compte/commandes')"
           >
             Voir mes commandes
           </button>
           <button
-            class="border border-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-brun-cacao transition-all duration-180 hover:bg-brun-cacao hover:text-ivoire active:translate-y-px"
+            class="border border-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire active:translate-y-px"
             @click="router.push('/boutique')"
           >
             Retour à la boutique
@@ -160,12 +160,12 @@ function formatPrice(value: number) {
         <div class="mt-5 space-y-4">
           <div class="border-b pb-4" style="border-color: var(--cacao-a12)">
             <div
-              class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Livraison
             </div>
             <p
-              class="mt-2 font-serif text-[18px] leading-[1.45] text-brun-cacao"
+              class="mt-2 font-serif text-[18px] leading-[1.45] text-cacao"
             >
               {{
                 checkoutSnapshot?.shipping?.deliveryLabel ??
@@ -173,7 +173,7 @@ function formatPrice(value: number) {
               }}
             </p>
             <p
-              class="mt-3 font-sans text-[13px] leading-[1.7] text-brun-cacao-2"
+              class="mt-3 font-sans text-[13px] leading-[1.7] text-cacao-2"
             >
               {{ checkoutSnapshot?.shipping?.address ?? "Adresse enregistrée"
               }}<br />
@@ -184,12 +184,12 @@ function formatPrice(value: number) {
 
           <div class="border-b pb-4" style="border-color: var(--cacao-a12)">
             <div
-              class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Client
             </div>
             <p
-              class="mt-2 font-sans text-[14px] leading-[1.7] text-brun-cacao-2"
+              class="mt-2 font-sans text-[14px] leading-[1.7] text-cacao-2"
             >
               {{
                 checkoutSnapshot?.shipping?.firstName ??
@@ -210,7 +210,7 @@ function formatPrice(value: number) {
           </div>
 
           <div
-            class="flex justify-between pt-1 font-serif text-[22px] font-medium text-brun-cacao"
+            class="flex justify-between pt-1 font-serif text-[22px] font-medium text-cacao"
           >
             <span>Total</span>
             <span style="font-variant-numeric: tabular-nums">{{
