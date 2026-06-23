@@ -199,7 +199,9 @@
 
 ### Tâches détaillées
 
-#### SEC-002 — Ajouter un header CSP dans les configs Nginx
+#### SEC-002 — Ajouter un header CSP dans les configs Nginx ✅ Fait
+
+- **Résultat** : header `Content-Security-Policy` ajouté dans `nginx.conf` et `nginx.prod.conf` (les configs publiquement exposées ; `spa.conf` est interne, derrière le reverse-proxy). Autorise `js.stripe.com`/`hooks.stripe.com`/`api.stripe.com`, bloque `object-src`, fixe `base-uri 'self'`.
 
 - **Description** : Définir un header `Content-Security-Policy` dans `docker/nginx/nginx.conf`, `nginx.prod.conf` et `spa.conf`, autorisant explicitement `js.stripe.com`, `api.stripe.com` et les origines propres du site.
 - **Pourquoi** : Le site embarque (désormais réellement, après FRONT-001) Stripe Elements ; l'absence totale de CSP est un risque XSS non négligeable pour une plateforme qui manipule des données de paiement.
@@ -215,7 +217,9 @@
 - **Critères de validation** : le site fonctionne intégralement (incl. paiement) avec la CSP active ; la console navigateur ne montre aucune violation CSP bloquante.
 - **Tests à réaliser** : test manuel avec DevTools (onglet Security/Console) sur chaque page, en particulier `commande/index.vue`.
 
-#### SEC-003 — Remplacer `ADMIN_PASSWORD` par un placeholder non exploitable
+#### SEC-003 — Remplacer `ADMIN_PASSWORD` par un placeholder non exploitable ✅ Fait
+
+- **Résultat** : `.env.example` utilise désormais `ADMIN_PASSWORD=CHANGE_ME_BEFORE_PROD` avec commentaire explicite.
 
 - **Description** : Dans `.env.example`, remplacer `ADMIN_PASSWORD=Admin1234!` par `ADMIN_PASSWORD=CHANGE_ME_BEFORE_PROD`.
 - **Pourquoi** : Un déployeur copiant `.env.example` → `.env` sans modification laisserait un mot de passe admin trivial et public (visible dans tout clone du repo).
@@ -231,7 +235,9 @@
 - **Critères de validation** : `.env.example` ne contient plus aucune valeur de mot de passe plausible.
 - **Tests à réaliser** : aucun (config).
 
-#### SEC-004 — Rendre `HttpExceptionFilter` catch-all
+#### SEC-004 — Rendre `HttpExceptionFilter` catch-all ✅ Fait
+
+- **Résultat** : filtre passé en `@Catch()` global ; les `HttpException` gardent leur traitement existant, toute autre erreur est loguée via `Logger` puis renvoyée au client comme `{success:false,error:{code:'INTERNAL_SERVER_ERROR',message:'Une erreur est survenue'}}` (500), sans fuite de stack trace.
 
 - **Description** : Étendre `apps/api/src/common/filters/http-exception.filter.ts` pour catcher toutes les exceptions (`@Catch()` sans argument), mapper les erreurs non-`HttpException` (Sequelize, `TypeError`, etc.) vers un code générique `INTERNAL_ERROR` sans exposer la stack trace en production.
 - **Pourquoi** : Actuellement, seules les `HttpException` sont catchées ; toute erreur imprévue (bug Sequelize, erreur de typage runtime) casse le contrat `{success:false,error:{code,message}}` et peut fuiter des détails techniques au client.
@@ -247,7 +253,9 @@
 - **Critères de validation** : forcer une erreur Sequelize (ex. contrainte FK violée) renvoie un `500` au format `{success:false,error:{code:'INTERNAL_ERROR',...}}` sans stack trace exposée côté client.
 - **Tests à réaliser** : test unitaire du filter avec une erreur native en entrée.
 
-#### ARCH-001 — Sortir Sequelize direct d'`orders.service.ts`
+#### ARCH-001 — Sortir Sequelize direct d'`orders.service.ts` ✅ Fait
+
+- **Résultat** : `decrementStock()` ajoutée dans `ProductsRepository`/`ProductVariantsRepository` (même sémantique `rowsAffected===0`) ; `orders.service.ts` n'injecte plus `Product`/`ProductVariant` directement. Test dédié ajouté dans `orders.service.spec.ts`. 35 tests Jest verts, `tsc --noEmit` propre.
 
 - **Description** : Ajouter `decrementStock(id, quantity, transaction)` dans `ProductsRepository` et `ProductVariantsRepository`, et retirer les `@InjectModel(Product)`/`@InjectModel(ProductVariant)` directs d'`orders.service.ts`.
 - **Pourquoi** : Violation du pattern Repository sur le module le plus critique du projet (gestion du stock/argent) — règle absolue n°1 de CLAUDE.md ("Pattern Repository obligatoire — jamais de Sequelize direct dans un Service").
@@ -263,7 +271,9 @@
 - **Critères de validation** : `orders.service.ts` ne contient plus aucun `@InjectModel` de `Product`/`ProductVariant` ; les tests existants (`orders.service.spec.ts`) passent sans modification de comportement observable.
 - **Tests à réaliser** : TEST-004 (tests dédiés aux repositories), non-régression sur `orders.service.spec.ts`.
 
-#### ARCH-002 — Sortir l'appel Stripe de la transaction DB
+#### ARCH-002 — Sortir l'appel Stripe de la transaction DB ✅ Fait
+
+- **Résultat** : `createOrder()` restructuré en deux temps — transaction courte (stock + commande), puis appel Stripe hors transaction ; en cas d'échec Stripe, `releaseStockAndCancel()` compense (incrémente le stock, statut `cancelled`) dans une transaction séparée. Nouveau test de compensation ajouté et vert.
 
 - **Description** : Restructurer `orders.service.ts` pour que la création du PaymentIntent Stripe (appel réseau externe) se fasse **avant** ou **après** la transaction Sequelize de décrément de stock, jamais à l'intérieur.
 - **Pourquoi** : Un appel HTTP externe tenu pendant une transaction DB prolonge les verrous (risque de contention sous charge) et peut créer un PaymentIntent Stripe orphelin sans commande correspondante si la transaction échoue après l'appel.
@@ -279,7 +289,9 @@
 - **Critères de validation** : simuler un échec Stripe (clé invalide temporaire) ne laisse aucune réservation de stock orpheline en base après le délai de compensation.
 - **Tests à réaliser** : test d'intégration simulant un échec de l'appel Stripe après réservation du stock.
 
-#### ARCH-003 — Unifier les types `User`/`Order`/`Product`
+#### ARCH-003 — Unifier les types `User`/`Order`/`Product` ✅ Fait
+
+- **Résultat** : `packages/types` est maintenant la source unique, importée par l'API. `User` aligné sur `UserResponseDto` réel (customerNumber, adresses, isActive — `updatedAt` retiré car jamais renvoyé). Nouveau type `AuthUser` pour la réponse login/register, utilisé par `packages/stores/auth.store.ts` (suppression de sa définition locale divergente). `Product.category` restreint à `CategorySummary` (id/name/slug, plus de faux `CategoryResponse` complet). `OrderItem` aligné sur `OrderItemResponseDto` (orderId et product fantômes retirés). `Order.shippingAddress` typé `ShippingAddress` strict côté API (DTO + modèle Sequelize) au lieu de `object`. Type fantôme `ProductSheet`/`FormatOption` supprimé (plus aucun usage après ARCH-005). `OrderStatus` conservé en enum (utilisé comme valeur dans 5 fichiers admin). `tsc --noEmit` propre sur `apps/api` et `apps/front-office`, build Nest + Vite OK, 35+18 tests verts.
 
 - **Description** : Faire de `packages/types` la source unique des contrats API, importée à la fois par `apps/api` (DTOs) et `apps/front-office`/`packages/stores`. Corriger les divergences identifiées : `User` (manque `customerNumber`, `addressStreet/City/Zip/Country`, `isActive`, `updatedAt`), `Order.shippingAddress` (typé `object` côté API, doit être `ShippingAddress` strict), `Product.category` (sous-ensemble incohérent), `TaxRateDto` dupliqué.
 - **Pourquoi** : Trois définitions divergentes de `User` coexistent actuellement (packages/types, DTO API, store Pinia `auth.store.ts`), créant un risque de champs `undefined` silencieux en runtime sans erreur de compilation.
@@ -295,7 +307,9 @@
 - **Critères de validation** : un seul symbole `User`/`Order`/`Product` existe dans le monorepo, importé partout ; `tsc --noEmit` passe sur `apps/api`, `apps/front-office`, tous les `packages/*`.
 - **Tests à réaliser** : TEST-005, plus vérification manuelle de l'affichage des champs précédemment manquants (téléphone, adresse, numéro client) dans les pages compte/admin.
 
-#### ARCH-004 — Supprimer le triple aliasing de tokens Tailwind
+#### ARCH-004 — Supprimer le triple aliasing de tokens Tailwind ✅ Fait
+
+- **Résultat** : usage réel mesuré avant migration (brun-cacao: 531 occurrences vs cacao: 24 ; beige: 68 vs beige-doux: 7) — décision prise avec l'utilisateur de migrer entièrement vers les noms canoniques plutôt que de se limiter à l'admin. 49 fichiers migrés (`brun-cacao`→`cacao`, `cocoa`→`cacao`, `ivory`→`ivoire`, `gold`→`dore`, `beige`→`beige-doux`) via regex ciblée préservant les `var(--brun-cacao)` (nom réel de la variable CSS, distinct de l'alias Tailwind). Alias supprimés du preset. Build Vite + `vue-tsc` propres, CSS généré sans classe manquante. Le token sémantique "erreur/rupture de stock" mentionné en description n'a pas été créé (hors scope strict de la tâche, laissé en dette mineure).
 
 - **Description** : Dans `packages/config/tailwind/preset.js`, supprimer les alias `cocoa`, `ivory`, `beige`, `gold`, `brun-cacao` et ne conserver que les noms canoniques (`cacao`, `ivoire`, `beige-doux`, `dore`) ; migrer toutes les pages admin (`apps/front-office/src/pages/admin/**`, `AdminSidebar.vue`) qui utilisent les alias.
 - **Pourquoi** : Trois façons d'écrire la même couleur créent une dérive stylistique inévitable et une incohérence visuelle déjà identifiée entre le site public et le back-office, violant l'exigence CLAUDE.md de noms canoniques.
@@ -311,7 +325,9 @@
 - **Critères de validation** : `grep -r "cocoa\|ivory\|brun-cacao\b\|gold" apps/front-office/src` ne retourne plus aucun résultat (hors commentaires) ; preset ne contient plus les alias.
 - **Tests à réaliser** : revue visuelle de toutes les pages admin après migration (capture d'écran avant/après).
 
-#### ARCH-005 — Nettoyer le code mort frontend
+#### ARCH-005 — Nettoyer le code mort frontend ✅ Fait
+
+- **Résultat** : confirmé zéro importeur pour `ProductDetail.vue`, `CartDrawer.vue`, `AppNav.vue`, `ProductGrid.vue` et `product.store.ts` avant suppression. Les ré-exports `auth.store.ts`/`cart.store.ts` ont été supprimés après migration des 11 fichiers qui les important vers `@carre-ivoire/stores` directement (dossier `apps/front-office/src/stores/` entièrement supprimé). Build Vite propre après coup.
 
 - **Description** : Supprimer les composants et store jamais montés/importés : `ProductDetail.vue`, `CartDrawer.vue`, `AppNav.vue` (stub vide), `ProductGrid.vue` (stub vide), `apps/front-office/src/stores/product.store.ts`, ainsi que les ré-exports vides `apps/front-office/src/stores/{auth,cart}.store.ts`.
 - **Pourquoi** : ~450 lignes de code mort créent un risque de double-maintenance (quelqu'un modifie le mauvais fichier en le croyant actif) et de confusion architecturale (deux systèmes d'état produit non synchronisés).
@@ -327,7 +343,9 @@
 - **Critères de validation** : `npm run build` sur `apps/front-office` réussit après suppression, aucune route ou composant ne référence plus les fichiers supprimés.
 - **Tests à réaliser** : build complet + smoke test manuel des pages panier/produit/auth.
 
-#### ARCH-006 — Supprimer les fichiers backend morts
+#### ARCH-006 — Supprimer les fichiers backend morts ✅ Fait
+
+- **Résultat** : `jwt.config.ts` et `validation.pipe.ts` (vide) supprimés après vérification qu'aucun module ne les importait ; dossier `common/pipes/` supprimé (devenu vide).
 
 - **Description** : Supprimer `apps/api/src/config/jwt.config.ts` (jamais utilisé) et `apps/api/src/common/pipes/validation.pipe.ts` (fichier vide).
 - **Pourquoi** : Code mort qui complique la lecture et entretient la confusion sur la configuration JWT réelle (voir ARCH-007).
@@ -343,7 +361,9 @@
 - **Critères de validation** : build réussit, aucune référence résiduelle.
 - **Tests à réaliser** : build complet.
 
-#### ARCH-007 — Unifier les secrets JWT
+#### ARCH-007 — Unifier les secrets JWT ✅ Fait
+
+- **Résultat** : `auth.module.ts` lit désormais `JWT_SECRET`/`JWT_EXPIRATION` (au lieu de `JWT_ACCESS_TOKEN_SECRET`/`JWT_ACCESS_TOKEN_EXPIRES_IN`, jamais validés par `env.validation.ts` et non alignés avec `auth.service.ts`/`jwt.strategy.ts`) — une seule variable fait désormais foi partout.
 
 - **Description** : Choisir une seule variable d'environnement (`JWT_SECRET`) et l'utiliser de façon cohérente dans `auth.module.ts`, `auth.service.ts`, `jwt.strategy.ts` et `env.validation.ts`, en supprimant la référence à `JWT_ACCESS_TOKEN_SECRET` non alignée.
 - **Pourquoi** : `auth.module.ts` configure une variable jamais lue ailleurs (`JWT_ACCESS_TOKEN_SECRET`) tandis que le reste du code utilise `JWT_SECRET` — latent aujourd'hui, mais dangereux si un futur appel passe par le `JwtService` mal configuré (signature avec un secret vide/différent).
@@ -359,7 +379,9 @@
 - **Critères de validation** : login/register génèrent des tokens valides vérifiables par `jwt.strategy.ts` avec la même variable partout.
 - **Tests à réaliser** : TEST-001 (couvre indirectement ce point), test manuel login → accès route protégée.
 
-#### ARCH-008 — Dédupliquer les mappings/DTOs dupliqués
+#### ARCH-008 — Dédupliquer les mappings/DTOs dupliqués ✅ Fait
+
+- **Résultat** : `TaxRateDto` (product-response.dto.ts) et `TaxRateResponse` (tax-rates.service.ts, troisième définition trouvée en cours de route) importent désormais `TaxRate` depuis `@carre-ivoire/types`. `toVariantResponseDto` extrait dans `apps/api/src/modules/products/mappers/variant.mapper.ts`, utilisé par `products.service.ts` et `product-variants.service.ts` (méthodes privées dupliquées supprimées).
 
 - **Description** : Importer `TaxRate`/`TaxRateDto` depuis `@carre-ivoire/types` dans `product-response.dto.ts` au lieu de le redéfinir localement ; extraire un mapper partagé `toVariantResponseDto` utilisé à la fois par `products.service.ts` et `product-variants.service.ts`.
 - **Pourquoi** : Deux définitions parallèles du même contrat (TaxRate) et deux implémentations dupliquées du même mapping créent un risque de divergence silencieuse si l'une évolue sans l'autre.
