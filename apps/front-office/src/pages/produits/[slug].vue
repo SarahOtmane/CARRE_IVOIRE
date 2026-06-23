@@ -2,13 +2,16 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
-import { useProduct, useProducts } from '@carre-ivoire/composables'
+import { useAuth, useFavorites, useProduct, useProducts } from '@carre-ivoire/composables'
 import { useCartStore } from '@carre-ivoire/stores'
 import ProductCard from '@/components/product/ProductCard.vue'
 
 const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
+const { isAuthenticated } = useAuth()
+const { isFavorite, add: addFavorite, remove: removeFavorite } = useFavorites()
+const togglingFavorite = ref(false)
 
 const slug = route.params.slug as string
 const { product, isLoading } = useProduct(slug)
@@ -80,6 +83,27 @@ function addToCart() {
   added.value = true
   setTimeout(() => { added.value = false }, 2000)
 }
+
+const isFav = computed(() => (product.value ? isFavorite(product.value.id) : false))
+
+async function toggleFavorite() {
+  if (!product.value) return
+  if (!isAuthenticated.value) {
+    router.push({ path: '/connexion', query: { redirect: route.fullPath } })
+    return
+  }
+  if (togglingFavorite.value) return
+  togglingFavorite.value = true
+  try {
+    if (isFav.value) {
+      await removeFavorite(product.value.id)
+    } else {
+      await addFavorite(product.value.id)
+    }
+  } finally {
+    togglingFavorite.value = false
+  }
+}
 </script>
 
 <template>
@@ -141,7 +165,21 @@ function addToCart() {
           </span>
         </div>
 
-        <span class="ci-eyebrow">{{ product.category?.name ?? 'Carré Ivoire' }}</span>
+        <div class="flex items-start justify-between gap-4">
+          <span class="ci-eyebrow">{{ product.category?.name ?? 'Carré Ivoire' }}</span>
+          <button
+            type="button"
+            class="flex h-9 w-9 flex-shrink-0 items-center justify-center border border-[var(--cacao-a24)] transition-opacity duration-180 disabled:cursor-not-allowed disabled:opacity-60"
+            :aria-label="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+            :aria-pressed="isFav"
+            :disabled="togglingFavorite"
+            @click="toggleFavorite"
+          >
+            <svg width="16" height="16" :fill="isFav ? 'var(--dore)' : 'none'" stroke="var(--brun-cacao)" stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter">
+              <use href="/assets/icons/sprite.svg#ci-heart" />
+            </svg>
+          </button>
+        </div>
         <h1
           class="mt-4 font-serif text-cacao"
           style="font-size: clamp(44px, 6vw, 80px); line-height: 0.95; font-weight: 500; letter-spacing: -0.02em"
