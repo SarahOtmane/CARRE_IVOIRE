@@ -73,14 +73,14 @@ const chiffres = [
       <div class="max-w-[880px]">
         <span class="ci-eyebrow">Nos Engagements</span>
         <h1
-          class="mt-4 font-serif font-medium text-brun-cacao"
+          class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(48px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.02em"
         >
           Quatre principes,<br/>
-          <em class="text-brun-cacao-2">sans compromis.</em>
+          <em class="text-cacao-2">sans compromis.</em>
         </h1>
         <p
-          class="mt-12 max-w-[560px] font-sans text-brun-cacao-2"
+          class="mt-12 max-w-[560px] font-sans text-cacao-2"
           style="font-size: 18px; line-height: 1.7"
         >
           Nous aurions pu aller plus vite, moins cher, à plus grande échelle.
@@ -101,13 +101,13 @@ const chiffres = [
         <div class="lg:sticky lg:top-[120px]">
           <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-dore">{{ eng.num }}</span>
           <h2
-            class="mt-3 font-serif font-medium text-brun-cacao"
+            class="mt-3 font-serif font-medium text-cacao"
             style="font-size: clamp(36px, 5vw, 64px); line-height: 0.95; letter-spacing: -0.02em"
           >
             {{ eng.titre }}
           </h2>
           <p
-            class="mt-5 font-serif italic text-brun-cacao-2"
+            class="mt-5 font-serif italic text-cacao-2"
             style="font-size: clamp(18px, 2vw, 24px); line-height: 1.3"
           >
             {{ eng.accroche }}
@@ -117,7 +117,7 @@ const chiffres = [
         <!-- Corps -->
         <div>
           <p
-            class="font-sans text-brun-cacao-2"
+            class="font-sans text-cacao-2"
             style="font-size: 17px; line-height: 1.75; max-width: 600px"
           >
             {{ eng.corps }}
@@ -131,7 +131,7 @@ const chiffres = [
               style="border-color: var(--cacao-a12)"
             >
               <span class="shrink-0 font-sans text-[11px] uppercase tracking-[0.18em] text-dore">—</span>
-              <span class="font-sans text-[14px] leading-relaxed text-brun-cacao">{{ detail }}</span>
+              <span class="font-sans text-[14px] leading-relaxed text-cacao">{{ detail }}</span>
             </li>
             <li class="border-t" style="border-color: var(--cacao-a12)" />
           </ul>
@@ -141,7 +141,7 @@ const chiffres = [
 
     <!-- ── Chiffres ────────────────────────────────────────── -->
     <section
-      class="bg-brun-cacao"
+      class="bg-cacao"
       style="padding: clamp(80px, 12vw, 192px) clamp(20px, 6vw, 104px)"
     >
       <div class="mb-20">
@@ -185,22 +185,22 @@ const chiffres = [
         <div class="max-w-[560px]">
           <span class="ci-eyebrow">05 — La boutique</span>
           <h2
-            class="mt-4 font-serif font-medium text-brun-cacao"
+            class="mt-4 font-serif font-medium text-cacao"
             style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
           >
             Des principes<br/>
-            <em class="text-brun-cacao-2">que vous pouvez goûter.</em>
+            <em class="text-cacao-2">que vous pouvez goûter.</em>
           </h2>
         </div>
         <div class="flex flex-col gap-4 sm:flex-row">
           <button
-            class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
+            class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
             @click="router.push('/boutique')"
           >
             Découvrir la boutique
           </button>
           <button
-            class="border border-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-brun-cacao transition-all duration-180 hover:bg-brun-cacao hover:text-ivoire active:translate-y-px"
+            class="border border-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire active:translate-y-px"
             @click="router.push('/histoire')"
           >
             Notre histoire →
