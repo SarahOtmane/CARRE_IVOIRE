@@ -13,6 +13,7 @@ const scrolled = ref(false);
 const hovered = ref(false);
 const boutiqueOpen = ref(false);
 const searchOpen = ref(false);
+const mobileMenuOpen = ref(false);
 const query = ref("");
 const inputRef = ref<HTMLInputElement | null>(null);
 
@@ -39,12 +40,23 @@ onUnmounted(() => {
 watch(searchOpen, (val) => {
   if (val) {
     boutiqueOpen.value = false;
+    mobileMenuOpen.value = false;
     nextTick(() => inputRef.value?.focus());
   }
 });
 
+function toggleMobileMenu() {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+  if (mobileMenuOpen.value) searchOpen.value = false;
+}
+
+function navigateMobile(path: string) {
+  mobileMenuOpen.value = false;
+  router.push(path);
+}
+
 const isActive = computed(
-  () => scrolled.value || hovered.value || searchOpen.value,
+  () => scrolled.value || hovered.value || searchOpen.value || mobileMenuOpen.value,
 );
 
 const navItems = [
@@ -247,8 +259,15 @@ function toggleSearch() {
         </RouterLink>
 
         <!-- Burger mobile -->
-        <button class="flex items-center lg:hidden" aria-label="Menu">
+        <button
+          class="flex items-center lg:hidden"
+          :aria-label="mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
+          :aria-expanded="mobileMenuOpen"
+          aria-controls="mobile-nav-panel"
+          @click="toggleMobileMenu"
+        >
           <svg
+            v-if="!mobileMenuOpen"
             width="18"
             height="18"
             fill="none"
@@ -261,8 +280,44 @@ function toggleSearch() {
             <line x1="1" y1="9" x2="17" y2="9" />
             <line x1="1" y1="14" x2="17" y2="14" />
           </svg>
+          <svg
+            v-else
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.25"
+            stroke-linecap="square"
+            stroke-linejoin="miter"
+            viewBox="0 0 18 18"
+          >
+            <line x1="3" y1="3" x2="15" y2="15" />
+            <line x1="15" y1="3" x2="3" y2="15" />
+          </svg>
         </button>
       </div>
+    </div>
+
+    <!-- Panneau de navigation mobile -->
+    <div
+      id="mobile-nav-panel"
+      class="overflow-hidden transition-[max-height,opacity] duration-400 ease-ui lg:hidden"
+      :class="mobileMenuOpen ? 'opacity-100' : 'opacity-0'"
+      :style="{ maxHeight: mobileMenuOpen ? '80vh' : '0' }"
+    >
+      <nav
+        class="flex flex-col gap-1 px-5 py-6"
+        style="border-top: 1px solid var(--cacao-a12)"
+      >
+        <button
+          v-for="item in navItems"
+          :key="item.id"
+          type="button"
+          class="cursor-pointer py-3 text-left font-sans text-[14px] tracking-[0.06em] text-cacao transition-opacity duration-180 hover:opacity-60"
+          @click="navigateMobile(item.path)"
+          >{{ item.label }}</button
+        >
+      </nav>
     </div>
 
     <!-- Mega menu boutique -->
