@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@carre-ivoire/stores";
 import { useAdminProducts, useAdminOrders, useAdminCategories } from "@carre-ivoire/composables";
 import { OrderStatus } from "@carre-ivoire/types";
 
@@ -43,20 +43,20 @@ function logout() {
 </script>
 
 <template>
-  <aside class="flex h-full w-72 flex-col border-r border-cocoa/40 bg-ivory">
-    <div class="border-b border-cocoa/40 px-6 py-6">
+  <aside class="flex h-full w-72 flex-col border-r border-cacao/40 bg-ivoire">
+    <div class="border-b border-cacao/40 px-6 py-6">
       <div class="flex items-center gap-4">
         <div
-          class="flex h-12 w-12 items-center justify-center border border-cocoa font-display text-xl text-cocoa"
+          class="flex h-12 w-12 items-center justify-center border border-cacao font-display text-xl text-cacao"
         >
           CI
         </div>
         <div class="min-w-0">
-          <div class="truncate font-display text-xl text-cocoa">
+          <div class="truncate font-display text-xl text-cacao">
             Carré Ivoire
           </div>
           <div
-            class="font-body text-[10px] uppercase tracking-[0.28em] text-cocoa/45"
+            class="font-body text-[10px] uppercase tracking-[0.28em] text-cacao/45"
           >
             Atelier admin
           </div>
@@ -72,12 +72,12 @@ function logout() {
         class="group flex items-center gap-3 border-l-2 px-3 py-3 transition-colors duration-200"
         :class="
           isActive(item.name)
-            ? 'border-cocoa bg-beige text-cocoa'
-            : 'border-transparent text-cocoa/80 hover:border-cocoa/25 hover:bg-beige/60'
+            ? 'border-cacao bg-beige-doux text-cacao'
+            : 'border-transparent text-cacao/80 hover:border-cacao/25 hover:bg-beige-doux/60'
         "
       >
         <span
-          class="w-8 font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
+          class="w-8 font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45"
           >{{ item.code }}</span
         >
         <span class="flex-1 font-display text-[18px] leading-none">{{
@@ -85,28 +85,28 @@ function logout() {
         }}</span>
         <span
           v-if="item.badge !== undefined"
-          class="min-w-6 text-right font-body text-[11px] tabular-nums text-cocoa/55"
+          class="min-w-6 text-right font-body text-[11px] tabular-nums text-cacao/55"
         >
           {{ item.badge }}
         </span>
       </RouterLink>
     </nav>
 
-    <div class="border-t border-cocoa/40 px-6 py-5">
+    <div class="border-t border-cacao/40 px-6 py-5">
       <div
-        class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
+        class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45"
       >
         Connecté
       </div>
-      <div class="mt-2 font-display text-lg text-cocoa">
+      <div class="mt-2 font-display text-lg text-cacao">
         {{ authStore.fullName || "Équipe admin" }}
       </div>
-      <div class="mt-1 font-body text-sm italic text-cocoa/55">
+      <div class="mt-1 font-body text-sm italic text-cacao/55">
         {{ pendingOrdersCount }} commandes à traiter
       </div>
       <button
         type="button"
-        class="mt-4 border border-cocoa px-3 py-2 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa transition-colors duration-200 hover:bg-cocoa hover:text-ivory"
+        class="mt-4 border border-cacao px-3 py-2 font-body text-[11px] uppercase tracking-[0.16em] text-cacao transition-colors duration-200 hover:bg-cacao hover:text-ivoire"
         @click="logout"
       >
         Quitter
