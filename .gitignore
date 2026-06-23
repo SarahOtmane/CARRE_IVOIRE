@@ -6,6 +6,7 @@ node_modules/
 # Build
 dist/
 .turbo/
+*.tsbuildinfo
 
 # Variables d'environnement — ne jamais commiter
 .env
