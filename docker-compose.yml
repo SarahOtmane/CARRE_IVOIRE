@@ -6,7 +6,6 @@ volumes:
   mysql_data:
   node_modules_api:
   node_modules_front:
-  node_modules_back:
 
 services:
   database:
@@ -70,24 +69,6 @@ services:
     build:
       context: ./apps/front-office
       target: ${DOCKER_TARGET:-production}
-    networks:
-      - carre_ivoire_network
-    depends_on:
-      backend:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-
-  back-office:
-    build:
-      context: ./apps/back-office
-      target: ${DOCKER_TARGET:-production}
-    profiles:
-      - back-office
     networks:
       - carre_ivoire_network
     depends_on:

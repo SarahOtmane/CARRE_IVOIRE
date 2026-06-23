@@ -1,5 +1,4 @@
 # Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-# With back-office: --profile back-office
 
 services:
   nginx:
@@ -9,7 +8,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
       - ./docker/nginx/ssl:/etc/nginx/ssl:ro
     networks:
       - carre_ivoire_network
@@ -20,7 +19,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      test: ["CMD", "wget", "-qO-", "http://localhost/api/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -50,19 +49,6 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL}
         VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY}
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: 256M
-
-  back-office:
-    build:
-      context: ./apps/back-office
-      target: production
-      args:
-        VITE_API_URL: ${VITE_API_URL}
     restart: unless-stopped
     deploy:
       resources:
