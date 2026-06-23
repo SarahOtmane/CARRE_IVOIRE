@@ -3,10 +3,10 @@ import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
 import { ProductVariantsRepository } from './product-variants.repository'
 import { ProductsRepository } from './products.repository'
-import type { ProductVariant } from './product-variant.model'
 import type { CreateVariantDto } from './dto/create-variant.dto'
 import type { UpdateVariantDto } from './dto/update-variant.dto'
 import type { VariantResponseDto } from './dto/variant-response.dto'
+import { toVariantResponseDto } from './mappers/variant.mapper'
 
 @Injectable()
 export class ProductVariantsService {
@@ -17,7 +17,7 @@ export class ProductVariantsService {
 
   async findByProductId(productId: number): Promise<VariantResponseDto[]> {
     const variants = await this.variantsRepository.findByProductId(productId)
-    return variants.map((v) => this.toResponseDto(v))
+    return variants.map((v) => toVariantResponseDto(v))
   }
 
   async create(productId: number, dto: CreateVariantDto): Promise<VariantResponseDto> {
@@ -26,7 +26,7 @@ export class ProductVariantsService {
       throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, 'Produit introuvable')
     }
     const variant = await this.variantsRepository.create(productId, dto)
-    return this.toResponseDto(variant)
+    return toVariantResponseDto(variant)
   }
 
   async update(productId: number, variantId: number, dto: UpdateVariantDto): Promise<VariantResponseDto> {
@@ -35,7 +35,7 @@ export class ProductVariantsService {
       throwApiError(ErrorCodes.VARIANT_NOT_FOUND, 'Variante introuvable')
     }
     const updated = await this.variantsRepository.update(variantId, dto)
-    return this.toResponseDto(updated!)
+    return toVariantResponseDto(updated!)
   }
 
   async delete(productId: number, variantId: number): Promise<void> {
@@ -44,21 +44,5 @@ export class ProductVariantsService {
       throwApiError(ErrorCodes.VARIANT_NOT_FOUND, 'Variante introuvable')
     }
     await this.variantsRepository.delete(variantId)
-  }
-
-  private toResponseDto(v: ProductVariant): VariantResponseDto {
-    return {
-      id: v.id,
-      productId: v.productId,
-      label: v.label,
-      weightGrams: v.weightGrams ?? undefined,
-      price: v.price,
-      stock: v.stock,
-      stockStatus: v.stockStatus,
-      displayOrder: v.displayOrder,
-      isActive: v.isActive === 1,
-      createdAt: v.created_at?.toISOString(),
-      updatedAt: v.updated_at?.toISOString(),
-    }
   }
 }
