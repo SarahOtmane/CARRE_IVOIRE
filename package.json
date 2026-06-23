@@ -13,8 +13,7 @@
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "dev:api": "npm --prefix apps/api run start:dev",
-    "dev:front": "npm --prefix apps/front-office run dev",
-    "dev:back": "npm --prefix apps/back-office run dev"
+    "dev:front": "npm --prefix apps/front-office run dev"
   },
   "devDependencies": {}
 }
