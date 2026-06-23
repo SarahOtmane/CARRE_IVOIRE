@@ -1,3 +1,5 @@
+import type { ShippingAddress } from '@carre-ivoire/types'
+
 export interface OrderItemResponseDto {
   id: number
   productId: number
@@ -12,7 +14,7 @@ export interface OrderResponseDto {
   userId: number
   status: string
   totalAmount: number
-  shippingAddress?: object
+  shippingAddress?: ShippingAddress
   stripePaymentIntentId?: string
   items: OrderItemResponseDto[]
   createdAt: string
