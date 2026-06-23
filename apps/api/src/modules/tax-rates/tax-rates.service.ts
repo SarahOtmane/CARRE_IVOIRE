@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import { InjectConnection } from '@nestjs/sequelize'
+import { Sequelize } from 'sequelize-typescript'
 import type { TaxRate } from '@carre-ivoire/types'
 import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
@@ -10,7 +12,10 @@ export type TaxRateResponse = TaxRate
 
 @Injectable()
 export class TaxRatesService {
-  constructor(private readonly repo: TaxRatesRepository) {}
+  constructor(
+    private readonly repo: TaxRatesRepository,
+    @InjectConnection() private readonly sequelize: Sequelize,
+  ) {}
 
   async findAll(): Promise<TaxRateResponse[]> {
     const rows = await this.repo.findAll()
@@ -18,20 +23,24 @@ export class TaxRatesService {
   }
 
   async create(dto: CreateTaxRateDto): Promise<TaxRateResponse> {
-    if (dto.isDefault) {
-      await this.repo.clearDefault()
-    }
-    const row = await this.repo.create(dto)
+    const row = await this.sequelize.transaction(async (t) => {
+      if (dto.isDefault) {
+        await this.repo.clearDefault(t)
+      }
+      return this.repo.create(dto, t)
+    })
     return this.toDto(row)
   }
 
   async update(id: number, dto: UpdateTaxRateDto): Promise<TaxRateResponse> {
     const existing = await this.repo.findById(id)
     if (!existing) throwApiError(ErrorCodes.TAX_RATE_NOT_FOUND, 'Taux de TVA introuvable')
-    if (dto.isDefault) {
-      await this.repo.clearDefault()
-    }
-    const updated = await this.repo.update(id, dto)
+    const updated = await this.sequelize.transaction(async (t) => {
+      if (dto.isDefault) {
+        await this.repo.clearDefault(t)
+      }
+      return this.repo.update(id, dto, t)
+    })
     return this.toDto(updated!)
   }
 
