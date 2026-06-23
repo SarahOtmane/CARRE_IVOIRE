@@ -47,14 +47,14 @@ const dates = [
       <div class="max-w-[880px]">
         <span class="ci-eyebrow">Notre Maison</span>
         <h1
-          class="mt-4 font-serif font-medium text-brun-cacao"
+          class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(48px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.02em"
         >
           Rue du Nil,<br/>
-          <em class="text-brun-cacao-2">une obsession.</em>
+          <em class="text-cacao-2">une obsession.</em>
         </h1>
         <p
-          class="mt-12 max-w-[560px] font-sans text-brun-cacao-2"
+          class="mt-12 max-w-[560px] font-sans text-cacao-2"
           style="font-size: 18px; line-height: 1.7"
         >
           Depuis 2019, nous fabriquons le chocolat à la main, dans notre atelier parisien.
@@ -83,11 +83,11 @@ const dates = [
         <div class="lg:pt-2">
           <span class="ci-eyebrow">01 — Le processus</span>
           <h2
-            class="mb-14 mt-4 font-serif font-medium text-brun-cacao"
+            class="mb-14 mt-4 font-serif font-medium text-cacao"
             style="font-size: clamp(28px, 3.5vw, 44px); line-height: 1.05"
           >
             De la fève<br/>
-            <em class="text-brun-cacao-2">au carré.</em>
+            <em class="text-cacao-2">au carré.</em>
           </h2>
 
           <div
@@ -102,8 +102,8 @@ const dates = [
                 style="width: 24px"
               >{{ etape.num }}</span>
               <div>
-                <h3 class="font-serif text-[20px] font-medium text-brun-cacao">{{ etape.titre }}</h3>
-                <p class="mt-2 font-sans text-[14px] leading-relaxed text-brun-cacao-2">{{ etape.texte }}</p>
+                <h3 class="font-serif text-[20px] font-medium text-cacao">{{ etape.titre }}</h3>
+                <p class="mt-2 font-sans text-[14px] leading-relaxed text-cacao-2">{{ etape.texte }}</p>
               </div>
             </div>
           </div>
@@ -120,11 +120,11 @@ const dates = [
       <div class="mb-20">
         <span class="ci-eyebrow">02 — Chronologie</span>
         <h2
-          class="mt-4 font-serif font-medium text-brun-cacao"
+          class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
         >
           La maison,<br/>
-          <em class="text-brun-cacao-2">année par année.</em>
+          <em class="text-cacao-2">année par année.</em>
         </h2>
       </div>
 
@@ -138,7 +138,7 @@ const dates = [
           <div class="mb-4 font-serif text-[40px] font-medium leading-none text-dore">
             {{ d.annee }}
           </div>
-          <p class="font-sans text-[14px] leading-relaxed text-brun-cacao-2">{{ d.fait }}</p>
+          <p class="font-sans text-[14px] leading-relaxed text-cacao-2">{{ d.fait }}</p>
         </div>
       </div>
     </section>
@@ -151,13 +151,13 @@ const dates = [
       <div class="mx-auto max-w-[760px] text-center">
         <span class="ci-eyebrow">03 — Philosophie</span>
         <blockquote
-          class="mt-8 font-serif italic text-brun-cacao"
+          class="mt-8 font-serif italic text-cacao"
           style="font-size: clamp(28px, 4vw, 52px); line-height: 1.1; letter-spacing: -0.01em"
         >
           « Deux ingrédients suffisent.<br/>
           Tout le reste est dans la main. »
         </blockquote>
-        <p class="mt-8 font-sans text-[11px] uppercase tracking-[0.22em] text-brun-cacao-3">
+        <p class="mt-8 font-sans text-[11px] uppercase tracking-[0.22em] text-cacao-3">
           — Rue du Nil, 2019
         </p>
       </div>
@@ -172,22 +172,22 @@ const dates = [
         <div class="max-w-[560px]">
           <span class="ci-eyebrow">04 — La boutique</span>
           <h2
-            class="mt-4 font-serif font-medium text-brun-cacao"
+            class="mt-4 font-serif font-medium text-cacao"
             style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
           >
             Le résultat,<br/>
-            <em class="text-brun-cacao-2">vous pouvez le goûter.</em>
+            <em class="text-cacao-2">vous pouvez le goûter.</em>
           </h2>
         </div>
         <div class="flex flex-col gap-4 sm:flex-row">
           <button
-            class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
+            class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
             @click="router.push('/boutique')"
           >
             Découvrir la boutique
           </button>
           <button
-            class="border border-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-brun-cacao transition-all duration-180 hover:bg-brun-cacao hover:text-ivoire active:translate-y-px"
+            class="border border-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire active:translate-y-px"
             @click="router.push('/engagements')"
           >
             Nos engagements →
