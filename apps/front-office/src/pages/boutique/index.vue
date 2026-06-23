@@ -59,11 +59,11 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
     >
       <span class="ci-eyebrow">Boutique</span>
       <h1
-        class="mt-4 font-serif font-medium text-brun-cacao"
+        class="mt-4 font-serif font-medium text-cacao"
         style="font-size: clamp(40px, 6vw, 80px); line-height: 0.95; letter-spacing: -0.01em"
       >
         Chaque carré,<br/>
-        <em class="text-brun-cacao-2">une origine.</em>
+        <em class="text-cacao-2">une origine.</em>
       </h1>
     </div>
 
@@ -75,8 +75,8 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
         <button
           class="flex cursor-pointer items-baseline gap-1.5 border-b pb-1 font-sans text-[12px] tracking-[0.02em] transition-[border-color,color,opacity] duration-180"
           :class="selectedCategoryId === undefined
-            ? 'border-brun-cacao text-brun-cacao'
-            : 'border-transparent text-brun-cacao-2 hover:border-brun-cacao hover:text-brun-cacao'"
+            ? 'border-cacao text-cacao'
+            : 'border-transparent text-cacao-2 hover:border-cacao hover:text-cacao'"
           @click="filterByCategory(undefined)"
         >
           tous les produits
@@ -86,8 +86,8 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
           :key="cat.id"
           class="flex cursor-pointer items-baseline gap-1.5 border-b pb-1 font-sans text-[12px] tracking-[0.02em] transition-[border-color,color,opacity] duration-180"
           :class="selectedCategoryId === cat.id
-            ? 'border-brun-cacao text-brun-cacao'
-            : 'border-transparent text-brun-cacao-2 hover:border-brun-cacao hover:text-brun-cacao'"
+            ? 'border-cacao text-cacao'
+            : 'border-transparent text-cacao-2 hover:border-cacao hover:text-cacao'"
           @click="filterByCategory(cat.id)"
         >
           {{ cat.name }}
@@ -97,12 +97,12 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
       <!-- Tri -->
       <div class="relative" data-sort>
         <button
-          class="flex items-center gap-1.5 font-sans text-[12px] text-brun-cacao-2"
+          class="flex items-center gap-1.5 font-sans text-[12px] text-cacao-2"
           @click.stop="sortOpen = !sortOpen"
         >
           <span>Trier par</span>
           <span
-            class="flex items-center gap-1.5 pb-0.5 text-brun-cacao"
+            class="flex items-center gap-1.5 pb-0.5 text-cacao"
             style="border-bottom: 1px solid var(--brun-cacao)"
           >
             {{ currentSort.label }}
@@ -126,7 +126,7 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
             v-for="opt in SORT_OPTIONS"
             :key="opt.value"
             class="block w-full px-4 py-2.5 text-left font-sans text-[12px] tracking-[0.02em] transition-colors duration-180 hover:bg-ivoire"
-            :class="sort === opt.value ? 'text-brun-cacao' : 'text-brun-cacao-2'"
+            :class="sort === opt.value ? 'text-cacao' : 'text-cacao-2'"
             @click="sort = opt.value; sortOpen = false"
           >{{ opt.label }}</button>
         </div>
@@ -161,14 +161,14 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
         class="mx-auto mt-4 font-serif font-medium"
         style="font-size: clamp(28px, 3.5vw, 44px); line-height: 1.1; max-width: 520px"
       >
-        <em class="text-brun-cacao-2">Cette collection</em>
-        <span class="text-brun-cacao"> arrive dans nos vitrines.</span>
+        <em class="text-cacao-2">Cette collection</em>
+        <span class="text-cacao"> arrive dans nos vitrines.</span>
       </h2>
-      <p class="mx-auto mb-8 mt-4 max-w-[420px] font-sans text-[15px] leading-relaxed text-brun-cacao-2">
+      <p class="mx-auto mb-8 mt-4 max-w-[420px] font-sans text-[15px] leading-relaxed text-cacao-2">
         Inscrivez-vous à la lettre pour être prévenu de sa sortie.
       </p>
       <button
-        class="pb-0.5 font-sans text-[13px] text-brun-cacao"
+        class="pb-0.5 font-sans text-[13px] text-cacao"
         style="border-bottom: 1px solid var(--brun-cacao)"
       >
         Me prévenir →
