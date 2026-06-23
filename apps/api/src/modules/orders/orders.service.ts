@@ -58,6 +58,14 @@ export class OrdersService {
           continue
         }
 
+        const activeVariants = await this.productVariantsRepository.findByProductId(item.productId)
+        if (activeVariants.length > 0) {
+          throwApiError(
+            ErrorCodes.VARIANT_REQUIRED,
+            `Le produit ${item.productId} nécessite de préciser une variante (variantId)`,
+          )
+        }
+
         const rowsAffected = await this.productsRepository.decrementStock(item.productId, item.quantity, t)
         if (rowsAffected === 0) {
           throwApiError(ErrorCodes.OUT_OF_STOCK, `Stock insuffisant pour le produit ${item.productId}`)
