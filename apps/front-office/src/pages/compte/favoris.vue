@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import type { ProductResponse } from "@carre-ivoire/types";
+import { useFavorites } from "@carre-ivoire/composables";
+import ProductCard from "@/components/product/ProductCard.vue";
 
 const router = useRouter();
-
-const favoris: ProductResponse[] = [];
+const { favorites, isLoading } = useFavorites();
 </script>
 
 <template>
@@ -29,11 +29,11 @@ const favoris: ProductResponse[] = [];
       </p>
     </section>
 
-    <div class="mb-8 flex items-center justify-between">
+    <div v-if="!isLoading" class="mb-8 flex items-center justify-between">
       <div
         class="font-sans text-[11px] uppercase tracking-[0.22em] text-cacao-2"
       >
-        {{ favoris.length }} article<span v-if="favoris.length > 1">s</span>
+        {{ favorites.length }} article<span v-if="favorites.length > 1">s</span>
       </div>
       <button
         class="border-b border-cacao pb-px font-sans text-[13px] text-cacao transition-opacity duration-180 hover:opacity-60"
@@ -43,15 +43,20 @@ const favoris: ProductResponse[] = [];
       </button>
     </div>
 
+    <!-- Chargement -->
+    <div v-if="isLoading" class="py-16 text-center">
+      <span class="ci-eyebrow">Chargement</span>
+    </div>
+
     <!-- Grille favoris -->
     <div
-      v-if="favoris.length > 0"
+      v-else-if="favorites.length > 0"
       class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3"
     >
       <ProductCard
-        v-for="product in favoris"
-        :key="product.id"
-        :product="product"
+        v-for="favorite in favorites"
+        :key="favorite.id"
+        :product="favorite.product"
       />
     </div>
 
