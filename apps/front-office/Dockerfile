@@ -14,6 +14,7 @@ RUN npm install --legacy-peer-deps
 
 # Copy front-office source into /app (keeps /app/src expected by volumes)
 COPY apps/front-office .
+RUN rm -f postcss.config.js
 
 EXPOSE 5173
 CMD ["npm", "run", "dev", "--", "--host"]
@@ -21,10 +22,8 @@ CMD ["npm", "run", "dev", "--", "--host"]
 # ─── Stage 2: Build (réutilise le layer development) ─────────────────
 FROM development AS build
 ARG VITE_API_URL
-ARG VITE_STRIPE_PUBLISHABLE_KEY
-ENV VITE_API_URL=$VITE_API_URL
-ENV VITE_STRIPE_PUBLISHABLE_KEY=$VITE_STRIPE_PUBLISHABLE_KEY
-RUN npm run build
+ARG FRONTEND_PUBLIC_KEY=pk_test_xxx
+RUN VITE_API_URL="$VITE_API_URL" VITE_STRIPE_PUBLISHABLE_KEY="$FRONTEND_PUBLIC_KEY" npm run build
 
 # ─── Stage 3: Production (Nginx static) ──────────────────────────────
 FROM nginx:1.25-alpine AS production
