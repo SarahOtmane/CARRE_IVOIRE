@@ -17,15 +17,15 @@ onMounted(async () => {
   <form class="space-y-10" @submit.prevent="emit('pay')">
     <div>
       <div
-        class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+        class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
       >
         Paiement
       </div>
-      <h3 class="font-serif text-[28px] font-medium text-brun-cacao">
+      <h3 class="font-serif text-[28px] font-medium text-cacao">
         Régler la commande.
       </h3>
       <p
-        class="mt-4 max-w-[460px] font-sans text-[15px] leading-[1.7] text-brun-cacao-2"
+        class="mt-4 max-w-[460px] font-sans text-[15px] leading-[1.7] text-cacao-2"
       >
         Paiement sécurisé par Stripe. Vos données de carte ne transitent jamais
         par nos serveurs.
@@ -34,7 +34,7 @@ onMounted(async () => {
 
     <div>
       <label
-        class="mb-3 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+        class="mb-3 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
       >
         Carte bancaire
       </label>
@@ -55,7 +55,7 @@ onMounted(async () => {
     <div class="flex flex-wrap items-center gap-4">
       <button
         type="submit"
-        class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+        class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
         :disabled="processing"
       >
         {{
@@ -65,7 +65,7 @@ onMounted(async () => {
         }}
       </button>
       <span
-        class="font-sans text-[11px] leading-[1.6] tracking-[0.04em] text-brun-cacao-2"
+        class="font-sans text-[11px] leading-[1.6] tracking-[0.04em] text-cacao-2"
       >
         Paiement sécurisé. Aucune donnée n'est conservée.
       </span>
