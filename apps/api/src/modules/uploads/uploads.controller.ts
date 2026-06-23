@@ -8,8 +8,10 @@ import {
   Req,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { extname, join } from 'path'
+import { join } from 'path'
 import { randomUUID } from 'crypto'
+import { mkdir } from 'fs/promises'
+import sharp from 'sharp'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { AdminGuard } from '@/modules/auth/guards/admin.guard'
 import type { Request } from 'express'
@@ -18,15 +20,9 @@ import type { Request } from 'express'
 const multer = require('multer')
 
 const UPLOAD_DIR = join(process.cwd(), 'uploads')
-const ALLOWED_EXT = /\.(jpg|jpeg|png|webp)$/i
+const ALLOWED_MIME = /^image\/(jpeg|png|webp)$/
 const MAX_SIZE_BYTES = 5 * 1024 * 1024
-
-const storage = multer.diskStorage({
-  destination: UPLOAD_DIR,
-  filename: (_req: unknown, file: { originalname: string }, cb: (err: null, name: string) => void) => {
-    cb(null, `${randomUUID()}${extname(file.originalname).toLowerCase()}`)
-  },
-})
+const MAX_DIMENSION = 1600
 
 @Controller('uploads')
 @UseGuards(JwtAuthGuard, AdminGuard)
@@ -34,24 +30,33 @@ export class UploadsController {
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
-      storage,
+      storage: multer.memoryStorage(),
       limits: { fileSize: MAX_SIZE_BYTES },
-      fileFilter: (_req: unknown, file: { originalname: string }, cb: (err: Error | null, accept: boolean) => void) => {
-        if (!ALLOWED_EXT.test(extname(file.originalname))) {
+      fileFilter: (_req: unknown, file: { mimetype: string }, cb: (err: Error | null, accept: boolean) => void) => {
+        if (!ALLOWED_MIME.test(file.mimetype)) {
           return cb(new BadRequestException('Format non supporté. Utilisez JPG, PNG ou WebP.'), false)
         }
         cb(null, true)
       },
     }),
   )
-  upload(
-    @UploadedFile() file: { filename: string } | undefined,
+  async upload(
+    @UploadedFile() file: { buffer: Buffer } | undefined,
     @Req() req: Request,
   ) {
     if (!file) {
       throw new BadRequestException('Aucun fichier reçu')
     }
+
+    await mkdir(UPLOAD_DIR, { recursive: true })
+
+    const filename = `${randomUUID()}.webp`
+    await sharp(file.buffer)
+      .resize({ width: MAX_DIMENSION, height: MAX_DIMENSION, fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toFile(join(UPLOAD_DIR, filename))
+
     const baseUrl = process.env.APP_URL ?? `${req.protocol}://${req.get('host')}`
-    return { url: `${baseUrl}/uploads/${file.filename}` }
+    return { url: `${baseUrl}/uploads/${filename}` }
   }
 }
