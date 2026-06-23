@@ -403,7 +403,9 @@
 
 ### Tâches détaillées
 
-#### BACK-003 — Garde-fou stock produit vs variante
+#### BACK-003 — Garde-fou stock produit vs variante ✅ Fait
+
+- **Résultat** : ajout du code d'erreur `VARIANT_REQUIRED` (400). Dans `orders.service.ts`, avant le décrément du stock produit, vérification de `productVariantsRepository.findByProductId()` ; si des variantes actives existent et qu'aucun `variantId` n'est fourni, l'erreur est levée avant tout décrément. Tests unitaires ajoutés (cas avec/sans variantes). 37 tests verts.
 
 - **Description** : Dans `orders.service.ts`, empêcher la commande d'un produit ayant des variantes actives sans `variantId` explicite — lever une erreur métier `VARIANT_REQUIRED` plutôt que de décrémenter le stock du parent par défaut.
 - **Pourquoi** : Actuellement, commander sans `variantId` un produit ayant des variantes décrémente le stock du parent au lieu de la variante réellement vendue, créant un risque réel de survente.
@@ -419,7 +421,9 @@
 - **Critères de validation** : une commande sans `variantId` sur un produit à variantes est rejetée avec `VARIANT_REQUIRED` ; une commande normale sur un produit sans variante fonctionne sans changement.
 - **Tests à réaliser** : test unitaire couvrant les deux cas (produit avec/sans variantes).
 
-#### BACK-004 — Transaction atomique sur le taux de TVA par défaut
+#### BACK-004 — Transaction atomique sur le taux de TVA par défaut ✅ Fait
+
+- **Résultat** : `clearDefault()`/`create()`/`update()` du repository acceptent désormais un paramètre `Transaction` optionnel ; `tax-rates.service.ts` enveloppe les deux opérations dans `sequelize.transaction()`. Nouveau fichier de test `tax-rates.service.spec.ts` (aucun test n'existait avant) vérifiant que `clearDefault` et `create`/`update` partagent la même transaction. 41 tests verts.
 
 - **Description** : Englober `clearDefault()` puis `create()`/`update()` dans une transaction Sequelize unique dans `tax-rates.repository.ts`/`tax-rates.service.ts`.
 - **Pourquoi** : Actuellement non atomique — une requête concurrente entre les deux appels peut laisser deux taux de TVA marqués `isDefault=true` simultanément, ou aucun.
@@ -435,7 +439,9 @@
 - **Critères de validation** : test de concurrence (deux requêtes simultanées de changement de taux par défaut) n'aboutit jamais à zéro ou deux taux par défaut.
 - **Tests à réaliser** : test d'intégration avec deux promesses concurrentes.
 
-#### FRONT-002 — Câbler les favoris côté UI
+#### FRONT-002 — Câbler les favoris côté UI ✅ Fait
+
+- **Résultat** : `favoris.vue` utilise `useFavorites()` (l'import manquant de `ProductCard` dans ce fichier — jamais déclaré — a aussi été corrigé, bug latent jamais déclenché car le tableau était toujours vide). Bouton cœur ajouté sur `ProductCard.vue` et `produits/[slug].vue` (icône `ci-heart` du sprite existant), avec redirection vers `/connexion?redirect=...` si non authentifié. Build + `vue-tsc` propres.
 
 - **Description** : Importer et utiliser le composable `useFavorites()` (déjà fonctionnel côté backend et composable) dans `apps/front-office/src/pages/compte/favoris.vue`, et ajouter un bouton "cœur" toggle favori sur `ProductCard.vue` et la page produit `produits/[slug].vue`.
 - **Pourquoi** : Le backend et le composable sont complets et fonctionnels, mais la page favoris affiche un tableau vide en dur (`const favoris = []`) et aucun bouton ne permet d'ajouter un favori — fonctionnalité documentée dans `ai_docs/concept.md` mais totalement absente pour l'utilisateur final.
@@ -451,7 +457,9 @@
 - **Critères de validation** : ajouter/retirer un favori depuis une fiche produit ou la grille boutique se reflète immédiatement dans `/compte/favoris`.
 - **Tests à réaliser** : test manuel du cycle complet ajout/suppression/affichage ; test composable existant `useFavorites` à étendre si nécessaire.
 
-#### FRONT-003 — Réparer le burger menu mobile
+#### FRONT-003 — Réparer le burger menu mobile ✅ Fait
+
+- **Résultat** : ajout de `mobileMenuOpen`, handler `@click`, icône burger/close dynamique, `aria-expanded`/`aria-controls`, et panneau de navigation mobile (boutons focusables au clavier, motion `duration-400 ease-ui` cohérente avec CLAUDE.md). Le panneau se ferme automatiquement à l'ouverture de la recherche et inversement.
 
 - **Description** : Ajouter le handler `@click` et l'état de menu mobile manquants sur l'icône burger dans `AppHeader.vue`.
 - **Pourquoi** : La navigation mobile est actuellement cassée — l'icône s'affiche mais ne fait rien, alors que `ai_docs/concept.md` revendique une expérience premium cross-device.
@@ -467,7 +475,9 @@
 - **Critères de validation** : sur viewport mobile, le burger ouvre/ferme un menu de navigation fonctionnel et accessible au clavier.
 - **Tests à réaliser** : test manuel responsive (DevTools mobile + clavier).
 
-#### FRONT-004 — Handler fonctionnel pour le formulaire newsletter
+#### FRONT-004 — Handler fonctionnel pour le formulaire newsletter ✅ Fait
+
+- **Résultat** (décision produit : implémentation backend complète) : nouveau module `apps/api/src/modules/newsletter/` (modèle `NewsletterSubscriber`, `POST /newsletter/subscribe` idempotent — anti-énumération comme `forgotPassword`). Composable `useNewsletter()` ajouté à `packages/composables`. `AppFooter.vue` converti en `<form @submit.prevent>` avec état de chargement et notification de succès (les erreurs sont déjà gérées par l'intercepteur `useApi`). Test unitaire du service ajouté. 43 tests verts.
 
 - **Description** : Ajouter un `@submit`/handler au formulaire newsletter dans `AppFooter.vue`, avec appel à un endpoint d'inscription (à créer côté backend si inexistant, ou intégration à un service tiers).
 - **Pourquoi** : Le formulaire est actuellement purement décoratif (aucun handler), ce qui ne correspond pas à une fonctionnalité affichée comme disponible aux utilisateurs.
@@ -483,7 +493,9 @@
 - **Critères de validation** : le formulaire either fonctionne réellement, either est retiré — jamais affiché sans action associée.
 - **Tests à réaliser** : test manuel de soumission si implémenté.
 
-#### FRONT-005 — Corriger les variables CSS inexistantes
+#### FRONT-005 — Corriger les variables CSS inexistantes ✅ Fait
+
+- **Résultat** : le footer a un fond sombre (`bg-cacao`/`text-ivoire`) — l'intention design était réelle (bordures claires sur fond sombre). `--ivoire-a15`/`--ivoire-a40` ajoutées à `colors-and-type.css` suivant la convention déjà en place pour `--cacao-a*`, plutôt que de remplacer par des alphas cacao qui auraient été invisibles sur ce fond.
 
 - **Description** : Remplacer `var(--ivoire-a40)` et `var(--ivoire-a15)` dans `AppFooter.vue` par des variables réellement définies dans `colors-and-type.css` (ex. `--cacao-a12` existant, ou ajouter `--ivoire-a40`/`--ivoire-a15` au fichier de tokens si la teinte ivoire-alpha est réellement voulue).
 - **Pourquoi** : Ces variables n'existent pas dans le design system — les bordures concernées sont actuellement invisibles/cassées silencieusement.
