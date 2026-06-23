@@ -2,7 +2,7 @@
 import { useRouter, useRoute } from 'vue-router'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
-import { useAuthStore } from '@/stores/auth.store'
+import { useAuthStore } from '@carre-ivoire/stores'
 
 const router = useRouter()
 const route = useRoute()
@@ -27,7 +27,7 @@ function logout() {
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-ivoire font-sans text-brun-cacao">
+  <div class="flex min-h-screen flex-col bg-ivoire font-sans text-cacao">
     <AppHeader />
 
     <main class="flex-1">
@@ -37,11 +37,11 @@ function logout() {
         <!-- En-tête compte -->
         <span class="ci-eyebrow">Espace client</span>
         <h1
-          class="mb-12 mt-4 font-serif font-medium text-brun-cacao"
+          class="mb-12 mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(36px, 5vw, 64px); line-height: 1"
         >
           Bonjour,
-          <em class="text-brun-cacao-2">{{ authStore.user?.firstName ?? 'vous' }}.</em>
+          <em class="text-cacao-2">{{ authStore.user?.firstName ?? 'vous' }}.</em>
         </h1>
 
         <!-- Grille sidebar + contenu -->
@@ -55,14 +55,14 @@ function logout() {
               class="cursor-pointer border-b py-3 font-sans text-[13px] tracking-[0.02em] transition-colors duration-180"
               style="border-color: var(--cacao-a08)"
               :class="isActive(item.path)
-                ? 'font-medium text-brun-cacao'
-                : 'text-brun-cacao-2 hover:text-brun-cacao'"
+                ? 'font-medium text-cacao'
+                : 'text-cacao-2 hover:text-cacao'"
               @click="router.push(item.path)"
             >{{ item.label }}</a>
 
             <!-- Déconnexion — séparée visuellement -->
             <a
-              class="mt-1 cursor-pointer border-b py-3 font-sans text-[13px] tracking-[0.02em] text-brun-cacao-3 transition-colors duration-180 hover:text-brun-cacao"
+              class="mt-1 cursor-pointer border-b py-3 font-sans text-[13px] tracking-[0.02em] text-cacao-3 transition-colors duration-180 hover:text-cacao"
               style="border-color: var(--cacao-a08)"
               @click="logout"
             >Déconnexion</a>
