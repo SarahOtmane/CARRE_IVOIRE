@@ -93,14 +93,14 @@ async function deleteCategory() {
 
 <template>
   <div class="space-y-8 pb-10">
-    <section class="border-b border-cocoa pb-8">
+    <section class="border-b border-cacao pb-8">
       <div class="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <div class="font-body text-[10px] uppercase tracking-[0.28em] text-cocoa/45">
+          <div class="font-body text-[10px] uppercase tracking-[0.28em] text-cacao/45">
             01 — Catégories
           </div>
-          <h2 class="mt-4 font-display text-5xl leading-[0.92] text-cocoa sm:text-6xl">
-            Familles de <span class="italic text-cocoa/55">la maison.</span>
+          <h2 class="mt-4 font-display text-5xl leading-[0.92] text-cacao sm:text-6xl">
+            Familles de <span class="italic text-cacao/55">la maison.</span>
           </h2>
         </div>
         <Button @click="createNew">
@@ -109,13 +109,13 @@ async function deleteCategory() {
       </div>
     </section>
 
-    <div v-if="isLoading && categories.length === 0" class="py-16 text-center font-body text-sm italic text-cocoa/45">
+    <div v-if="isLoading && categories.length === 0" class="py-16 text-center font-body text-sm italic text-cacao/45">
       Chargement…
     </div>
 
-    <section v-else class="overflow-hidden border border-cocoa bg-ivory">
+    <section v-else class="overflow-hidden border border-cacao bg-ivoire">
       <div
-        class="grid grid-cols-[48px_minmax(0,2fr)_minmax(0,2fr)_80px_120px_80px] border-b border-cocoa px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
+        class="grid grid-cols-[48px_minmax(0,2fr)_minmax(0,2fr)_80px_120px_80px] border-b border-cacao px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45"
       >
         <span>Img</span>
         <span>Nom</span>
@@ -128,9 +128,9 @@ async function deleteCategory() {
       <div
         v-for="cat in orderedCategories"
         :key="cat.id"
-        class="grid grid-cols-[48px_minmax(0,2fr)_minmax(0,2fr)_80px_120px_80px] items-center gap-4 border-b border-cocoa px-6 py-5 last:border-b-0"
+        class="grid grid-cols-[48px_minmax(0,2fr)_minmax(0,2fr)_80px_120px_80px] items-center gap-4 border-b border-cacao px-6 py-5 last:border-b-0"
       >
-        <div class="h-10 w-10 border border-cocoa bg-beige/30">
+        <div class="h-10 w-10 border border-cacao bg-beige-doux/30">
           <img
             v-if="cat.imageUrl"
             :src="cat.imageUrl"
@@ -138,16 +138,16 @@ async function deleteCategory() {
             class="h-full w-full object-cover"
           />
         </div>
-        <div class="font-display text-xl text-cocoa">{{ cat.name }}</div>
-        <div class="font-body text-sm italic text-cocoa/60">{{ cat.description || "—" }}</div>
-        <div class="text-right font-body text-[11px] text-cocoa/45">{{ cat.slug }}</div>
-        <div class="border border-cocoa px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cocoa/70">
+        <div class="font-display text-xl text-cacao">{{ cat.name }}</div>
+        <div class="font-body text-sm italic text-cacao/60">{{ cat.description || "—" }}</div>
+        <div class="text-right font-body text-[11px] text-cacao/45">{{ cat.slug }}</div>
+        <div class="border border-cacao px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cacao/70">
           {{ cat.isActive ? "Actif" : "Inactif" }}
         </div>
         <div class="text-right">
           <button
             type="button"
-            class="font-body text-[11px] uppercase tracking-[0.18em] text-cocoa/55 hover:underline"
+            class="font-body text-[11px] uppercase tracking-[0.18em] text-cacao/55 hover:underline"
             @click="open(cat)"
           >
             Éditer
@@ -155,31 +155,31 @@ async function deleteCategory() {
         </div>
       </div>
 
-      <div v-if="categories.length === 0" class="px-6 py-12 text-center font-body text-sm italic text-cocoa/45">
+      <div v-if="categories.length === 0" class="px-6 py-12 text-center font-body text-sm italic text-cacao/45">
         Aucune catégorie.
       </div>
     </section>
 
     <div
       v-if="draft"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-cocoa/35 p-4"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-cacao/35 p-4"
     >
       <form
-        class="max-h-[90vh] w-full max-w-2xl overflow-y-auto border border-cocoa bg-ivory p-8"
+        class="max-h-[90vh] w-full max-w-2xl overflow-y-auto border border-cacao bg-ivoire p-8"
         @submit.prevent="save"
       >
-        <div class="flex items-start justify-between gap-6 border-b border-cocoa pb-6">
+        <div class="flex items-start justify-between gap-6 border-b border-cacao pb-6">
           <div>
-            <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45">
+            <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45">
               {{ isCreating ? "Création" : "Édition" }}
             </div>
-            <h3 class="mt-3 font-display text-3xl text-cocoa">
+            <h3 class="mt-3 font-display text-3xl text-cacao">
               {{ isCreating ? "Nouvelle catégorie" : draft.name }}
             </h3>
           </div>
           <button
             type="button"
-            class="font-body text-[11px] uppercase tracking-[0.18em] text-cocoa/55"
+            class="font-body text-[11px] uppercase tracking-[0.18em] text-cacao/55"
             @click="close"
           >
             Fermer
@@ -188,53 +188,53 @@ async function deleteCategory() {
 
         <div class="mt-8 grid gap-6">
           <label class="grid gap-2">
-            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Nom</span>
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Nom</span>
             <input
               v-model="draft.name"
               type="text"
               required
-              class="border border-cocoa bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
+              class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
               @blur="onNameBlur"
             />
           </label>
 
           <label class="grid gap-2">
-            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Slug</span>
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Slug</span>
             <input
               v-model="draft.slug"
               type="text"
               required
-              class="border border-cocoa bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
+              class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
             />
           </label>
 
           <label class="grid gap-2">
-            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Description</span>
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Description</span>
             <input
               v-model="draft.description"
               type="text"
-              class="border border-cocoa bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
+              class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
             />
           </label>
 
           <!-- Image de la catégorie -->
           <div class="grid gap-3">
-            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Image</span>
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Image</span>
             <div class="flex items-start gap-4">
               <div
                 v-if="draft.imageUrl"
-                class="h-20 w-20 flex-shrink-0 border border-cocoa bg-beige/30"
+                class="h-20 w-20 flex-shrink-0 border border-cacao bg-beige-doux/30"
               >
                 <img :src="draft.imageUrl" alt="" class="h-full w-full object-cover" />
               </div>
               <div
                 v-else
-                class="flex h-20 w-20 flex-shrink-0 items-center justify-center border border-dashed border-cocoa bg-beige/10"
+                class="flex h-20 w-20 flex-shrink-0 items-center justify-center border border-dashed border-cacao bg-beige-doux/10"
               >
-                <span class="font-body text-[9px] uppercase tracking-[0.14em] text-cocoa/35">Vide</span>
+                <span class="font-body text-[9px] uppercase tracking-[0.14em] text-cacao/35">Vide</span>
               </div>
               <div class="flex flex-col gap-2">
-                <label class="cursor-pointer border border-cocoa px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-cocoa transition-colors hover:border-cocoa">
+                <label class="cursor-pointer border border-cacao px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-cacao transition-colors hover:border-cacao">
                   <span>{{ isUploading ? "Envoi…" : draft.imageUrl ? "Changer" : "Choisir" }}</span>
                   <input
                     type="file"
@@ -247,7 +247,7 @@ async function deleteCategory() {
                 <button
                   v-if="draft.imageUrl"
                   type="button"
-                  class="font-body text-[10px] uppercase tracking-[0.14em] text-cocoa/40 hover:text-cocoa"
+                  class="font-body text-[10px] uppercase tracking-[0.14em] text-cacao/40 hover:text-cacao"
                   @click="draft.imageUrl = ''"
                 >
                   Retirer
@@ -258,20 +258,20 @@ async function deleteCategory() {
 
           <div class="grid gap-6 sm:grid-cols-2">
             <label class="grid gap-2">
-              <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Ordre d'affichage</span>
+              <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Ordre d'affichage</span>
               <input
                 v-model.number="draft.displayOrder"
                 type="number"
                 min="1"
-                class="border border-cocoa bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
+                class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
               />
             </label>
 
             <label class="grid gap-2">
-              <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/55">Statut</span>
+              <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Statut</span>
               <select
                 v-model="draft.isActive"
-                class="border border-cocoa bg-beige/20 px-3 py-2.5 font-body text-base text-cocoa outline-none focus:border-cocoa/60"
+                class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
               >
                 <option :value="true">Actif</option>
                 <option :value="false">Inactif</option>
@@ -291,7 +291,7 @@ async function deleteCategory() {
           </button>
           <button
             type="button"
-            class="border border-cocoa px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cocoa"
+            class="border border-cacao px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-cacao"
             @click="close"
           >
             Annuler
@@ -299,7 +299,7 @@ async function deleteCategory() {
           <button
             type="submit"
             :disabled="isLoading || isUploading"
-            class="border border-cocoa bg-cocoa px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-ivory disabled:opacity-50"
+            class="border border-cacao bg-cacao px-4 py-3 font-body text-[11px] uppercase tracking-[0.16em] text-ivoire disabled:opacity-50"
           >
             {{ isLoading ? "Enregistrement…" : "Enregistrer" }}
           </button>
