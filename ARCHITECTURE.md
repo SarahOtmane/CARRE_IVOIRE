@@ -7,7 +7,7 @@ carre_ivoire/ (Monorepo — npm workspaces)
 ├── apps/
 │   ├── api/            NestJS 10 · Sequelize 6 · MySQL 8
 │   ├── front-office/   Vue.js 3 · Pinia · Tailwind · Vite
-│   └── back-office/    Vue.js 3 · Pinia · Tailwind · Vite
+│   └── back-office/    Section admin intégrée au front-office
 ├── packages/
 │   ├── config/         Tailwind preset · ESLint · TypeScript configs
 │   ├── types/          Interfaces TypeScript partagées API ↔ Frontend
@@ -31,7 +31,7 @@ apps/front-office ──┐
                     ├── @carre-ivoire/types
                     └── @carre-ivoire/config
 
-apps/back-office  ──┤ (mêmes dépendances)
+admin (/admin)     ──┤ (mêmes dépendances que front-office)
 
 apps/api ───────────┼── @carre-ivoire/types
                     └── @carre-ivoire/config
@@ -79,7 +79,9 @@ DTO         →  valide et transforme les données entrantes
 
 ---
 
-## Frontend (apps/front-office & apps/back-office)
+## Frontend (apps/front-office)
+
+## Frontend (apps/front-office)
 
 ### Architecture par couche
 
@@ -236,11 +238,11 @@ Source de vérité absolue pour toute l'UI.
 
 ### Profils
 
-| Profil        | Active                        |
-| ------------- | ----------------------------- |
-| (aucun)       | front-office + API + DB       |
-| `back-office` | Ajoute le portail admin       |
-| `nginx`       | Ajoute nginx en dev (port 80) |
+| Profil  | Active                        |
+| ------- | ----------------------------- |
+| (aucun) | front-office + API + DB       |
+| `admin` | Section admin intégrée        |
+| `nginx` | Ajoute nginx en dev (port 80) |
 
 ### Stages Dockerfile
 
@@ -252,7 +254,7 @@ Source de vérité absolue pour toute l'UI.
 
 ### Volumes nommés
 
-`node_modules_api`, `node_modules_front`, `node_modules_back` — persistent entre redémarrages pour éviter de réinstaller les dépendances.
+`node_modules_api`, `node_modules_front` — persistent entre redémarrages pour éviter de réinstaller les dépendances.
 
 ---
 
@@ -271,7 +273,7 @@ Form de login (Vue)
 ### Création d'un produit (Admin)
 
 ```
-Formulaire back-office
+Formulaire admin
   → POST /api/v1/products (avec Bearer token)
   → JwtAuthGuard + AdminGuard → vérifient le token et le rôle
   → ProductService → ProductRepository → Sequelize → MySQL
