@@ -19,8 +19,8 @@ const displayPrice = computed(() => {
 })
 
 const badgeVariants: Record<string, string> = {
-  'NOUVEAU':         'bg-papier text-brun-cacao border border-[var(--cacao-a24)]',
-  'Édition limitée': 'bg-brun-cacao text-ivoire',
+  'NOUVEAU':         'bg-papier text-cacao border border-[var(--cacao-a24)]',
+  'Édition limitée': 'bg-cacao text-ivoire',
   'Signature':       'text-dore border border-dore',
 }
 </script>
@@ -38,7 +38,7 @@ const badgeVariants: Record<string, string> = {
       <div
         v-if="product.badge"
         class="absolute left-3 top-3 z-10 font-sans text-[9px] uppercase tracking-[0.22em]"
-        :class="badgeVariants[product.badge] ?? 'bg-papier text-brun-cacao border border-[var(--cacao-a24)]'"
+        :class="badgeVariants[product.badge] ?? 'bg-papier text-cacao border border-[var(--cacao-a24)]'"
         style="padding: 5px 9px"
       >{{ product.badge }}</div>
 
@@ -56,7 +56,7 @@ const badgeVariants: Record<string, string> = {
 
       <!-- Overlay CTA sur hover -->
       <div
-        class="absolute inset-x-0 bottom-0 bg-brun-cacao py-3.5 text-center font-sans text-[11px] uppercase tracking-[0.18em] text-ivoire transition-transform duration-400"
+        class="absolute inset-x-0 bottom-0 bg-cacao py-3.5 text-center font-sans text-[11px] uppercase tracking-[0.18em] text-ivoire transition-transform duration-400"
         :style="{ transform: hovered ? 'translateY(0)' : 'translateY(100%)' }"
       >
         Voir le produit
@@ -66,7 +66,7 @@ const badgeVariants: Record<string, string> = {
     <!-- Infos produit -->
     <div class="pt-5">
       <span v-if="product.shortDescription" class="ci-eyebrow">{{ product.shortDescription }}</span>
-      <div class="mt-1.5 font-serif text-[22px] leading-[1.15] tracking-[-0.005em] text-brun-cacao">
+      <div class="mt-1.5 font-serif text-[22px] leading-[1.15] tracking-[-0.005em] text-cacao">
         {{ product.name }}
       </div>
       <div class="mt-2 font-sans text-[13px] text-dore" style="letter-spacing: 0.02em; font-variant-numeric: tabular-nums">
