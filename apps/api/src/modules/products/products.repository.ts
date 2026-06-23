@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { Sequelize } from 'sequelize-typescript'
+import { Op } from 'sequelize'
 import type { Transaction } from 'sequelize'
 import { Product } from './product.model'
 import { ProductVariant } from './product-variant.model'
@@ -24,9 +25,18 @@ export class ProductsRepository {
 
     const limit = Math.min(query.limit ?? 12, 50)
     const page = query.page ?? 1
+    const search = query.search?.trim()
+
+    const matchClause =
+      'MATCH(`Product`.`name`, `Product`.`short_description`, `Product`.`description`) AGAINST (:search IN NATURAL LANGUAGE MODE)'
+
+    if (search) {
+      where[Op.and as never] = Sequelize.literal(matchClause) as never
+    }
 
     return this.db.findAndCountAll({
       where,
+      attributes: search ? { include: [[Sequelize.literal(matchClause), 'relevance']] } : undefined,
       include: [
         { model: Category, attributes: ['id', 'name', 'slug'] },
         { model: TaxRate, attributes: ['id', 'label', 'rate', 'is_default'] },
@@ -34,10 +44,13 @@ export class ProductsRepository {
       ],
       limit,
       offset: (page - 1) * limit,
-      order: [
-        ['displayOrder', 'ASC'],
-        ['created_at', 'DESC'],
-      ],
+      order: search
+        ? [[Sequelize.literal('relevance'), 'DESC']]
+        : [
+            ['displayOrder', 'ASC'],
+            ['created_at', 'DESC'],
+          ],
+      replacements: search ? { search } : undefined,
       distinct: true,
     })
   }
