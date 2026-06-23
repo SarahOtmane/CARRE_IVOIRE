@@ -2,11 +2,36 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ProductResponse } from '@carre-ivoire/types'
+import { useAuth, useFavorites } from '@carre-ivoire/composables'
 
 const props = defineProps<{ product: ProductResponse }>()
 const router = useRouter()
+const { isAuthenticated } = useAuth()
+const { isFavorite, add, remove } = useFavorites()
 
 const hovered = ref(false)
+const togglingFavorite = ref(false)
+
+const isFav = computed(() => isFavorite(props.product.id))
+
+async function toggleFavorite(event: MouseEvent) {
+  event.stopPropagation()
+  if (!isAuthenticated.value) {
+    router.push({ path: '/connexion', query: { redirect: router.currentRoute.value.fullPath } })
+    return
+  }
+  if (togglingFavorite.value) return
+  togglingFavorite.value = true
+  try {
+    if (isFav.value) {
+      await remove(props.product.id)
+    } else {
+      await add(props.product.id)
+    }
+  } finally {
+    togglingFavorite.value = false
+  }
+}
 
 function formatPrice(centimes: number) {
   return `${(centimes / 100).toFixed(2).replace('.', ',')} €`
@@ -41,6 +66,20 @@ const badgeVariants: Record<string, string> = {
         :class="badgeVariants[product.badge] ?? 'bg-papier text-cacao border border-[var(--cacao-a24)]'"
         style="padding: 5px 9px"
       >{{ product.badge }}</div>
+
+      <!-- Favori -->
+      <button
+        type="button"
+        class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center bg-papier transition-opacity duration-180 disabled:cursor-not-allowed disabled:opacity-60"
+        :aria-label="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        :aria-pressed="isFav"
+        :disabled="togglingFavorite"
+        @click="toggleFavorite"
+      >
+        <svg width="16" height="16" :fill="isFav ? 'var(--dore)' : 'none'" stroke="var(--brun-cacao)" stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter">
+          <use href="/assets/icons/sprite.svg#ci-heart" />
+        </svg>
+      </button>
 
       <!-- Image -->
       <img
