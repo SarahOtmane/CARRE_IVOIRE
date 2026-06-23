@@ -22,5 +22,8 @@
     "pinia": "^2.1.0",
     "typescript": "^5.0.0",
     "vue": "^3.4.0"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^9.8.0"
   }
 }

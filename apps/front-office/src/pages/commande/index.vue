@@ -2,6 +2,8 @@
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cart.store";
+import { useCheckout } from "@carre-ivoire/composables";
+import type { ShippingAddress } from "@carre-ivoire/types";
 import CheckoutForm from "@/components/checkout/CheckoutForm.vue";
 import StripePaymentForm from "@/components/checkout/StripePaymentForm.vue";
 
@@ -21,50 +23,58 @@ type ShippingPayload = {
 
 const router = useRouter();
 const cartStore = useCartStore();
+const { submitOrder } = useCheckout();
 
 const step = ref<"livraison" | "paiement">("livraison");
 const shipping = ref<ShippingPayload | null>(null);
-const processing = ref(false);
 
 const shippingFee = computed(() => shipping.value?.deliveryPrice ?? 0);
 const grandTotal = computed(() => cartStore.total + shippingFee.value);
-
-const orderNumber = computed(() => {
-  const year = new Date().getFullYear();
-  const sequence = Math.floor(1000 + Math.random() * 9000);
-  return `CI-${year}-${sequence}`;
-});
 
 function handleShippingSubmit(payload: ShippingPayload) {
   shipping.value = payload;
   step.value = "paiement";
 }
 
-function handlePaymentSubmit() {
+async function handlePaymentSubmit() {
   if (!shipping.value || cartStore.items.length === 0) return;
 
-  processing.value = true;
+  const shippingAddress: ShippingAddress = {
+    firstName: shipping.value.firstName,
+    lastName: shipping.value.lastName,
+    line1: shipping.value.address,
+    postalCode: shipping.value.postalCode,
+    city: shipping.value.city,
+    country: shipping.value.country,
+  };
 
-  globalThis.setTimeout(() => {
+  try {
+    const { orderId, totalAmount } = await submitOrder(
+      cartStore.items,
+      shippingAddress,
+    );
+
     globalThis.sessionStorage.setItem(
       "ci:last-checkout",
       JSON.stringify({
-        orderNumber: orderNumber.value,
-        total: grandTotal.value,
+        orderNumber: `#${orderId}`,
+        total: totalAmount / 100,
         shipping: shipping.value,
         items: cartStore.items,
       }),
     );
+
     cartStore.clearCart();
-    processing.value = false;
     router.replace({
       name: "checkout-confirmation",
       query: {
-        order: orderNumber.value,
-        total: grandTotal.value.toFixed(2),
+        order: `#${orderId}`,
+        total: (totalAmount / 100).toFixed(2),
       },
     });
-  }, 900);
+  } catch {
+    // Erreurs affichées via useApi (notification) ou stripeError dans StripePaymentForm
+  }
 }
 </script>
 
@@ -161,7 +171,6 @@ function handlePaymentSubmit() {
         <StripePaymentForm
           v-else
           :total="grandTotal"
-          :processing="processing"
           @pay="handlePaymentSubmit"
         />
       </div>

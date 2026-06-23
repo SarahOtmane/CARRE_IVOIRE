@@ -10,6 +10,8 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
+  Unique,
+  Index,
 } from 'sequelize-typescript'
 import { User } from '@/modules/users/users.model'
 import { OrderItem } from './order-item.model'
@@ -34,6 +36,7 @@ export class Order extends Model<Order> {
   @BelongsTo(() => User)
   declare user: User
 
+  @Unique
   @AllowNull(false)
   @Column({ type: DataType.STRING(30), field: 'order_number' })
   declare orderNumber: string
@@ -62,6 +65,7 @@ export class Order extends Model<Order> {
   @Column({ type: DataType.JSON, field: 'shipping_address' })
   declare shippingAddress: object | null
 
+  @Index
   @AllowNull(true)
   @Column({ type: DataType.STRING(255), field: 'stripe_payment_intent_id' })
   declare stripePaymentIntentId: string | null

@@ -1,37 +1,20 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { useCheckout } from "@carre-ivoire/composables";
 
-const props = defineProps<{
-  total: number;
-  processing?: boolean;
-}>();
+defineProps<{ total: number }>();
+const emit = defineEmits<{ (e: "pay"): void }>();
 
-const emit = defineEmits<{
-  (
-    e: "pay",
-    payload: {
-      cardName: string;
-      cardNumber: string;
-      expiry: string;
-      cvc: string;
-    },
-  ): void;
-}>();
+const { processing, stripeError, mountCard } = useCheckout();
+const cardContainer = ref<HTMLElement | null>(null);
 
-const form = ref({
-  cardName: "Constance Roze",
-  cardNumber: "4242 4242 4242 4242",
-  expiry: "12 / 28",
-  cvc: "123",
+onMounted(async () => {
+  if (cardContainer.value) await mountCard(cardContainer.value);
 });
-
-function submit() {
-  emit("pay", { ...form.value });
-}
 </script>
 
 <template>
-  <form class="space-y-10" @submit.prevent="submit">
+  <form class="space-y-10" @submit.prevent="emit('pay')">
     <div>
       <div
         class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
@@ -44,79 +27,29 @@ function submit() {
       <p
         class="mt-4 max-w-[460px] font-sans text-[15px] leading-[1.7] text-brun-cacao-2"
       >
-        Paiement simulé pour cette maquette. Aucune carte n'est stockée.
+        Paiement sécurisé par Stripe. Vos données de carte ne transitent jamais
+        par nos serveurs.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 gap-6">
-      <div>
-        <label
-          for="payment-name"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
-        >
-          Nom sur la carte
-        </label>
-        <input
-          id="payment-name"
-          v-model="form.cardName"
-          type="text"
-          autocomplete="cc-name"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
-        />
-      </div>
-      <div>
-        <label
-          for="payment-number"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
-        >
-          Numéro de carte
-        </label>
-        <input
-          id="payment-number"
-          v-model="form.cardNumber"
-          type="text"
-          inputmode="numeric"
-          autocomplete="cc-number"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
-        />
-      </div>
-      <div class="grid grid-cols-2 gap-6">
-        <div>
-          <label
-            for="payment-expiry"
-            class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
-          >
-            Expiration
-          </label>
-          <input
-            id="payment-expiry"
-            v-model="form.expiry"
-            type="text"
-            autocomplete="cc-exp"
-            class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-            style="border-color: var(--cacao-a24)"
-          />
-        </div>
-        <div>
-          <label
-            for="payment-cvc"
-            class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
-          >
-            CVC
-          </label>
-          <input
-            id="payment-cvc"
-            v-model="form.cvc"
-            type="text"
-            inputmode="numeric"
-            autocomplete="cc-csc"
-            class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-            style="border-color: var(--cacao-a24)"
-          />
-        </div>
-      </div>
+    <div>
+      <label
+        class="mb-3 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+      >
+        Carte bancaire
+      </label>
+      <div
+        ref="cardContainer"
+        class="border-b py-[14px]"
+        style="border-color: var(--cacao-a24); min-height: 44px"
+      />
+      <p
+        v-if="stripeError"
+        class="mt-2 font-sans text-[12px]"
+        style="color: #9b1c1c"
+      >
+        {{ stripeError }}
+      </p>
     </div>
 
     <div class="flex flex-wrap items-center gap-4">
@@ -128,7 +61,7 @@ function submit() {
         {{
           processing
             ? "Paiement…"
-            : `Payer ${props.total.toFixed(2).replace(".", ",")} €`
+            : `Payer ${total.toFixed(2).replace(".", ",")} €`
         }}
       </button>
       <span

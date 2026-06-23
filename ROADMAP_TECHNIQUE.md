@@ -113,7 +113,7 @@
 
 ### Tâches détaillées
 
-#### DB-001 — Synchroniser le schéma DB directement depuis les modèles Sequelize
+#### DB-001 — Synchroniser le schéma DB directement depuis les modèles Sequelize ✅ Fait
 
 - **Description** : Pas de système de migrations pour l'instant (le projet n'a qu'un environnement local, pas de production) : le schéma MySQL est piloté directement par les modèles Sequelize via `sequelize.sync({ alter: true })` au démarrage en développement. La tâche consiste à (1) auditer chaque modèle (`@Column`, `@ForeignKey`, `@Index`, `@AllowNull`, `@Default`) pour s'assurer qu'il reflète fidèlement l'intention métier actuelle (colonnes utilisées par les services/DTOs, contraintes FK entre `Product`/`ProductVariant`/`Order`/`OrderItem`/`Category`/`User`/`Favorite`/`TaxRate`), (2) corriger les divergences trouvées directement dans les fichiers `*.model.ts`, (3) relancer `sync({ alter: true })` sur la base locale et vérifier que le schéma résultant correspond aux attentes (index, types, valeurs par défaut), (4) supprimer le dossier `apps/api/src/database/migrations/` (vide) et le script `db:migrate` du `package.json` pour ne pas laisser une fausse impression qu'un système de migrations est actif.
 - **Pourquoi** : Reconstituer un système de migrations n'a pas de sens sans production à faire évoluer ; en local, la source de vérité la plus simple et la moins risquée est le modèle Sequelize lui-même, synchronisé directement. Cela évite aussi la dérive observée actuellement entre seeders/modèles et un dossier de migrations vide.
@@ -129,7 +129,7 @@
 - **Critères de validation** : démarrer l'API en local sur une base vide crée automatiquement un schéma cohérent avec tous les modèles ; les seeders s'exécutent ensuite sans erreur ; le dossier `migrations/` n'existe plus.
 - **Tests à réaliser** : test manuel "provisioning from scratch" — base MySQL vide, démarrage de l'API, puis `npm run db:seed:all`, vérification de l'absence d'erreur et de la cohérence des données.
 
-#### BACK-001 — Idempotence du webhook Stripe
+#### BACK-001 — Idempotence du webhook Stripe ✅ Fait
 
 - **Description** : Ajouter une table `stripe_webhook_events` (colonnes `event_id` UNIQUE, `type`, `processed_at`) et vérifier l'idempotence avant tout traitement d'événement Stripe entrant.
 - **Pourquoi** : Stripe peut renvoyer un même événement plusieurs fois (timeout, retry) ; sans garde-fou, un replay de `payment_intent.succeeded` ou `payment_intent.payment_failed` peut décrémenter le stock une seconde fois ou renvoyer un email de confirmation en double.
@@ -145,7 +145,7 @@
 - **Critères de validation** : envoyer deux fois le même événement Stripe (via `stripe trigger` ou replay manuel) ne déclenche le traitement métier qu'une seule fois.
 - **Tests à réaliser** : TEST-002 (test unitaire + test d'intégration de replay).
 
-#### BACK-002 — Remplacer `throw new Error` natif par `HttpException` dans Stripe
+#### BACK-002 — Remplacer `throw new Error` natif par `HttpException` dans Stripe ✅ Fait
 
 - **Description** : Dans `stripe.service.ts:15`, remplacer `throw new Error('STRIPE_SECRET_KEY environment variable is not set')` par une `InternalServerErrorException` (ou équivalent NestJS) pour respecter le contrat `{success:false,error:{code,message}}`.
 - **Pourquoi** : Toute erreur native échappe au `HttpExceptionFilter` global (`@Catch(HttpException)`), cassant le contrat de réponse API uniforme exigé par CLAUDE.md.
@@ -161,7 +161,7 @@
 - **Critères de validation** : démarrer l'API sans `STRIPE_SECRET_KEY` renvoie une erreur au format `{success:false,error:{code,message}}` si le chemin est atteint via une requête HTTP.
 - **Tests à réaliser** : test unitaire vérifiant le type d'exception levée.
 
-#### FRONT-001 — Intégration Stripe Elements réelle
+#### FRONT-001 — Intégration Stripe Elements réelle ✅ Fait
 
 - **Description** : Remplacer le formulaire de paiement simulé (`StripePaymentForm.vue`, carte `4242 4242 4242 4242` en dur, `setTimeout`) par une intégration Stripe.js/Elements réelle : création d'un PaymentIntent côté backend, confirmation côté client, gestion des états d'échec (carte refusée, 3D Secure, timeout réseau).
 - **Pourquoi** : En l'état, aucune commande réelle ne peut être passée ni payée — c'est un bloquant absolu pour toute mise en production, masqué par une UI qui donne l'illusion d'une fonctionnalité complète.
