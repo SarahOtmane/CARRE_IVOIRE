@@ -82,8 +82,10 @@ export class OrdersRepository {
     const where: Record<string, unknown> = {}
     if (query.status) where.status = query.status
 
-    const limit = Math.min(query.limit ?? 20, 100)
-    const page = query.page ?? 1
+    // NestJS convertit un query param numérique absent en NaN (Number(undefined)), pas en
+    // undefined — `?? valeur` ne rattrape pas NaN, d'où la vérification explicite ci-dessous.
+    const limit = Math.min(Number.isFinite(query.limit) ? (query.limit as number) : 20, 100)
+    const page = Number.isFinite(query.page) ? (query.page as number) : 1
 
     return this.orderDb.findAndCountAll({
       where,
