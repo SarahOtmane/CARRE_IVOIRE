@@ -517,7 +517,9 @@
 
 ### Tâches détaillées
 
-#### TEST-001 — Tests Guards JWT/Admin
+#### TEST-001 — Tests Guards JWT/Admin ✅ Fait
+
+- **Résultat** : `jwt-auth.guard.spec.ts` (4 scénarios : token absent, erreur stratégie, token expiré, token valide) et `admin.guard.spec.ts` (3 scénarios : pas d'utilisateur, rôle client, rôle admin) créés. Aucun bug de logique trouvé. 56 tests verts à ce stade.
 
 - **Description** : Créer `jwt-auth.guard.spec.ts` et `admin.guard.spec.ts` couvrant : token absent, token invalide, token expiré, token valide rôle client sur route admin (doit être refusé), token valide rôle admin sur route admin (doit passer).
 - **Pourquoi** : Le contrôle d'accès admin qui protège tout le back-office n'a actuellement aucun test — un bug de logique de rôle passerait inaperçu jusqu'en production.
@@ -533,7 +535,9 @@
 - **Critères de validation** : couverture des 5 scénarios listés, tous verts.
 - **Tests à réaliser** : les tests eux-mêmes constituent le livrable.
 
-#### TEST-002 — Tests Stripe (signature webhook, idempotence)
+#### TEST-002 — Tests Stripe (signature webhook, idempotence) ✅ Fait
+
+- **Résultat** : `stripe.service.spec.ts` vérifie la signature HMAC réelle via `Stripe.webhooks.generateTestHeaderString` (signature valide acceptée, signature invalide/secret différent rejetés en `INVALID_WEBHOOK_SIGNATURE`, `STRIPE_SECRET_KEY` manquante → `InternalServerErrorException`). `stripe.controller.spec.ts` vérifie le routage par type d'événement et l'idempotence (replay du même `event.id` → traitement métier une seule fois). 64 tests verts.
 
 - **Description** : Créer des tests unitaires pour `stripe.service.ts` (vérification de signature avec secret invalide → rejet, secret valide → acceptation) et un test d'intégration pour BACK-001 (envoi du même `event.id` deux fois → traitement métier une seule fois).
 - **Pourquoi** : Le point d'entrée de l'argent réel n'a actuellement aucun test ; un bug de vérification de signature webhook serait une vulnérabilité critique (falsification de confirmation de paiement).
@@ -549,7 +553,9 @@
 - **Critères de validation** : signature invalide → 400 rejeté ; replay du même event → un seul traitement métier observable.
 - **Tests à réaliser** : les tests eux-mêmes.
 
-#### TEST-003 — Tests e2e controllers
+#### TEST-003 — Tests e2e controllers ✅ Fait
+
+- **Résultat** : `test/jest-e2e.json` + `test/setup-app.ts` (reproduit le bootstrap réel de main.ts) + 3 specs (`app`, `admin-access`, `checkout-flow`, override de `StripeService` pour ne jamais appeler le réseau réel). **Deux bugs réels trouvés et corrigés en cours de route** : (1) `Model.sync()` de Sequelize revérifie les index à chaque appel quel que soit `alter` — exécuter `synchronize` à chaque boot d'app e2e (un par fichier) causait des conflits ; solution : le schéma de test est créé une seule fois via `test/_setup-db.e2e-spec.ts` (`npm run pretest:e2e`), les boots suivants utilisent `synchronize:false`. (2) **Bug de production réel** : `GET /orders` sans `page`/`limit` plantait en 500 (`LIMIT NaN, NaN`) — NestJS convertit un `@Query()` numérique absent en `NaN` (`Number(undefined)`), que `?? valeur` ne rattrape pas ; corrigé dans `orders.repository.ts` avec `Number.isFinite()`, plus un bug de nettoyage de test (suppression de l'utilisateur avant ses commandes, violation FK). Suite stable sur 3 exécutions consécutives, avec et sans reset de la base.
 
 - **Description** : Mettre en place une configuration Jest e2e (`apps/api/test/jest-e2e.json`) et écrire au moins les flux critiques : inscription → connexion → ajout panier → commande → paiement (mock Stripe) → vérification stock décrémenté ; accès admin refusé à un client ; accès admin autorisé à un admin.
 - **Pourquoi** : Aucun test e2e n'existe actuellement dans le repo ; les guards, pipes et décorateurs appliqués au niveau route ne sont jamais vérifiés en conditions réelles (seule la logique de service l'est).
@@ -565,7 +571,9 @@
 - **Critères de validation** : les 3 flux e2e listés passent en local et en CI.
 - **Tests à réaliser** : les tests eux-mêmes constituent le livrable, intégrés à INFRA-001.
 
-#### TEST-004 — Tests repositories
+#### TEST-004 — Tests repositories ✅ Fait
+
+- **Résultat** : `products.repository.spec.ts` et `product-variants.repository.spec.ts` créés (increment/decrement × succès/échec). `orders.repository.spec.ts` ajouté en prime lors de TEST-003 pour couvrir la régression NaN découverte. 49 tests à ce stade (avant TEST-001/002).
 
 - **Description** : Créer des tests unitaires pour `ProductsRepository.incrementStock/decrementStock` et `ProductVariantsRepository.incrementStock/decrementStock`, couvrant le cas `rowsAffected===0` (stock insuffisant) et le cas de succès.
 - **Pourquoi** : Ces méthodes sont au cœur de la cohérence du stock et n'ont actuellement aucun test direct (seulement testées indirectement via `orders.service.spec.ts`).
@@ -581,7 +589,9 @@
 - **Critères de validation** : couverture des deux méthodes (increment/decrement) × deux cas (succès/échec) sur les deux repositories.
 - **Tests à réaliser** : les tests eux-mêmes.
 
-#### TEST-005 — Tests frontend composables/stores additionnels
+#### TEST-005 — Tests frontend composables/stores additionnels ✅ Fait
+
+- **Résultat** : Vitest configuré pour `packages/composables` (absent jusqu'ici). `auth.store.spec.ts`, `useAuth.spec.ts`, `useApi.spec.ts` (intercepteurs testés directement via `interceptors.request/response.handlers[0]`, sans appel réseau), `useCheckout.spec.ts` (Stripe.js et `useApi` mockés via `vi.mock`). `@carre-ivoire/stores` ajouté comme dépendance déclarée de `packages/composables` (manquante jusqu'ici, masquée par le hoisting npm). 13+22 tests frontend verts.
 
 - **Description** : Ajouter des tests Vitest pour `auth.store.ts`, `useApi.ts` (intercepteurs axios, gestion 401), `useAuth.ts`, `useCheckout.ts` (créé en FRONT-001).
 - **Pourquoi** : Seuls `cart.store.ts` et `notification.store.ts` sont testés actuellement ; l'authentification et les appels API centralisés n'ont aucune garantie automatisée.
@@ -597,7 +607,9 @@
 - **Critères de validation** : couverture des cas de login/logout/expiration token/erreur réseau.
 - **Tests à réaliser** : les tests eux-mêmes.
 
-#### INFRA-001 — Pipeline CI (lint + test + build)
+#### INFRA-001 — Pipeline CI (lint + test + build) ✅ Fait
+
+- **Résultat** : `.github/workflows/ci.yml` avec jobs `lint`/`build`/`test`/`test-e2e` (service MySQL dédié, secrets factices)/`audit`. Une vraie erreur ESLint préexistante (`require()` CommonJS dans `uploads.controller.ts`) bloquait le lint global — corrigée (import ES `multer` au lieu de `require`). Validé localement : lint/build/test tous exit 0.
 
 - **Description** : Créer `.github/workflows/ci.yml` exécutant, sur chaque PR vers `main`/`dev` : `npm install`, lint (`eslint --workspaces`), build (`npm run build --workspaces`), tests (`npm run test --workspaces`), avec une base MySQL de service pour les tests d'intégration/e2e.
 - **Pourquoi** : Aucun pipeline n'existe actuellement (`.github/` ne contient qu'un template de PR) — aucune garantie automatique avant merge, le `pull_request_template.md` repose entièrement sur l'auto-déclaration humaine.
@@ -613,7 +625,9 @@
 - **Critères de validation** : une PR avec un test cassé ou un lint en échec est automatiquement bloquée (statut rouge GitHub).
 - **Tests à réaliser** : test du pipeline lui-même (PR volontairement cassée pour vérifier le blocage).
 
-#### INFRA-002 — Scan de vulnérabilités
+#### INFRA-002 — Scan de vulnérabilités ✅ Fait
+
+- **Résultat** : step `npm audit --audit-level=high` ajouté au workflow CI (`continue-on-error: true` — ne bloque pas sur les vulnérabilités existantes, remonte juste un rapport). `.github/dependabot.yml` créé (npm, racine, hebdomadaire, dépendances de dev groupées).
 
 - **Description** : Ajouter `npm audit --audit-level=high` comme step du pipeline CI, et configurer Dependabot (`.github/dependabot.yml`) pour les mises à jour de sécurité automatiques.
 - **Pourquoi** : Aucun scan de dépendances n'est actuellement en place ; risque de vulnérabilités connues non détectées avant production.
@@ -629,7 +643,9 @@
 - **Critères de validation** : le step `npm audit` s'exécute et remonte un rapport ; Dependabot crée ses premières PR de mise à jour.
 - **Tests à réaliser** : aucun (outillage).
 
-#### INFRA-003 — Ajouter le champ `engines`
+#### INFRA-003 — Ajouter le champ `engines` ✅ Fait
+
+- **Résultat** : `engines.node >=20.0.0` ajouté au `package.json` racine, `apps/api` et `apps/front-office`.
 
 - **Description** : Ajouter `"engines": {"node": ">=20.0.0"}` dans `apps/api/package.json` et `apps/front-office/package.json` (et aux packages si pertinent).
 - **Pourquoi** : Seul le Dockerfile fixe Node 20 actuellement ; un développeur local avec une autre version n'est averti par aucun garde-fou npm.
