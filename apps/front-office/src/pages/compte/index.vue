@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth.store";
+import { useAuthStore } from "@carre-ivoire/stores";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -32,7 +32,7 @@ const shortcuts = [
     >
       <span class="ci-eyebrow">Espace client</span>
       <h2
-        class="mt-4 font-serif text-brun-cacao"
+        class="mt-4 font-serif text-cacao"
         style="
           font-size: clamp(36px, 5vw, 64px);
           line-height: 1;
@@ -40,12 +40,12 @@ const shortcuts = [
         "
       >
         Bonjour,
-        <em class="text-brun-cacao-2"
+        <em class="text-cacao-2"
           >{{ authStore.user?.firstName ?? "vous" }}.</em
         >
       </h2>
       <p
-        class="mt-5 max-w-[620px] font-sans text-[16px] leading-[1.7] text-brun-cacao-2"
+        class="mt-5 max-w-[620px] font-sans text-[16px] leading-[1.7] text-cacao-2"
       >
         Votre espace réunit vos commandes, vos favoris et vos informations. Tout
         est ici. Clair. Direct.
@@ -55,7 +55,7 @@ const shortcuts = [
         <button
           v-for="shortcut in shortcuts"
           :key="shortcut.path"
-          class="border border-brun-cacao px-5 py-3 font-sans text-[12px] tracking-[0.08em] text-brun-cacao transition-all duration-180 hover:bg-brun-cacao hover:text-ivoire active:translate-y-px"
+          class="border border-cacao px-5 py-3 font-sans text-[12px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire active:translate-y-px"
           @click="router.push(shortcut.path)"
         >
           {{ shortcut.label }}
@@ -71,12 +71,12 @@ const shortcuts = [
         style="border-color: var(--cacao-a12)"
       >
         <div
-          class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           {{ stat.label }}
         </div>
         <div
-          class="mt-2 font-serif text-[36px] font-medium leading-none text-brun-cacao"
+          class="mt-2 font-serif text-[36px] font-medium leading-none text-cacao"
         >
           {{ stat.value }}
         </div>
@@ -85,7 +85,7 @@ const shortcuts = [
 
     <div class="grid grid-cols-1 gap-10 lg:grid-cols-[1.25fr_0.75fr]">
       <div>
-        <h3 class="mb-5 font-serif text-[28px] font-medium text-brun-cacao">
+        <h3 class="mb-5 font-serif text-[28px] font-medium text-cacao">
           Dernières commandes
         </h3>
 
@@ -97,12 +97,12 @@ const shortcuts = [
         >
           <div>
             <div
-              class="font-sans text-[11px] uppercase tracking-[0.18em] text-brun-cacao-2"
+              class="font-sans text-[11px] uppercase tracking-[0.18em] text-cacao-2"
             >
               {{ order.id }}
             </div>
             <div
-              class="mt-1 font-serif text-[18px] font-medium text-brun-cacao"
+              class="mt-1 font-serif text-[18px] font-medium text-cacao"
             >
               {{ order.date }}
             </div>
@@ -120,7 +120,7 @@ const shortcuts = [
               {{ order.total.toFixed(2).replace(".", ",") }} €
             </span>
             <a
-              class="cursor-pointer border-b border-brun-cacao pb-px font-sans text-[12px] text-brun-cacao"
+              class="cursor-pointer border-b border-cacao pb-px font-sans text-[12px] text-cacao"
               @click="router.push('/compte/commandes/' + order.id)"
               >Détail →</a
             >
@@ -129,7 +129,7 @@ const shortcuts = [
 
         <div class="mt-8">
           <button
-            class="border-b border-brun-cacao pb-px font-sans text-[13px] text-brun-cacao transition-opacity duration-180 hover:opacity-60"
+            class="border-b border-cacao pb-px font-sans text-[13px] text-cacao transition-opacity duration-180 hover:opacity-60"
             @click="router.push('/compte/commandes')"
           >
             Voir toutes mes commandes →
@@ -140,12 +140,12 @@ const shortcuts = [
       <div class="space-y-8">
         <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
           <div
-            class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+            class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
           >
             Adresse par défaut
           </div>
           <div
-            class="mt-3 font-serif text-[22px] leading-[1.35] text-brun-cacao"
+            class="mt-3 font-serif text-[22px] leading-[1.35] text-cacao"
           >
             4 rue du Nil<br />
             <span class="italic">75002 Paris</span>
@@ -154,25 +154,25 @@ const shortcuts = [
 
         <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
           <div
-            class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+            class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
           >
             Raccourcis
           </div>
           <div class="mt-3 space-y-3">
             <button
-              class="block w-full border-b border-brun-cacao pb-px text-left font-sans text-[13px] text-brun-cacao"
+              class="block w-full border-b border-cacao pb-px text-left font-sans text-[13px] text-cacao"
               @click="router.push('/compte/informations')"
             >
               Modifier mes informations →
             </button>
             <button
-              class="block w-full border-b border-brun-cacao pb-px text-left font-sans text-[13px] text-brun-cacao"
+              class="block w-full border-b border-cacao pb-px text-left font-sans text-[13px] text-cacao"
               @click="router.push('/compte/favoris')"
             >
               Revoir mes favoris →
             </button>
             <button
-              class="block w-full border-b border-brun-cacao pb-px text-left font-sans text-[13px] text-brun-cacao"
+              class="block w-full border-b border-cacao pb-px text-left font-sans text-[13px] text-cacao"
               @click="router.push('/compte/commandes')"
             >
               Suivre mes commandes →

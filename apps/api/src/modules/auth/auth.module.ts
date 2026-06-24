@@ -16,9 +16,9 @@ import { AdminGuard } from './guards/admin.guard'
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+        secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES_IN', '1h'),
+          expiresIn: configService.get<string>('JWT_EXPIRATION', '24h'),
           algorithm: 'HS256',
         },
       }),

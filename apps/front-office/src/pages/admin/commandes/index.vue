@@ -49,30 +49,30 @@ function statusLabel(status: OrderStatus) {
 
 <template>
   <div class="space-y-8 pb-10">
-    <section class="border-b border-cocoa pb-8">
+    <section class="border-b border-cacao pb-8">
       <div class="flex flex-wrap items-end justify-between gap-6">
         <div>
-          <div class="font-body text-[10px] uppercase tracking-[0.28em] text-cocoa/45">
+          <div class="font-body text-[10px] uppercase tracking-[0.28em] text-cacao/45">
             03 — Commandes
           </div>
-          <h2 class="mt-4 font-display text-5xl leading-[0.92] text-cocoa sm:text-6xl">
-            Le carnet <span class="italic text-cocoa/55">de l'atelier.</span>
+          <h2 class="mt-4 font-display text-5xl leading-[0.92] text-cacao sm:text-6xl">
+            Le carnet <span class="italic text-cacao/55">de l'atelier.</span>
           </h2>
         </div>
-        <div class="font-body text-[11px] uppercase tracking-[0.16em] text-cocoa/55">
+        <div class="font-body text-[11px] uppercase tracking-[0.16em] text-cacao/55">
           {{ filteredOrders.length }} commande<span v-if="filteredOrders.length > 1">s</span>
         </div>
       </div>
     </section>
 
-    <section class="flex flex-wrap items-center gap-4 border border-cocoa bg-ivory px-6 py-5">
-      <label class="flex min-w-[240px] flex-1 items-center gap-3 border-b border-cocoa pb-3">
-        <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45">Recherche</span>
+    <section class="flex flex-wrap items-center gap-4 border border-cacao bg-ivoire px-6 py-5">
+      <label class="flex min-w-[240px] flex-1 items-center gap-3 border-b border-cacao pb-3">
+        <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45">Recherche</span>
         <input
           v-model="search"
           type="search"
           placeholder="Numéro, ville…"
-          class="min-w-0 flex-1 bg-transparent font-body text-sm text-cocoa outline-none"
+          class="min-w-0 flex-1 bg-transparent font-body text-sm text-cacao outline-none"
         />
       </label>
 
@@ -82,7 +82,7 @@ function statusLabel(status: OrderStatus) {
           :key="opt.value"
           type="button"
           class="border px-3 py-2 font-body text-[10px] uppercase tracking-[0.18em] transition-colors duration-200"
-          :class="statusFilter === opt.value ? 'border-cocoa bg-cocoa text-ivory' : 'border-cocoa text-cocoa hover:bg-beige/50'"
+          :class="statusFilter === opt.value ? 'border-cacao bg-cacao text-ivoire' : 'border-cacao text-cacao hover:bg-beige-doux/50'"
           @click="statusFilter = opt.value"
         >
           {{ opt.label }}
@@ -90,13 +90,13 @@ function statusLabel(status: OrderStatus) {
       </div>
     </section>
 
-    <div v-if="isLoading" class="py-16 text-center font-body text-sm italic text-cocoa/45">
+    <div v-if="isLoading" class="py-16 text-center font-body text-sm italic text-cacao/45">
       Chargement…
     </div>
 
-    <section v-else class="overflow-hidden border border-cocoa bg-ivory">
+    <section v-else class="overflow-hidden border border-cacao bg-ivoire">
       <div
-        class="grid grid-cols-[72px_72px_minmax(0,1.5fr)_minmax(0,1fr)_72px_120px_140px_72px] border-b border-cocoa px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cocoa/45"
+        class="grid grid-cols-[72px_72px_minmax(0,1.5fr)_minmax(0,1fr)_72px_120px_140px_72px] border-b border-cacao px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45"
       >
         <span>N°</span>
         <span>Date</span>
@@ -112,24 +112,24 @@ function statusLabel(status: OrderStatus) {
         v-for="order in filteredOrders"
         :key="order.id"
         type="button"
-        class="grid w-full grid-cols-[72px_72px_minmax(0,1.5fr)_minmax(0,1fr)_72px_120px_140px_72px] items-center gap-4 border-b border-cocoa px-6 py-5 text-left transition-colors duration-200 hover:bg-beige/50 last:border-b-0"
+        class="grid w-full grid-cols-[72px_72px_minmax(0,1.5fr)_minmax(0,1fr)_72px_120px_140px_72px] items-center gap-4 border-b border-cacao px-6 py-5 text-left transition-colors duration-200 hover:bg-beige-doux/50 last:border-b-0"
         @click="router.push({ name: 'admin-commandes-detail', params: { id: String(order.id) } })"
       >
-        <span class="font-body text-[11px] text-cocoa/55 tabular-nums">#{{ order.id }}</span>
-        <span class="font-body text-[12px] text-cocoa tabular-nums">{{ formatDate(order.createdAt) }}</span>
-        <span class="min-w-0 truncate font-body text-sm text-cocoa">
+        <span class="font-body text-[11px] text-cacao/55 tabular-nums">#{{ order.id }}</span>
+        <span class="font-body text-[12px] text-cacao tabular-nums">{{ formatDate(order.createdAt) }}</span>
+        <span class="min-w-0 truncate font-body text-sm text-cacao">
           {{ order.shippingAddress ? `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}` : `Client #${order.userId}` }}
         </span>
-        <span class="font-body text-sm italic text-cocoa/60">{{ order.shippingAddress?.city ?? "—" }}</span>
-        <span class="text-right font-body text-sm tabular-nums text-cocoa">{{ order.items.length }}</span>
-        <span class="text-right font-body text-sm tabular-nums text-gold">{{ formatPrice(order.totalAmount) }}</span>
-        <span class="border border-cocoa px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cocoa/70">
+        <span class="font-body text-sm italic text-cacao/60">{{ order.shippingAddress?.city ?? "—" }}</span>
+        <span class="text-right font-body text-sm tabular-nums text-cacao">{{ order.items.length }}</span>
+        <span class="text-right font-body text-sm tabular-nums text-dore">{{ formatPrice(order.totalAmount) }}</span>
+        <span class="border border-cacao px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cacao/70">
           {{ statusLabel(order.status) }}
         </span>
-        <span class="text-right font-body text-[11px] uppercase tracking-[0.18em] text-cocoa/55">Ouvrir</span>
+        <span class="text-right font-body text-[11px] uppercase tracking-[0.18em] text-cacao/55">Ouvrir</span>
       </button>
 
-      <div v-if="filteredOrders.length === 0 && !isLoading" class="px-6 py-12 text-center font-body text-sm italic text-cocoa/45">
+      <div v-if="filteredOrders.length === 0 && !isLoading" class="px-6 py-12 text-center font-body text-sm italic text-cacao/45">
         Aucune commande trouvée.
       </div>
     </section>

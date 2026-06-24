@@ -4,12 +4,14 @@ import type { Request } from 'express'
 import type Stripe from 'stripe'
 import { StripeService } from './stripe.service'
 import { OrdersService } from './orders.service'
+import { StripeWebhookEventsRepository } from './stripe-webhook-events.repository'
 
 @Controller('stripe')
 export class StripeController {
   constructor(
     private readonly stripeService: StripeService,
     private readonly ordersService: OrdersService,
+    private readonly webhookEventsRepository: StripeWebhookEventsRepository,
   ) {}
 
   @Post('webhook')
@@ -19,6 +21,11 @@ export class StripeController {
     @Headers('stripe-signature') sig: string,
   ) {
     const event = this.stripeService.constructEvent(req.rawBody!, sig)
+
+    const isNew = await this.webhookEventsRepository.recordEvent(event.id, event.type)
+    if (!isNew) {
+      return { received: true }
+    }
 
     if (event.type === 'payment_intent.succeeded') {
       const paymentIntent = event.data.object as Stripe.PaymentIntent

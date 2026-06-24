@@ -13,6 +13,9 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "dependencies": {
+    "@carre-ivoire/types": "*"
+  },
   "peerDependencies": {
     "pinia": "^2.1.0",
     "vue": "^3.4.0"

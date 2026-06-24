@@ -58,7 +58,7 @@ watch(
     <div class="mb-12 pb-8" style="border-bottom: 1px solid var(--border)">
       <RouterLink
         to="/boutique"
-        class="mb-6 inline-flex items-center gap-2 font-sans text-[12px] tracking-[0.06em] text-brun-cacao-2 transition-colors duration-180 hover:text-brun-cacao"
+        class="mb-6 inline-flex items-center gap-2 font-sans text-[12px] tracking-[0.06em] text-cacao-2 transition-colors duration-180 hover:text-cacao"
       >
         ← Boutique
       </RouterLink>
@@ -66,18 +66,18 @@ watch(
       <div v-if="currentCategory">
         <span class="ci-eyebrow">{{ currentCategory.name }}</span>
         <h1
-          class="mt-4 font-serif font-medium text-brun-cacao"
+          class="mt-4 font-serif font-medium text-cacao"
           style="
             font-size: clamp(40px, 6vw, 80px);
             line-height: 0.95;
             letter-spacing: -0.01em;
           "
         >
-          <em class="text-brun-cacao-2">{{ currentCategory.name }}</em>
+          <em class="text-cacao-2">{{ currentCategory.name }}</em>
         </h1>
         <p
           v-if="currentCategory.description"
-          class="mt-4 max-w-[560px] font-sans text-[15px] leading-relaxed text-brun-cacao-2"
+          class="mt-4 max-w-[560px] font-sans text-[15px] leading-relaxed text-cacao-2"
         >
           {{ currentCategory.description }}
         </p>
@@ -116,8 +116,8 @@ watch(
           max-width: 520px;
         "
       >
-        <em class="text-brun-cacao-2">Cette collection</em>
-        <span class="text-brun-cacao"> arrive dans nos vitrines.</span>
+        <em class="text-cacao-2">Cette collection</em>
+        <span class="text-cacao"> arrive dans nos vitrines.</span>
       </h2>
     </div>
   </div>

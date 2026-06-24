@@ -31,6 +31,10 @@
   --cacao-a45: rgba(58, 31, 20, 0.45);
   --cacao-a78: rgba(58, 31, 20, 0.78);
 
+  /* ----- Alpha scales (ivoire on cacao — surfaces sombres, ex. footer) ----- */
+  --ivoire-a15: rgba(246, 232, 222, 0.15);
+  --ivoire-a40: rgba(246, 232, 222, 0.4);
+
   /* ----- Semantic color roles ----- */
   --bg: var(--ivoire);
   --bg-alt: var(--rose-poudre);

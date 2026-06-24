@@ -10,7 +10,9 @@ import {
   ForeignKey,
   BelongsTo,
   HasMany,
+  Unique,
 } from 'sequelize-typescript'
+import type { ShippingAddress } from '@carre-ivoire/types'
 import { User } from '@/modules/users/users.model'
 import { OrderItem } from './order-item.model'
 
@@ -19,6 +21,9 @@ import { OrderItem } from './order-item.model'
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  indexes: [
+    { name: 'orders_stripe_payment_intent_id', fields: ['stripe_payment_intent_id'] },
+  ],
 })
 export class Order extends Model<Order> {
   @PrimaryKey
@@ -34,6 +39,7 @@ export class Order extends Model<Order> {
   @BelongsTo(() => User)
   declare user: User
 
+  @Unique('order_number')
   @AllowNull(false)
   @Column({ type: DataType.STRING(30), field: 'order_number' })
   declare orderNumber: string
@@ -60,7 +66,7 @@ export class Order extends Model<Order> {
 
   @AllowNull(true)
   @Column({ type: DataType.JSON, field: 'shipping_address' })
-  declare shippingAddress: object | null
+  declare shippingAddress: ShippingAddress | null
 
   @AllowNull(true)
   @Column({ type: DataType.STRING(255), field: 'stripe_payment_intent_id' })

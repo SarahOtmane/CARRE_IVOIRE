@@ -32,7 +32,7 @@ export class Product extends Model<Product> {
   @Column(DataType.STRING(255))
   declare name: string
 
-  @Unique
+  @Unique('slug')
   @AllowNull(false)
   @Column(DataType.STRING(255))
   declare slug: string

@@ -12,12 +12,10 @@ import { join } from 'path'
 import { randomUUID } from 'crypto'
 import { mkdir } from 'fs/promises'
 import sharp from 'sharp'
+import multer from 'multer'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { AdminGuard } from '@/modules/auth/guards/admin.guard'
 import type { Request } from 'express'
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const multer = require('multer')
 
 const UPLOAD_DIR = join(process.cwd(), 'uploads')
 const ALLOWED_MIME = /^image\/(jpeg|png|webp)$/

@@ -2,13 +2,16 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
-import { useProduct, useProducts } from '@carre-ivoire/composables'
+import { useAuth, useFavorites, useProduct, useProducts } from '@carre-ivoire/composables'
 import { useCartStore } from '@carre-ivoire/stores'
 import ProductCard from '@/components/product/ProductCard.vue'
 
 const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
+const { isAuthenticated } = useAuth()
+const { isFavorite, add: addFavorite, remove: removeFavorite } = useFavorites()
+const togglingFavorite = ref(false)
 
 const slug = route.params.slug as string
 const { product, isLoading } = useProduct(slug)
@@ -80,6 +83,27 @@ function addToCart() {
   added.value = true
   setTimeout(() => { added.value = false }, 2000)
 }
+
+const isFav = computed(() => (product.value ? isFavorite(product.value.id) : false))
+
+async function toggleFavorite() {
+  if (!product.value) return
+  if (!isAuthenticated.value) {
+    router.push({ path: '/connexion', query: { redirect: route.fullPath } })
+    return
+  }
+  if (togglingFavorite.value) return
+  togglingFavorite.value = true
+  try {
+    if (isFav.value) {
+      await removeFavorite(product.value.id)
+    } else {
+      await addFavorite(product.value.id)
+    }
+  } finally {
+    togglingFavorite.value = false
+  }
+}
 </script>
 
 <template>
@@ -92,13 +116,13 @@ function addToCart() {
   <div v-else-if="!product" class="px-5 py-[120px] lg:px-[104px]">
     <span class="ci-eyebrow">Introuvable</span>
     <h1
-      class="mt-4 font-serif text-brun-cacao"
+      class="mt-4 font-serif text-cacao"
       style="font-size: clamp(36px, 6vw, 72px); line-height: 1; font-weight: 500"
     >
       Cette fiche produit n'existe pas.
     </h1>
     <button
-      class="mt-8 border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire"
+      class="mt-8 border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire"
       @click="router.push('/boutique')"
     >
       Retour à la boutique
@@ -108,13 +132,13 @@ function addToCart() {
   <!-- Fiche produit -->
   <div v-else>
     <nav
-      class="px-5 pt-14 font-sans text-[11px] uppercase tracking-[0.18em] text-brun-cacao-2 lg:px-[104px] lg:pt-16"
+      class="px-5 pt-14 font-sans text-[11px] uppercase tracking-[0.18em] text-cacao-2 lg:px-[104px] lg:pt-16"
     >
       <button class="transition-opacity duration-180 hover:opacity-60" type="button" @click="router.push('/')">accueil</button>
       <span class="mx-3">·</span>
       <button class="transition-opacity duration-180 hover:opacity-60" type="button" @click="router.push('/boutique')">boutique</button>
       <span class="mx-3">·</span>
-      <span class="text-brun-cacao">{{ product.name }}</span>
+      <span class="text-cacao">{{ product.name }}</span>
     </nav>
 
     <section
@@ -135,29 +159,43 @@ function addToCart() {
       <div>
         <div v-if="product.badge" class="mb-5">
           <span
-            class="inline-block border px-3 py-1 font-sans text-[9px] uppercase tracking-[0.22em] border-[var(--cacao-a24)] bg-papier text-brun-cacao"
+            class="inline-block border px-3 py-1 font-sans text-[9px] uppercase tracking-[0.22em] border-[var(--cacao-a24)] bg-papier text-cacao"
           >
             {{ product.badge }}
           </span>
         </div>
 
-        <span class="ci-eyebrow">{{ product.category?.name ?? 'Carré Ivoire' }}</span>
+        <div class="flex items-start justify-between gap-4">
+          <span class="ci-eyebrow">{{ product.category?.name ?? 'Carré Ivoire' }}</span>
+          <button
+            type="button"
+            class="flex h-9 w-9 flex-shrink-0 items-center justify-center border border-[var(--cacao-a24)] transition-opacity duration-180 disabled:cursor-not-allowed disabled:opacity-60"
+            :aria-label="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+            :aria-pressed="isFav"
+            :disabled="togglingFavorite"
+            @click="toggleFavorite"
+          >
+            <svg width="16" height="16" :fill="isFav ? 'var(--dore)' : 'none'" stroke="var(--brun-cacao)" stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter">
+              <use href="/assets/icons/sprite.svg#ci-heart" />
+            </svg>
+          </button>
+        </div>
         <h1
-          class="mt-4 font-serif text-brun-cacao"
+          class="mt-4 font-serif text-cacao"
           style="font-size: clamp(44px, 6vw, 80px); line-height: 0.95; font-weight: 500; letter-spacing: -0.02em"
         >
           {{ product.name }}
         </h1>
         <p
           v-if="product.shortDescription"
-          class="mt-5 max-w-[520px] font-sans text-[18px] leading-[1.7] text-brun-cacao-2"
+          class="mt-5 max-w-[520px] font-sans text-[18px] leading-[1.7] text-cacao-2"
         >
           {{ product.shortDescription }}
         </p>
 
         <!-- Variantes -->
         <div v-if="product.variants.length > 0" class="mt-8 border-t pt-6" style="border-color: var(--cacao-a12)">
-          <span class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2">Format</span>
+          <span class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2">Format</span>
           <div class="mt-4 flex flex-wrap gap-3">
             <button
               v-for="variant in product.variants"
@@ -167,8 +205,8 @@ function addToCart() {
               class="border px-4 py-3 font-sans text-[13px] transition-all duration-180 disabled:cursor-not-allowed disabled:opacity-40"
               :class="
                 selectedVariantId === variant.id
-                  ? 'border-brun-cacao bg-brun-cacao text-ivoire'
-                  : 'border-brun-cacao text-brun-cacao'
+                  ? 'border-cacao bg-cacao text-ivoire'
+                  : 'border-cacao text-cacao'
               "
               @click="selectedVariantId = variant.id"
             >
@@ -181,19 +219,19 @@ function addToCart() {
         <!-- Quantité + panier -->
         <div class="mt-8 border-t pt-6" style="border-color: var(--cacao-a12)">
           <div class="flex items-center gap-5">
-            <span class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2">Quantité</span>
-            <div class="flex items-center border border-brun-cacao">
+            <span class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2">Quantité</span>
+            <div class="flex items-center border border-cacao">
               <button
                 type="button"
-                class="flex h-11 w-11 items-center justify-center text-brun-cacao"
+                class="flex h-11 w-11 items-center justify-center text-cacao"
                 @click="quantity = Math.max(1, quantity - 1)"
               >
                 −
               </button>
-              <span class="min-w-10 px-2 text-center font-sans text-[13px] tabular-nums text-brun-cacao">{{ quantity }}</span>
+              <span class="min-w-10 px-2 text-center font-sans text-[13px] tabular-nums text-cacao">{{ quantity }}</span>
               <button
                 type="button"
-                class="flex h-11 w-11 items-center justify-center text-brun-cacao"
+                class="flex h-11 w-11 items-center justify-center text-cacao"
                 @click="quantity += 1"
               >
                 +
@@ -205,14 +243,14 @@ function addToCart() {
             <button
               type="button"
               :disabled="selectedVariant?.stockStatus === 'out_of_stock'"
-              class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40"
+              class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40"
               @click="addToCart"
             >
               Ajouter au panier — {{ formatPrice(unitTotal) }}
             </button>
             <button
               type="button"
-              class="border border-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-brun-cacao transition-all duration-180 hover:bg-brun-cacao hover:text-ivoire active:translate-y-px"
+              class="border border-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire active:translate-y-px"
               @click="router.push('/panier')"
             >
               Voir le panier
@@ -232,19 +270,19 @@ function addToCart() {
             <button
               type="button"
               class="border-b pb-1 font-sans text-[11px] uppercase tracking-[0.22em]"
-              :class="tab === 'composition' ? 'border-brun-cacao text-brun-cacao' : 'border-transparent text-brun-cacao-3'"
+              :class="tab === 'composition' ? 'border-cacao text-cacao' : 'border-transparent text-cacao-3'"
               @click="tab = 'composition'"
             >Composition</button>
             <button
               type="button"
               class="border-b pb-1 font-sans text-[11px] uppercase tracking-[0.22em]"
-              :class="tab === 'degustation' ? 'border-brun-cacao text-brun-cacao' : 'border-transparent text-brun-cacao-3'"
+              :class="tab === 'degustation' ? 'border-cacao text-cacao' : 'border-transparent text-cacao-3'"
               @click="tab = 'degustation'"
             >Dégustation</button>
             <button
               type="button"
               class="border-b pb-1 font-sans text-[11px] uppercase tracking-[0.22em]"
-              :class="tab === 'conservation' ? 'border-brun-cacao text-brun-cacao' : 'border-transparent text-brun-cacao-3'"
+              :class="tab === 'conservation' ? 'border-cacao text-cacao' : 'border-transparent text-cacao-3'"
               @click="tab = 'conservation'"
             >Conservation</button>
           </div>
@@ -254,22 +292,22 @@ function addToCart() {
               <li
                 v-for="(item, index) in compositionItems"
                 :key="item"
-                class="flex items-baseline justify-between border-b py-3 font-sans text-[14px] text-brun-cacao"
+                class="flex items-baseline justify-between border-b py-3 font-sans text-[14px] text-cacao"
                 style="border-color: var(--cacao-a08)"
               >
                 <span>{{ item }}</span>
-                <span class="text-brun-cacao-3">0{{ index + 1 }}</span>
+                <span class="text-cacao-3">0{{ index + 1 }}</span>
               </li>
             </ul>
-            <p v-else-if="tab === 'composition'" class="font-sans text-[15px] leading-[1.8] text-brun-cacao-2">
+            <p v-else-if="tab === 'composition'" class="font-sans text-[15px] leading-[1.8] text-cacao-2">
               Composition non renseignée.
             </p>
 
-            <p v-else-if="tab === 'degustation'" class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-brun-cacao-2">
+            <p v-else-if="tab === 'degustation'" class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-cacao-2">
               {{ product.description ?? product.shortDescription ?? 'Notes de dégustation à venir.' }}
             </p>
 
-            <p v-else class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-brun-cacao-2">
+            <p v-else class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-cacao-2">
               {{ product.allergens ?? 'Informations de conservation à venir.' }}
             </p>
           </div>
@@ -282,12 +320,12 @@ function addToCart() {
       <div class="mx-auto max-w-[760px] text-center">
         <span class="ci-eyebrow">L'histoire</span>
         <h2
-          class="mt-5 font-serif text-brun-cacao"
+          class="mt-5 font-serif text-cacao"
           style="font-size: clamp(32px, 4vw, 56px); line-height: 1.05; font-style: italic; font-weight: 500"
         >
           « {{ product.name }} »
         </h2>
-        <p class="mt-6 font-sans text-[17px] leading-[1.8] text-brun-cacao-2">
+        <p class="mt-6 font-sans text-[17px] leading-[1.8] text-cacao-2">
           {{ product.description }}
         </p>
       </div>
@@ -298,7 +336,7 @@ function addToCart() {
       <div class="mb-8">
         <span class="ci-eyebrow">Aussi dans la maison</span>
         <h2
-          class="mt-4 font-serif text-brun-cacao"
+          class="mt-4 font-serif text-cacao"
           style="font-size: clamp(28px, 4vw, 48px); line-height: 1; font-weight: 500"
         >
           D'autres carrés.

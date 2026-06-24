@@ -25,6 +25,11 @@ export const envValidationSchema = Joi.object({
   MAIL_FROM: Joi.string().optional().allow(''),
 
   FRONTEND_URL: Joi.string().optional().allow(''),
+  CORS_ORIGIN: Joi.string().when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().required(),
+    otherwise: Joi.string().optional().allow(''),
+  }),
   ADMIN_EMAIL: Joi.string().email().optional(),
   ADMIN_PASSWORD: Joi.string().optional().allow(''),
 })

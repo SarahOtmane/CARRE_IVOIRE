@@ -45,7 +45,7 @@ export class OrderItem extends Model<OrderItem> {
   declare variant: ProductVariant | null
 
   @AllowNull(false)
-  @Column(DataType.INTEGER)
+  @Column(DataType.INTEGER.UNSIGNED)
   declare quantity: number
 
   @AllowNull(false)

@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useNewsletter } from "@carre-ivoire/composables";
 
 const router = useRouter();
 const email = ref("");
+const { isLoading: isSubscribing, subscribe } = useNewsletter();
+
+async function handleNewsletterSubmit() {
+  if (!email.value.trim()) return;
+  await subscribe(email.value.trim());
+  email.value = "";
+}
 
 const cols = [
   {
@@ -41,7 +49,7 @@ const cols = [
 </script>
 
 <template>
-  <footer class="bg-brun-cacao px-5 pb-12 pt-24 text-ivoire lg:px-[104px]">
+  <footer class="bg-cacao px-5 pb-12 pt-24 text-ivoire lg:px-[104px]">
     <div
       class="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))_minmax(0,1.5fr)]"
     >
@@ -81,16 +89,23 @@ const cols = [
         >
           Une fois par mois.<br />Rien de plus.
         </p>
-        <div class="flex" style="border-bottom: 1px solid var(--ivoire-a40)">
+        <form
+          class="flex"
+          style="border-bottom: 1px solid var(--ivoire-a40)"
+          @submit.prevent="handleNewsletterSubmit"
+        >
           <input
             v-model="email"
             type="email"
+            required
             placeholder="vous@maison.fr"
             class="flex-1 bg-transparent py-2 font-sans text-[13px] text-ivoire placeholder-ivoire placeholder-opacity-40 outline-none"
           />
           <button
-            class="flex shrink-0 cursor-pointer items-center py-2 text-ivoire opacity-70 transition-opacity duration-180 hover:opacity-100"
+            type="submit"
+            class="flex shrink-0 cursor-pointer items-center py-2 text-ivoire opacity-70 transition-opacity duration-180 hover:opacity-100 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="S'inscrire"
+            :disabled="isSubscribing"
           >
             <svg
               width="16"
@@ -106,7 +121,7 @@ const cols = [
               <polyline points="10,3 15,8 10,13" />
             </svg>
           </button>
-        </div>
+        </form>
       </div>
     </div>
 

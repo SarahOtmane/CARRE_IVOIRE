@@ -31,7 +31,7 @@ const badgeClasses = computed(() => {
     case 'error':
       return 'border-red-600 text-red-600 bg-red-50'
     default:
-      return 'border-brun-cacao-2 text-brun-cacao-2 bg-beige-doux'
+      return 'border-cacao-2 text-cacao-2 bg-beige-doux'
   }
 })
 </script>

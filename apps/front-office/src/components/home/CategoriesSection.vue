@@ -47,18 +47,18 @@ const categories = computed(() =>
       <div class="max-w-[620px]">
         <span class="ci-eyebrow">01 — La boutique</span>
         <h2
-          class="mt-4 font-serif font-medium text-brun-cacao"
+          class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4.5vw, 64px); line-height: 1; letter-spacing: -0.01em"
         >
           Neuf familles,<br/>
-          <em class="text-brun-cacao-2">une même obsession.</em>
+          <em class="text-cacao-2">une même obsession.</em>
         </h2>
       </div>
       <div class="flex flex-col items-end gap-3">
-        <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-brun-cacao-3">— I / IV</span>
+        <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-cacao-3">— I / IV</span>
         <RouterLink
           to="/boutique"
-          class="border-b border-brun-cacao pb-0.5 font-sans text-[13px] text-brun-cacao"
+          class="border-b border-cacao pb-0.5 font-sans text-[13px] text-cacao"
         >
           Voir la boutique →
         </RouterLink>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
-import { useCartStore } from "@/stores/cart.store";
+import { useCartStore } from "@carre-ivoire/stores";
+import { useCheckout } from "@carre-ivoire/composables";
+import type { ShippingAddress } from "@carre-ivoire/types";
 import CheckoutForm from "@/components/checkout/CheckoutForm.vue";
 import StripePaymentForm from "@/components/checkout/StripePaymentForm.vue";
 
@@ -21,50 +23,58 @@ type ShippingPayload = {
 
 const router = useRouter();
 const cartStore = useCartStore();
+const { submitOrder } = useCheckout();
 
 const step = ref<"livraison" | "paiement">("livraison");
 const shipping = ref<ShippingPayload | null>(null);
-const processing = ref(false);
 
 const shippingFee = computed(() => shipping.value?.deliveryPrice ?? 0);
 const grandTotal = computed(() => cartStore.total + shippingFee.value);
-
-const orderNumber = computed(() => {
-  const year = new Date().getFullYear();
-  const sequence = Math.floor(1000 + Math.random() * 9000);
-  return `CI-${year}-${sequence}`;
-});
 
 function handleShippingSubmit(payload: ShippingPayload) {
   shipping.value = payload;
   step.value = "paiement";
 }
 
-function handlePaymentSubmit() {
+async function handlePaymentSubmit() {
   if (!shipping.value || cartStore.items.length === 0) return;
 
-  processing.value = true;
+  const shippingAddress: ShippingAddress = {
+    firstName: shipping.value.firstName,
+    lastName: shipping.value.lastName,
+    line1: shipping.value.address,
+    postalCode: shipping.value.postalCode,
+    city: shipping.value.city,
+    country: shipping.value.country,
+  };
 
-  globalThis.setTimeout(() => {
+  try {
+    const { orderId, totalAmount } = await submitOrder(
+      cartStore.items,
+      shippingAddress,
+    );
+
     globalThis.sessionStorage.setItem(
       "ci:last-checkout",
       JSON.stringify({
-        orderNumber: orderNumber.value,
-        total: grandTotal.value,
+        orderNumber: `#${orderId}`,
+        total: totalAmount / 100,
         shipping: shipping.value,
         items: cartStore.items,
       }),
     );
+
     cartStore.clearCart();
-    processing.value = false;
     router.replace({
       name: "checkout-confirmation",
       query: {
-        order: orderNumber.value,
-        total: grandTotal.value.toFixed(2),
+        order: `#${orderId}`,
+        total: (totalAmount / 100).toFixed(2),
       },
     });
-  }, 900);
+  } catch {
+    // Erreurs affichées via useApi (notification) ou stripeError dans StripePaymentForm
+  }
 }
 </script>
 
@@ -73,7 +83,7 @@ function handlePaymentSubmit() {
     <section class="px-5 lg:px-[104px]">
       <span class="ci-eyebrow">Tunnel de commande</span>
       <h1
-        class="mt-4 font-serif text-brun-cacao"
+        class="mt-4 font-serif text-cacao"
         style="
           font-size: clamp(44px, 7vw, 96px);
           line-height: 0.95;
@@ -83,7 +93,7 @@ function handlePaymentSubmit() {
         Votre commande.
       </h1>
       <p
-        class="mt-6 max-w-[640px] font-sans text-[16px] leading-[1.7] text-brun-cacao-2"
+        class="mt-6 max-w-[640px] font-sans text-[16px] leading-[1.7] text-cacao-2"
       >
         Livraison, paiement, confirmation. Le trajet reste court.
       </p>
@@ -102,17 +112,17 @@ function handlePaymentSubmit() {
             :class="step === 'livraison' ? 'opacity-100' : 'opacity-50'"
           >
             <div
-              class="flex h-8 w-8 items-center justify-center border border-brun-cacao font-serif text-[14px]"
+              class="flex h-8 w-8 items-center justify-center border border-cacao font-serif text-[14px]"
               :class="
                 step === 'livraison'
-                  ? 'bg-brun-cacao text-ivoire'
-                  : 'bg-transparent text-brun-cacao'
+                  ? 'bg-cacao text-ivoire'
+                  : 'bg-transparent text-cacao'
               "
             >
               1
             </div>
             <span
-              class="font-sans text-[11px] uppercase tracking-[0.22em] text-brun-cacao"
+              class="font-sans text-[11px] uppercase tracking-[0.22em] text-cacao"
               >Livraison</span
             >
           </div>
@@ -121,17 +131,17 @@ function handlePaymentSubmit() {
             :class="step === 'paiement' ? 'opacity-100' : 'opacity-50'"
           >
             <div
-              class="flex h-8 w-8 items-center justify-center border border-brun-cacao font-serif text-[14px]"
+              class="flex h-8 w-8 items-center justify-center border border-cacao font-serif text-[14px]"
               :class="
                 step === 'paiement'
-                  ? 'bg-brun-cacao text-ivoire'
-                  : 'bg-transparent text-brun-cacao'
+                  ? 'bg-cacao text-ivoire'
+                  : 'bg-transparent text-cacao'
               "
             >
               2
             </div>
             <span
-              class="font-sans text-[11px] uppercase tracking-[0.22em] text-brun-cacao"
+              class="font-sans text-[11px] uppercase tracking-[0.22em] text-cacao"
               >Paiement</span
             >
           </div>
@@ -142,11 +152,11 @@ function handlePaymentSubmit() {
           class="border-t pt-8"
           style="border-color: var(--cacao-a12)"
         >
-          <p class="font-serif text-[22px] italic text-brun-cacao-2">
+          <p class="font-serif text-[22px] italic text-cacao-2">
             Votre coffret est vide.
           </p>
           <button
-            class="mt-6 border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire"
+            class="mt-6 border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire"
             @click="router.push('/boutique')"
           >
             Retour à la boutique
@@ -161,7 +171,6 @@ function handlePaymentSubmit() {
         <StripePaymentForm
           v-else
           :total="grandTotal"
-          :processing="processing"
           @pay="handlePaymentSubmit"
         />
       </div>
@@ -181,12 +190,12 @@ function handlePaymentSubmit() {
             :key="`${item.productId}-${item.variantId ?? 'default'}`"
             class="flex justify-between gap-4 font-sans text-[13px]"
           >
-            <span class="text-brun-cacao-2">
+            <span class="text-cacao-2">
               {{ item.name }}
-              <span class="text-brun-cacao-3">× {{ item.quantity }}</span>
+              <span class="text-cacao-3">× {{ item.quantity }}</span>
             </span>
             <span
-              class="text-brun-cacao"
+              class="text-cacao"
               style="font-variant-numeric: tabular-nums"
             >
               {{ (item.price * item.quantity).toFixed(2).replace(".", ",") }} €
@@ -196,17 +205,17 @@ function handlePaymentSubmit() {
 
         <div class="space-y-3 pt-5">
           <div class="flex justify-between font-sans text-[13px]">
-            <span class="text-brun-cacao-2">Sous-total</span>
+            <span class="text-cacao-2">Sous-total</span>
             <span
-              class="text-brun-cacao"
+              class="text-cacao"
               style="font-variant-numeric: tabular-nums"
               >{{ cartStore.total.toFixed(2).replace(".", ",") }} €</span
             >
           </div>
           <div class="flex justify-between font-sans text-[13px]">
-            <span class="text-brun-cacao-2">Livraison</span>
+            <span class="text-cacao-2">Livraison</span>
             <span
-              class="text-brun-cacao"
+              class="text-cacao"
               style="font-variant-numeric: tabular-nums"
             >
               {{
@@ -217,7 +226,7 @@ function handlePaymentSubmit() {
             </span>
           </div>
           <div
-            class="flex justify-between border-t pt-3 font-serif text-[22px] font-medium text-brun-cacao"
+            class="flex justify-between border-t pt-3 font-serif text-[22px] font-medium text-cacao"
             style="border-color: var(--cacao-a12)"
           >
             <span>Total</span>
@@ -229,11 +238,11 @@ function handlePaymentSubmit() {
 
         <div class="mt-6 border-t pt-5" style="border-color: var(--cacao-a12)">
           <div
-            class="font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+            class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
           >
             Paiement sécurisé
           </div>
-          <p class="mt-3 font-sans text-[13px] leading-[1.7] text-brun-cacao-2">
+          <p class="mt-3 font-sans text-[13px] leading-[1.7] text-cacao-2">
             Le tunnel se termine sur une confirmation de commande et un
             récapitulatif complet.
           </p>

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { Sequelize } from 'sequelize-typescript'
+import { Op } from 'sequelize'
 import type { Transaction } from 'sequelize'
 import { ProductVariant } from './product-variant.model'
 import type { CreateVariantDto } from './dto/create-variant.dto'
@@ -20,8 +21,8 @@ export class ProductVariantsRepository {
     })
   }
 
-  async findById(id: number): Promise<ProductVariant | null> {
-    return this.db.findByPk(id)
+  async findById(id: number, t?: Transaction): Promise<ProductVariant | null> {
+    return this.db.findByPk(id, { transaction: t })
   }
 
   async create(productId: number, dto: CreateVariantDto): Promise<ProductVariant> {
@@ -63,5 +64,23 @@ export class ProductVariantsRepository {
       { stock: Sequelize.literal(`stock + ${Math.floor(Math.abs(quantity))}`) } as any,
       { where: { id: variantId }, transaction: t },
     )
+  }
+
+  async decrementStock(variantId: number, productId: number, quantity: number, t?: Transaction): Promise<number> {
+    const safeQuantity = Math.floor(Math.abs(quantity))
+    const [rowsAffected] = await this.db.update(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
+      { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
+      {
+        where: {
+          id: variantId,
+          productId,
+          stock: { [Op.gte]: quantity },
+          isActive: 1,
+        },
+        transaction: t,
+      },
+    )
+    return rowsAffected
   }
 }

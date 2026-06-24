@@ -29,12 +29,12 @@ function formatPrice(value: number) {
 
     <div class="flex flex-1 flex-col justify-between gap-4">
       <div>
-        <div class="font-serif text-[18px] font-medium text-brun-cacao">
+        <div class="font-serif text-[18px] font-medium text-cacao">
           {{ item.name }}
         </div>
         <div
           v-if="item.format"
-          class="mt-1 font-sans text-[11px] uppercase tracking-[0.18em] text-brun-cacao-2"
+          class="mt-1 font-sans text-[11px] uppercase tracking-[0.18em] text-cacao-2"
         >
           Format {{ item.format }}
         </div>
@@ -43,7 +43,7 @@ function formatPrice(value: number) {
       <div class="flex flex-wrap items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <button
-            class="flex h-8 w-8 items-center justify-center border border-brun-cacao font-sans text-[13px] text-brun-cacao"
+            class="flex h-8 w-8 items-center justify-center border border-cacao font-sans text-[13px] text-cacao"
             type="button"
             aria-label="Diminuer la quantité"
             @click="emit('decrement')"
@@ -51,12 +51,12 @@ function formatPrice(value: number) {
             −
           </button>
           <span
-            class="min-w-8 text-center font-sans text-[13px] tabular-nums text-brun-cacao"
+            class="min-w-8 text-center font-sans text-[13px] tabular-nums text-cacao"
           >
             {{ item.quantity }}
           </span>
           <button
-            class="flex h-8 w-8 items-center justify-center border border-brun-cacao font-sans text-[13px] text-brun-cacao"
+            class="flex h-8 w-8 items-center justify-center border border-cacao font-sans text-[13px] text-cacao"
             type="button"
             aria-label="Augmenter la quantité"
             @click="emit('increment')"
@@ -73,7 +73,7 @@ function formatPrice(value: number) {
             {{ formatPrice(item.price * item.quantity) }}
           </span>
           <button
-            class="border-b border-brun-cacao pb-px font-sans text-[11px] uppercase tracking-[0.12em] text-brun-cacao-2"
+            class="border-b border-cacao pb-px font-sans text-[11px] uppercase tracking-[0.12em] text-cacao-2"
             type="button"
             @click="emit('remove')"
           >

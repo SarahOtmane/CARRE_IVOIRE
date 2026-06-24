@@ -32,7 +32,7 @@ const engagements = [
     <div class="mb-20">
       <span class="ci-eyebrow">04 — Engagements</span>
       <h2
-        class="mt-4 font-serif font-medium text-brun-cacao"
+        class="mt-4 font-serif font-medium text-cacao"
         style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
       >
         Quatre principes,<br/>
@@ -45,15 +45,15 @@ const engagements = [
       <div
         v-for="e in engagements"
         :key="e.num"
-        class="border-t border-brun-cacao pt-5"
+        class="border-t border-cacao pt-5"
       >
         <div class="mb-4 font-sans text-[11px] uppercase tracking-[0.22em] text-dore">
           {{ e.num }}
         </div>
-        <h3 class="mb-3 font-serif text-2xl font-medium text-brun-cacao">
+        <h3 class="mb-3 font-serif text-2xl font-medium text-cacao">
           {{ e.title }}
         </h3>
-        <p class="font-sans text-sm leading-relaxed text-brun-cacao-2">
+        <p class="font-sans text-sm leading-relaxed text-cacao-2">
           {{ e.text }}
         </p>
       </div>

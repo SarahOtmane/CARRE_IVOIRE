@@ -22,23 +22,23 @@ const router = useRouter()
         <span class="ci-eyebrow">03 — Maison</span>
 
         <h2
-          class="mb-8 mt-4 font-serif font-medium text-brun-cacao"
+          class="mb-8 mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
         >
           Rue du Nil,<br/>
-          <em class="text-brun-cacao-2">depuis 2019.</em>
+          <em class="text-cacao-2">depuis 2019.</em>
         </h2>
 
-        <p class="mb-5 max-w-[480px] font-sans leading-relaxed text-brun-cacao-2" style="font-size: 18px; line-height: 1.7">
+        <p class="mb-5 max-w-[480px] font-sans leading-relaxed text-cacao-2" style="font-size: 18px; line-height: 1.7">
           Nous choisissons les fèves. Nous les torréfions. Nous les broyons. Nous faisons le chocolat, en petite quantité, chaque semaine.
         </p>
 
-        <p class="mb-10 max-w-[480px] font-sans text-brun-cacao-2" style="font-size: 18px; line-height: 1.7">
+        <p class="mb-10 max-w-[480px] font-sans text-cacao-2" style="font-size: 18px; line-height: 1.7">
           Deux ingrédients suffisent : la fève et le sucre. Tout le reste est dans la main.
         </p>
 
         <button
-          class="border border-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-brun-cacao transition-all duration-180 hover:bg-brun-cacao hover:text-ivoire active:translate-y-px"
+          class="border border-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire active:translate-y-px"
           @click="router.push('/histoire')"
         >
           Visiter l'atelier

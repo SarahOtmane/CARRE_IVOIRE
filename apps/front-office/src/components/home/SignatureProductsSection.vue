@@ -17,14 +17,14 @@ const { result } = useProducts({ limit: 3 })
       <div>
         <span class="ci-eyebrow-accent">02 — Signature</span>
         <h2
-          class="mt-4 font-serif font-medium text-brun-cacao"
+          class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
         >
           Nos carrés<br/>
           <em>de mars.</em>
         </h2>
       </div>
-      <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-brun-cacao-3">— II</span>
+      <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-cacao-3">— II</span>
     </div>
 
     <!-- Grille produits -->
@@ -39,7 +39,7 @@ const { result } = useProducts({ limit: 3 })
     <!-- Lien vers boutique -->
     <div class="mt-16 text-center">
       <button
-        class="border border-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-brun-cacao transition-all duration-180 hover:bg-brun-cacao hover:text-ivoire active:translate-y-px"
+        class="border border-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire active:translate-y-px"
         @click="router.push('/boutique')"
       >
         Voir toute la boutique
