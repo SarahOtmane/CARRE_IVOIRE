@@ -2,6 +2,9 @@
   "name": "@carre-ivoire/api",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "build": "nest build",
     "start": "node dist/main",
@@ -11,7 +14,9 @@
     "db:seed:undo": "sequelize-cli db:seed:undo",
     "db:seed:undo:all": "sequelize-cli db:seed:undo:all",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
-    "test": "jest"
+    "test": "jest",
+    "pretest:e2e": "NODE_ENV=test DB_NAME=carre_ivoire_test jest --config ./test/jest-e2e.json --runInBand --testPathPattern=_setup-db",
+    "test:e2e": "NODE_ENV=test DB_NAME=carre_ivoire_test jest --config ./test/jest-e2e.json --testPathIgnorePatterns=_setup-db --runInBand"
   },
   "dependencies": {
     "@carre-ivoire/types": "*",
