@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import { useAuth, useFavorites, useProduct, useProducts } from '@carre-ivoire/composables'
 import { useCartStore } from '@carre-ivoire/stores'
+import { Button, Badge } from '@carre-ivoire/ui'
 import ProductCard from '@/components/product/ProductCard.vue'
 
 const route = useRoute()
@@ -121,12 +122,9 @@ async function toggleFavorite() {
     >
       Cette fiche produit n'existe pas.
     </h1>
-    <button
-      class="mt-8 border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire"
-      @click="router.push('/boutique')"
-    >
+    <Button class="mt-8" @click="router.push('/boutique')">
       Retour à la boutique
-    </button>
+    </Button>
   </div>
 
   <!-- Fiche produit -->
@@ -158,11 +156,7 @@ async function toggleFavorite() {
       <!-- Infos -->
       <div>
         <div v-if="product.badge" class="mb-5">
-          <span
-            class="inline-block border px-3 py-1 font-sans text-[9px] uppercase tracking-[0.22em] border-[var(--cacao-a24)] bg-papier text-cacao"
-          >
-            {{ product.badge }}
-          </span>
+          <Badge variant="accent">{{ product.badge }}</Badge>
         </div>
 
         <div class="flex items-start justify-between gap-4">
@@ -240,21 +234,20 @@ async function toggleFavorite() {
           </div>
 
           <div class="mt-8 flex flex-wrap items-center gap-4">
-            <button
-              type="button"
+            <Button
+              size="lg"
               :disabled="selectedVariant?.stockStatus === 'out_of_stock'"
-              class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-40"
               @click="addToCart"
             >
               Ajouter au panier — {{ formatPrice(unitTotal) }}
-            </button>
-            <button
-              type="button"
-              class="border border-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire active:translate-y-px"
+            </Button>
+            <Button
+              size="lg"
+              variant="secondary"
               @click="router.push('/panier')"
             >
               Voir le panier
-            </button>
+            </Button>
             <span
               v-if="added"
               class="font-sans text-[12px] uppercase tracking-[0.14em] text-dore"

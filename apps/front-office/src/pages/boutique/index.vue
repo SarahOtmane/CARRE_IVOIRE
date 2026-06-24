@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useProducts, useCategories } from '@carre-ivoire/composables'
+import { Button } from '@carre-ivoire/ui'
 import ProductCard from '@/components/product/ProductCard.vue'
 
 useHead({
@@ -167,12 +168,9 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
       <p class="mx-auto mb-8 mt-4 max-w-[420px] font-sans text-[15px] leading-relaxed text-cacao-2">
         Inscrivez-vous à la lettre pour être prévenu de sa sortie.
       </p>
-      <button
-        class="pb-0.5 font-sans text-[13px] text-cacao"
-        style="border-bottom: 1px solid var(--brun-cacao)"
-      >
-        Me prévenir →
-      </button>
+      <Button variant="secondary" size="sm">
+        Me prévenir
+      </Button>
     </div>
 
   </div>

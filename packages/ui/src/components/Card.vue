@@ -16,6 +16,6 @@ withDefaults(defineProps<Props>(), {
 
 <style scoped>
 .card-border {
-  border-color: rgba(58, 31, 20, 0.12);
+  border-color: var(--cacao-a12);
 }
 </style>
