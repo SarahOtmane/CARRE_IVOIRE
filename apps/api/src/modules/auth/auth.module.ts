@@ -5,6 +5,7 @@ import { PassportModule } from '@nestjs/passport'
 import { UsersModule } from '@/modules/users/users.module'
 import { AuthService } from './auth.service'
 import { AuthController } from './auth.controller'
+import { LoginAttemptsService } from './login-attempts.service'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { AdminGuard } from './guards/admin.guard'
@@ -26,7 +27,7 @@ import { AdminGuard } from './guards/admin.guard'
     }),
     UsersModule,
   ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard, AdminGuard],
+  providers: [AuthService, LoginAttemptsService, JwtStrategy, JwtAuthGuard, AdminGuard],
   controllers: [AuthController],
   exports: [JwtAuthGuard, AdminGuard, AuthService],
 })

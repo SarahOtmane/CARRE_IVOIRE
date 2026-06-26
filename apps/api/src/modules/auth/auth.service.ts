@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { LoginAttemptsService } from './login-attempts.service'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
@@ -23,6 +24,7 @@ export class AuthService {
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly loginAttempts: LoginAttemptsService,
   ) { }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto & TokenPair> {
@@ -46,15 +48,25 @@ export class AuthService {
   }
 
   async login(dto: LoginDto): Promise<AuthResponseDto & TokenPair> {
+    // Vérifier le blocage par email avant toute requête DB
+    this.loginAttempts.check(dto.email)
+
     // Même message d'erreur pour email inconnu ou mot de passe incorrect (anti-énumération)
     const INVALID_CREDENTIALS = () => throwApiError(ErrorCodes.INVALID_CREDENTIALS, 'Identifiants invalides')
 
     const user = await this.usersRepository.findByEmail(dto.email)
-    if (!user || !user.is_active) INVALID_CREDENTIALS()
+    if (!user || !user.is_active) {
+      this.loginAttempts.recordFailure(dto.email)
+      INVALID_CREDENTIALS()
+    }
 
     const passwordValid = await bcrypt.compare(dto.password, user!.password_hash)
-    if (!passwordValid) INVALID_CREDENTIALS()
+    if (!passwordValid) {
+      this.loginAttempts.recordFailure(dto.email)
+      INVALID_CREDENTIALS()
+    }
 
+    this.loginAttempts.clearAttempts(dto.email)
     const tokens = this.generateTokens(user!)
     return { ...tokens, user: this.toAuthUserDto(user!) }
   }
