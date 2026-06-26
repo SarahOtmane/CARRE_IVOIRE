@@ -1,24 +1,62 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useAdminTaxRates } from "@carre-ivoire/composables";
+import { ref, onMounted } from "vue";
+import { useAdminTaxRates, useApi } from "@carre-ivoire/composables";
+
+const api = useApi();
 
 const settings = ref({
-  currency: "EUR",
   shippingFlat: 8,
   shippingFreeFrom: 70,
-  bccEmail: "admin@carreivoire.fr",
+  bccEmail: "",
   address: "4 rue du Nil, 75002 Paris",
-  maker: "Carré Ivoire",
 });
 
+const isLoading = ref(false);
+const isSaving = ref(false);
 const saved = ref(false);
+const saveError = ref<string | null>(null);
 let saveTimeout: ReturnType<typeof setTimeout> | undefined;
 
-function save() {
-  saved.value = true;
-  if (saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => { saved.value = false; }, 2400);
+async function loadSettings() {
+  isLoading.value = true;
+  try {
+    const res = await api.get<{ success: boolean; data: { shippingFlat: number; shippingFreeFrom: number; bccEmail: string; address: string } }>('/settings');
+    const data = res.data.data;
+    settings.value = {
+      shippingFlat: data.shippingFlat / 100,
+      shippingFreeFrom: data.shippingFreeFrom / 100,
+      bccEmail: data.bccEmail,
+      address: data.address,
+    };
+  } catch {
+    // silencieux — les valeurs par défaut restent affichées
+  } finally {
+    isLoading.value = false;
+  }
 }
+
+async function save() {
+  if (isSaving.value) return;
+  isSaving.value = true;
+  saveError.value = null;
+  try {
+    await api.patch('/settings', {
+      shippingFlat: Math.round(settings.value.shippingFlat * 100),
+      shippingFreeFrom: Math.round(settings.value.shippingFreeFrom * 100),
+      bccEmail: settings.value.bccEmail || undefined,
+      address: settings.value.address || undefined,
+    });
+    saved.value = true;
+    if (saveTimeout) clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => { saved.value = false; }, 2400);
+  } catch {
+    saveError.value = "Erreur lors de la sauvegarde.";
+  } finally {
+    isSaving.value = false;
+  }
+}
+
+onMounted(loadSettings);
 
 // TVA
 const { taxRates, isLoading: tvaLoading, create: createTva, update: updateTva, remove: removeTva } = useAdminTaxRates();
@@ -128,15 +166,19 @@ async function deleteTva(id: number, label: string) {
         <div class="flex items-center gap-6 pt-2">
           <button
             type="submit"
-            class="border border-cacao bg-cacao px-7 py-4 font-body text-[11px] uppercase tracking-[0.16em] text-ivoire"
+            :disabled="isSaving"
+            class="border border-cacao bg-cacao px-7 py-4 font-body text-[11px] uppercase tracking-[0.16em] text-ivoire disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Enregistrer
+            {{ isSaving ? 'Enregistrement…' : 'Enregistrer' }}
           </button>
           <span
             v-if="saved"
             class="font-body text-[11px] uppercase tracking-[0.14em] text-dore"
           >
             Paramètres enregistrés
+          </span>
+          <span v-if="saveError" class="font-body text-[11px] text-red-700">
+            {{ saveError }}
           </span>
         </div>
       </div>
@@ -155,8 +197,8 @@ async function deleteTva(id: number, label: string) {
             </div>
           </div>
         </div>
-        <p class="font-body text-[11px] italic text-cacao/45">
-          Ces paramètres seront reliés à l'API dans une prochaine version.
+        <p v-if="isLoading" class="font-body text-[11px] italic text-cacao/45">
+          Chargement des paramètres…
         </p>
       </aside>
     </form>
