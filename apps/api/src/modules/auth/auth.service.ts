@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { LoginAttemptsService } from './login-attempts.service'
+import { RefreshTokensRepository } from './refresh-tokens.repository'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
@@ -25,6 +26,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly loginAttempts: LoginAttemptsService,
+    private readonly refreshTokensRepository: RefreshTokensRepository,
   ) { }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto & TokenPair> {
@@ -44,6 +46,7 @@ export class AuthService {
     })
 
     const tokens = this.generateTokens(user)
+    await this.storeRefreshToken(user.id, tokens.refreshToken)
     return { ...tokens, user: this.toAuthUserDto(user) }
   }
 
@@ -68,26 +71,49 @@ export class AuthService {
 
     this.loginAttempts.clearAttempts(dto.email)
     const tokens = this.generateTokens(user!)
+    await this.storeRefreshToken(user!.id, tokens.refreshToken)
     return { ...tokens, user: this.toAuthUserDto(user!) }
   }
 
-  async refresh(refreshToken: string | undefined): Promise<{ accessToken: string }> {
+  async refresh(refreshToken: string | undefined): Promise<{ accessToken: string; refreshToken: string }> {
     if (!refreshToken) {
       throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token manquant')
     }
+
+    // 1. Vérifier la signature JWT
+    let payload: JwtPayload
     try {
-      const payload = this.jwtService.verify<JwtPayload>(refreshToken, {
+      payload = this.jwtService.verify<JwtPayload>(refreshToken!, {
         secret: process.env.REFRESH_TOKEN_SECRET,
       })
-      const user = await this.usersRepository.findById(payload.sub)
-      if (!user || !user.is_active) {
-        throwApiError(ErrorCodes.UNAUTHORIZED, 'Token invalide')
-      }
-      const accessToken = this.signAccessToken(user)
-      return { accessToken }
     } catch {
       throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token invalide ou expiré')
     }
+
+    // 2. Vérifier que le token est connu et non révoqué en base
+    const stored = await this.refreshTokensRepository.findValid(refreshToken!)
+    if (!stored) {
+      // Token inconnu ou déjà révoqué → révoquer tous les tokens de l'utilisateur (détection de replay)
+      await this.refreshTokensRepository.revokeAllForUser(payload!.sub)
+      throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token révoqué')
+    }
+
+    const user = await this.usersRepository.findById(payload!.sub)
+    if (!user || !user.is_active) {
+      throwApiError(ErrorCodes.UNAUTHORIZED, 'Utilisateur introuvable')
+    }
+
+    // 3. Rotation : révoquer l'ancien, émettre un nouveau
+    await this.refreshTokensRepository.revoke(refreshToken!)
+    const newTokens = this.generateTokens(user!)
+    await this.storeRefreshToken(user!.id, newTokens.refreshToken)
+
+    return { accessToken: newTokens.accessToken, refreshToken: newTokens.refreshToken }
+  }
+
+  async revokeRefreshToken(refreshToken: string | undefined): Promise<void> {
+    if (!refreshToken) return
+    await this.refreshTokensRepository.revoke(refreshToken)
   }
 
   async forgotPassword(email: string): Promise<void> {
@@ -118,6 +144,11 @@ export class AuthService {
 
     const newHash = await bcrypt.hash(newPassword, 12)
     await this.usersRepository.clearResetToken(user!.id, newHash)
+  }
+
+  private async storeRefreshToken(userId: number, token: string): Promise<void> {
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 jours
+    await this.refreshTokensRepository.store(userId, token, expiresAt)
   }
 
   private generateTokens(user: User): TokenPair {

@@ -58,15 +58,25 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refresh(@Req() req: Request) {
-    const refreshToken = req.cookies?.refresh_token as string | undefined
-    return this.authService.refresh(refreshToken)
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const oldToken = req.cookies?.refresh_token as string | undefined
+    const { accessToken, refreshToken } = await this.authService.refresh(oldToken)
+    res.cookie('refresh_token', refreshToken, {
+      ...REFRESH_COOKIE_OPTIONS,
+      secure: process.env.NODE_ENV === 'production',
+    })
+    return { accessToken }
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
-  logout(@Res({ passthrough: true }) res: Response) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.refresh_token as string | undefined
+    await this.authService.revokeRefreshToken(refreshToken)
     res.clearCookie('refresh_token')
     return { message: 'Déconnecté avec succès' }
   }
