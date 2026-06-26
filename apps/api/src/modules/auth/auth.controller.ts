@@ -8,26 +8,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { IsEmail, IsString, MinLength } from 'class-validator'
-
-class ForgotPasswordDto {
-  @IsEmail()
-  email: string
-}
-
-class ResetPasswordDto {
-  @IsString()
-  token: string
-
-  @IsString()
-  @MinLength(8)
-  newPassword: string
-}
 import type { Request, Response } from 'express'
 import { Throttle } from '@nestjs/throttler'
 import { AuthService } from './auth.service'
 import { RegisterDto } from './dto/register.dto'
 import { LoginDto } from './dto/login.dto'
+import { ForgotPasswordDto } from './dto/forgot-password.dto'
+import { ResetPasswordDto } from './dto/reset-password.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 const REFRESH_COOKIE_OPTIONS = {
@@ -71,15 +58,25 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  refresh(@Req() req: Request) {
-    const refreshToken = req.cookies?.refresh_token as string | undefined
-    return this.authService.refresh(refreshToken)
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const oldToken = req.cookies?.refresh_token as string | undefined
+    const { accessToken, refreshToken } = await this.authService.refresh(oldToken)
+    res.cookie('refresh_token', refreshToken, {
+      ...REFRESH_COOKIE_OPTIONS,
+      secure: process.env.NODE_ENV === 'production',
+    })
+    return { accessToken }
   }
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
-  logout(@Res({ passthrough: true }) res: Response) {
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const refreshToken = req.cookies?.refresh_token as string | undefined
+    await this.authService.revokeRefreshToken(refreshToken)
     res.clearCookie('refresh_token')
     return { message: 'Déconnecté avec succès' }
   }

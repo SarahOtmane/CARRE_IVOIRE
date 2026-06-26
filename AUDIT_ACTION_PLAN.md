@@ -1,4 +1,5 @@
 # AUDIT TECHNIQUE — CARRÉ IVOIRE
+
 ## Plan d'action complet
 
 **Date :** 26 juin 2026 | **Branche :** `dev` | **Score global : 71/100**
@@ -9,21 +10,21 @@
 
 Le projet a une architecture backend solide (pattern Repository strict, transactions atomiques, idempotence Stripe) et un design system cohérent. Les problèmes critiques sont concentrés sur la couche frontend : des pages déconnectées de l'API, des frais de livraison absents du paiement réel, et l'absence de HTTPS. Ces points doivent être résolus avant tout déploiement en production.
 
-| Priorité | Nb points | Estimation |
-|---|---|---|
-| 🔴 Critique (bloquant fonctionnel) | 5 | ~14h |
-| 🟠 Important (avant production) | 8 | ~32h |
-| 🟡 Amélioration (prochainement) | 8 | ~28h |
-| 🟢 Optimisation (non bloquant) | 5 | ~16h |
-| **Total** | **26** | **~90h** |
+| Priorité                           | Nb points | Estimation | Avancement  |
+| ---------------------------------- | --------- | ---------- | ----------- |
+| 🔴 Critique (bloquant fonctionnel) | 5         | ~14h       | ✅ 5/5 fait |
+| 🟠 Important (avant production)    | 8         | ~32h       | ✅ 8/8 fait |
+| 🟡 Amélioration (prochainement)    | 8         | ~28h       | ✅ 8/8 fait |
+| 🟢 Optimisation (non bloquant)     | 5         | ~16h       | ✅ 5/5 fait |
+| **Total**                          | **26**    | **~90h**   |
 
 ---
 
-## 🔴 CRITIQUE — À corriger en priorité absolue
+## 🔴 CRITIQUE — À corriger en priorité absolue ✅ TERMINÉ
 
 ---
 
-### C1 — Page "Mes commandes" : données hardcodées
+### ✅ C1 — Page "Mes commandes" : données hardcodées
 
 **Fichier :** `apps/front-office/src/pages/compte/commandes/index.vue`  
 **Problème :** `const orders = [{ id: "CI-2026-0142", ... }]` — liste statique inchangeable.  
@@ -34,75 +35,50 @@ Le projet a une architecture backend solide (pattern Repository strict, transact
 
 1. Créer le composable `packages/composables/src/useUserOrders.ts` :
 
-```typescript
-// packages/composables/src/useUserOrders.ts
-import { ref } from 'vue'
-import { useApi } from './useApi'
-import type { Order } from '@carre-ivoire/types'
-
-export function useUserOrders() {
-  const api = useApi()
-  const orders = ref<Order[]>([])
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
-
-  async function fetchOrders() {
-    isLoading.value = true
-    error.value = null
-    try {
-      const res = await api.get<{ success: boolean; data: Order[] }>('/orders/me')
-      orders.value = res.data.data
-    } catch {
-      error.value = 'Impossible de charger vos commandes.'
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  return { orders, isLoading, error, fetchOrders }
-}
-```
-
 2. Exporter depuis `packages/composables/src/index.ts` : ajouter `export * from './useUserOrders'`
 
 3. Remplacer le contenu de `apps/front-office/src/pages/compte/commandes/index.vue` :
 
 ```vue
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import { useUserOrders } from '@carre-ivoire/composables'
+import { onMounted } from "vue";
+import { useUserOrders } from "@carre-ivoire/composables";
 
-const { orders, isLoading, error, fetchOrders } = useUserOrders()
+const { orders, isLoading, error, fetchOrders } = useUserOrders();
 
-onMounted(() => fetchOrders())
+onMounted(() => fetchOrders());
 
 function statusLabel(status: string) {
   const map: Record<string, string> = {
-    pending: 'En attente',
-    payment_pending: 'Paiement en cours',
-    confirmed: 'Confirmée',
-    processing: 'En préparation',
-    shipped: 'Expédiée',
-    delivered: 'Livrée',
-    cancelled: 'Annulée',
-    refunded: 'Remboursée',
-  }
-  return map[status] ?? status
+    pending: "En attente",
+    payment_pending: "Paiement en cours",
+    confirmed: "Confirmée",
+    processing: "En préparation",
+    shipped: "Expédiée",
+    delivered: "Livrée",
+    cancelled: "Annulée",
+    refunded: "Remboursée",
+  };
+  return map[status] ?? status;
 }
 
 function formatDate(iso: string) {
-  return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(iso))
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(iso));
 }
 
 function formatPrice(centimes: number) {
-  return `${(centimes / 100).toFixed(2).replace('.', ',')} €`
+  return `${(centimes / 100).toFixed(2).replace(".", ",")} €`;
 }
 </script>
 ```
 
 ---
 
-### C2 — Page "Mes informations" : bouton Enregistrer sans effet
+### ✅ C2 — Page "Mes informations" : bouton Enregistrer sans effet
 
 **Fichier :** `apps/front-office/src/pages/compte/informations.vue`  
 **Problème :** `function save() { /* Intégration API à brancher ici */ saved.value = true }` — aucune requête envoyée.  
@@ -116,29 +92,31 @@ function formatPrice(centimes: number) {
 2. Remplacer la fonction `save()` :
 
 ```typescript
-import { useApi } from '@carre-ivoire/composables'
-import { useAuthStore } from '@carre-ivoire/stores'
+import { useApi } from "@carre-ivoire/composables";
+import { useAuthStore } from "@carre-ivoire/stores";
 
-const api = useApi()
-const authStore = useAuthStore()
-const saveError = ref<string | null>(null)
+const api = useApi();
+const authStore = useAuthStore();
+const saveError = ref<string | null>(null);
 
 async function save() {
-  saveError.value = null
+  saveError.value = null;
   try {
-    const res = await api.patch('/users/me', {
+    const res = await api.patch("/users/me", {
       firstName: form.firstName,
       lastName: form.lastName,
       phone: form.phone,
-    })
+    });
     // Mettre à jour le store si le backend renvoie l'utilisateur mis à jour
     if (res.data?.data) {
-      authStore.setAuth(authStore.token!, res.data.data)
+      authStore.setAuth(authStore.token!, res.data.data);
     }
-    saved.value = true
-    setTimeout(() => { saved.value = false }, 2000)
+    saved.value = true;
+    setTimeout(() => {
+      saved.value = false;
+    }, 2000);
   } catch {
-    saveError.value = 'Une erreur est survenue. Veuillez réessayer.'
+    saveError.value = "Une erreur est survenue. Veuillez réessayer.";
   }
 }
 ```
@@ -147,7 +125,7 @@ async function save() {
 
 ---
 
-### C3 — Frais de livraison absents du montant Stripe
+### ✅ C3 — Frais de livraison absents du montant Stripe
 
 **Fichier backend :** `apps/api/src/modules/orders/dto/create-order.dto.ts` + `orders.service.ts`  
 **Fichier frontend :** `apps/front-office/src/pages/commande/index.vue`  
@@ -161,7 +139,7 @@ async function save() {
 
 ```typescript
 // apps/api/src/modules/orders/dto/create-order.dto.ts
-import { IsInt, Min, IsOptional } from 'class-validator'
+import { IsInt, Min, IsOptional } from "class-validator";
 
 export class CreateOrderDto {
   // ... champs existants ...
@@ -169,7 +147,7 @@ export class CreateOrderDto {
   @IsOptional()
   @IsInt()
   @Min(0)
-  shippingAmount?: number  // en centimes
+  shippingAmount?: number; // en centimes
 }
 ```
 
@@ -189,21 +167,21 @@ const totalAmount = itemsTotal + shippingAmount
 ```typescript
 // apps/front-office/src/pages/commande/index.vue
 // Dans submitOrder(), ajouter shippingAmount à la requête
-await api.post('/orders', {
-  items: cartStore.items.map(item => ({
+await api.post("/orders", {
+  items: cartStore.items.map((item) => ({
     productId: item.productId,
     variantId: item.variantId,
     quantity: item.quantity,
     format: item.format,
   })),
   shippingAddress,
-  shippingAmount: deliveryPrice * 100,  // en centimes
-})
+  shippingAmount: deliveryPrice * 100, // en centimes
+});
 ```
 
 ---
 
-### C4 — Absence de page d'inscription
+### ✅ C4 — Absence de page d'inscription
 
 **Problème :** `POST /auth/register` fonctionne mais aucune page frontend ne permet de créer un compte. Les nouveaux utilisateurs sont bloqués.  
 **Temps estimé :** 3h
@@ -214,31 +192,32 @@ await api.post('/orders', {
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useApi } from '@carre-ivoire/composables'
-import { useAuthStore } from '@carre-ivoire/stores'
-import { Button } from '@carre-ivoire/ui'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useApi } from "@carre-ivoire/composables";
+import { useAuthStore } from "@carre-ivoire/stores";
+import { Button } from "@carre-ivoire/ui";
 
-const router = useRouter()
-const api = useApi()
-const authStore = useAuthStore()
+const router = useRouter();
+const api = useApi();
+const authStore = useAuthStore();
 
-const form = ref({ firstName: '', lastName: '', email: '', password: '' })
-const error = ref<string | null>(null)
-const isLoading = ref(false)
+const form = ref({ firstName: "", lastName: "", email: "", password: "" });
+const error = ref<string | null>(null);
+const isLoading = ref(false);
 
 async function submit() {
-  isLoading.value = true
-  error.value = null
+  isLoading.value = true;
+  error.value = null;
   try {
-    const res = await api.post('/auth/register', form.value)
-    authStore.setAuth(res.data.data.token, res.data.data.user)
-    router.push('/compte/commandes')
+    const res = await api.post("/auth/register", form.value);
+    authStore.setAuth(res.data.data.token, res.data.data.user);
+    router.push("/compte/commandes");
   } catch (e: any) {
-    error.value = e.response?.data?.error?.message ?? 'Erreur lors de l\'inscription.'
+    error.value =
+      e.response?.data?.error?.message ?? "Erreur lors de l'inscription.";
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
 }
 </script>
@@ -254,7 +233,7 @@ async function submit() {
 
 ---
 
-### C5 — `useAdminProducts.fetchOne()` : route inexistante
+### ✅ C5 — `useAdminProducts.fetchOne()` : route inexistante
 
 **Fichier :** `packages/composables/src/useAdminProducts.ts`, ligne 23  
 **Problème :** `api.get('/products/by-id/${id}')` — cette route n'existe pas dans l'API. Le backend expose `GET /products/:slug` uniquement.  
@@ -277,6 +256,7 @@ async findById(@Param('id', ParseIntPipe) id: number) {
 ```
 
 Et dans `products.service.ts` :
+
 ```typescript
 async findById(id: number): Promise<Product> {
   const product = await this.productsRepository.findById(id)
@@ -287,11 +267,11 @@ async findById(id: number): Promise<Product> {
 
 ---
 
-## 🟠 IMPORTANT — Avant mise en production
+## 🟠 IMPORTANT — Avant mise en production ✅ TERMINÉ
 
 ---
 
-### I1 — HTTPS en production
+### ✅ I1 — HTTPS en production
 
 **Fichiers :** `docker/nginx/nginx.conf`, `docker-compose.prod.yml`  
 **Problème :** Port 80 uniquement. Tokens JWT, données de commande et cookies transitent en clair.  
@@ -335,7 +315,7 @@ certbot:
 
 ---
 
-### I2 — Endpoint changement de mot de passe
+### ✅ I2 — Endpoint changement de mot de passe
 
 **Problème :** La page `/compte/informations` propose un formulaire de changement de mot de passe mais aucun endpoint API ne le supporte.  
 **Temps estimé :** 4h
@@ -346,15 +326,15 @@ certbot:
 
 ```typescript
 // apps/api/src/modules/users/dto/change-password.dto.ts
-import { IsString, MinLength } from 'class-validator'
+import { IsString, MinLength } from "class-validator";
 
 export class ChangePasswordDto {
   @IsString()
-  currentPassword: string
+  currentPassword: string;
 
   @IsString()
   @MinLength(8)
-  newPassword: string
+  newPassword: string;
 }
 ```
 
@@ -388,16 +368,16 @@ async changePassword(userId: number, dto: ChangePasswordDto): Promise<void> {
 
 ```typescript
 async function changePassword() {
-  await api.patch('/users/me/password', {
+  await api.patch("/users/me/password", {
     currentPassword: passwordForm.current,
     newPassword: passwordForm.new,
-  })
+  });
 }
 ```
 
 ---
 
-### I3 — Access token hors localStorage
+### ✅ I3 — Access token hors localStorage
 
 **Fichier :** `packages/stores/src/auth.store.ts`  
 **Problème :** `{ persist: true }` stocke le token JWT dans `localStorage`. Un XSS peut le voler.  
@@ -410,39 +390,39 @@ async function changePassword() {
 ```typescript
 // packages/stores/src/auth.store.ts
 export const useAuthStore = defineStore(
-  'auth',
+  "auth",
   () => {
-    const token = ref<string | null>(null)  // en mémoire uniquement
-    const user = ref<User | null>(null)
+    const token = ref<string | null>(null); // en mémoire uniquement
+    const user = ref<User | null>(null);
     // ... reste identique ...
   },
   {
     persist: {
-      paths: ['user'],  // Persist seulement les infos utilisateur, pas le token
+      paths: ["user"], // Persist seulement les infos utilisateur, pas le token
     },
   },
-)
+);
 ```
 
 2. Créer un composable `useTokenRefresh` appelé au démarrage de l'app :
 
 ```typescript
 // packages/composables/src/useTokenRefresh.ts
-import { useApi } from './useApi'
-import { useAuthStore } from '@carre-ivoire/stores'
+import { useApi } from "./useApi";
+import { useAuthStore } from "@carre-ivoire/stores";
 
 export async function refreshTokenOnMount() {
-  const api = useApi()
-  const authStore = useAuthStore()
+  const api = useApi();
+  const authStore = useAuthStore();
 
   // Si l'utilisateur est connu (user en localStorage) mais token absent (mémoire),
   // tenter de renouveler via le cookie refresh_token
   if (authStore.user && !authStore.token) {
     try {
-      const res = await api.post('/auth/refresh')
-      authStore.setAuth(res.data.data.token, res.data.data.user)
+      const res = await api.post("/auth/refresh");
+      authStore.setAuth(res.data.data.token, res.data.data.user);
     } catch {
-      authStore.logout()
+      authStore.logout();
     }
   }
 }
@@ -452,7 +432,7 @@ export async function refreshTokenOnMount() {
 
 ---
 
-### I4 — Index FULLTEXT pour la recherche
+### ✅ I4 — Index FULLTEXT pour la recherche
 
 **Problème :** `MATCH() AGAINST()` dans `products.repository.findAll()` sans index FULLTEXT = scan complet à chaque recherche.  
 **Temps estimé :** 30min
@@ -470,17 +450,19 @@ Option B — Dans le modèle Sequelize :
 ```typescript
 // apps/api/src/modules/products/product.model.ts
 @Table({
-  tableName: 'products',
+  tableName: "products",
   indexes: [
-    { type: 'FULLTEXT', fields: ['name', 'short_description', 'description'] }
-  ]
+    { type: "FULLTEXT", fields: ["name", "short_description", "description"] },
+  ],
 })
-export class Product extends Model { /* ... */ }
+export class Product extends Model {
+  /* ... */
+}
 ```
 
 ---
 
-### I5 — Validation des formulaires frontend
+### ✅ I5 — Validation des formulaires frontend
 
 **Fichiers :** `apps/front-office/src/components/checkout/CheckoutForm.vue`, `connexion.vue`, `informations.vue`  
 **Problème :** Aucune validation côté client. L'utilisateur peut soumettre des champs vides.  
@@ -490,23 +472,23 @@ export class Product extends Model { /* ... */ }
 
 ```typescript
 // Ajouter dans CheckoutForm.vue
-const errors = ref<Record<string, string>>({})
+const errors = ref<Record<string, string>>({});
 
 function validate(): boolean {
-  errors.value = {}
-  if (!form.firstName?.trim()) errors.value.firstName = 'Prénom requis'
-  if (!form.lastName?.trim()) errors.value.lastName = 'Nom requis'
+  errors.value = {};
+  if (!form.firstName?.trim()) errors.value.firstName = "Prénom requis";
+  if (!form.lastName?.trim()) errors.value.lastName = "Nom requis";
   if (!form.email?.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(form.email))
-    errors.value.email = 'Email invalide'
-  if (!form.address?.trim()) errors.value.address = 'Adresse requise'
+    errors.value.email = "Email invalide";
+  if (!form.address?.trim()) errors.value.address = "Adresse requise";
   if (!form.postalCode?.trim() || !/^\d{5}$/.test(form.postalCode))
-    errors.value.postalCode = 'Code postal invalide (5 chiffres)'
-  if (!form.city?.trim()) errors.value.city = 'Ville requise'
-  return Object.keys(errors.value).length === 0
+    errors.value.postalCode = "Code postal invalide (5 chiffres)";
+  if (!form.city?.trim()) errors.value.city = "Ville requise";
+  return Object.keys(errors.value).length === 0;
 }
 
 async function submit() {
-  if (!validate()) return
+  if (!validate()) return;
   // ... reste du submit
 }
 ```
@@ -515,7 +497,7 @@ Afficher `errors.firstName` etc. sous chaque input dans le template.
 
 ---
 
-### I6 — DTOs inline dans `auth.controller.ts`
+### ✅ I6 — DTOs inline dans `auth.controller.ts`
 
 **Fichier :** `apps/api/src/modules/auth/auth.controller.ts`, lignes 13–25  
 **Problème :** `ForgotPasswordDto` et `ResetPasswordDto` déclarés dans le controller.  
@@ -526,27 +508,29 @@ Afficher `errors.firstName` etc. sous chaque input dans le template.
 1. Créer `apps/api/src/modules/auth/dto/forgot-password.dto.ts` :
 
 ```typescript
-import { IsEmail } from 'class-validator'
+import { IsEmail } from "class-validator";
 
 export class ForgotPasswordDto {
   @IsEmail()
-  email: string
+  email: string;
 }
 ```
 
 2. Créer `apps/api/src/modules/auth/dto/reset-password.dto.ts` :
 
 ```typescript
-import { IsString, MinLength, Matches } from 'class-validator'
+import { IsString, MinLength, Matches } from "class-validator";
 
 export class ResetPasswordDto {
   @IsString()
-  token: string
+  token: string;
 
   @IsString()
   @MinLength(8)
-  @Matches(/^(?=.*[A-Z])(?=.*\d)/, { message: 'Le mot de passe doit contenir une majuscule et un chiffre' })
-  password: string
+  @Matches(/^(?=.*[A-Z])(?=.*\d)/, {
+    message: "Le mot de passe doit contenir une majuscule et un chiffre",
+  })
+  password: string;
 }
 ```
 
@@ -554,7 +538,7 @@ export class ResetPasswordDto {
 
 ---
 
-### I7 — `useApi()` → instance singleton
+### ✅ I7 — `useApi()` → instance singleton
 
 **Fichier :** `packages/composables/src/useApi.ts`  
 **Problème :** Nouvelle instance Axios créée à chaque appel. Intercepteurs re-enregistrés × N.  
@@ -564,40 +548,40 @@ export class ResetPasswordDto {
 
 ```typescript
 // packages/composables/src/useApi.ts
-import axios, { type AxiosInstance } from 'axios'
-import { useAuthStore } from '@carre-ivoire/stores'
+import axios, { type AxiosInstance } from "axios";
+import { useAuthStore } from "@carre-ivoire/stores";
 
-let _instance: AxiosInstance | null = null
+let _instance: AxiosInstance | null = null;
 
 export function useApi(): AxiosInstance {
-  if (_instance) return _instance
+  if (_instance) return _instance;
 
   _instance = axios.create({
-    baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1',
+    baseURL: import.meta.env.VITE_API_URL ?? "http://localhost:3000/api/v1",
     withCredentials: true,
-  })
+  });
 
   _instance.interceptors.request.use((config) => {
     // Lire le store LORS de la requête, pas à la création du singleton
-    const authStore = useAuthStore()
+    const authStore = useAuthStore();
     if (authStore.token) {
-      config.headers.Authorization = `Bearer ${authStore.token}`
+      config.headers.Authorization = `Bearer ${authStore.token}`;
     }
-    return config
-  })
+    return config;
+  });
 
   _instance.interceptors.response.use(
     (res) => res,
     async (error) => {
       if (error.response?.status === 401) {
-        const authStore = useAuthStore()
-        authStore.logout()
+        const authStore = useAuthStore();
+        authStore.logout();
       }
-      return Promise.reject(error)
+      return Promise.reject(error);
     },
-  )
+  );
 
-  return _instance
+  return _instance;
 }
 ```
 
@@ -605,7 +589,7 @@ export function useApi(): AxiosInstance {
 
 ---
 
-### I8 — CI audit ne doit pas être ignoré
+### ✅ I8 — CI audit ne doit pas être ignoré
 
 **Fichier :** `.github/workflows/ci.yml`  
 **Problème :** `continue-on-error: true` sur `npm audit` — les vulnérabilités high/critical ne bloquent pas le pipeline.  
@@ -622,11 +606,11 @@ Si des vulnérabilités actuelles empêchent cela, les documenter dans `.nsprc` 
 
 ---
 
-## 🟡 AMÉLIORATION — Prochainement
+## 🟡 AMÉLIORATION — Prochainement ✅ TERMINÉ
 
 ---
 
-### A1 — Newsletter : connecter le frontend
+### ✅ A1 — Newsletter : connecter le frontend
 
 **Endpoint existant :** `POST /newsletter/subscribe`  
 **Temps estimé :** 3h
@@ -635,21 +619,21 @@ Ajouter un composant `packages/ui/src/NewsletterForm.vue` :
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useApi } from '@carre-ivoire/composables'
+import { ref } from "vue";
+import { useApi } from "@carre-ivoire/composables";
 
-const api = useApi()
-const email = ref('')
-const submitted = ref(false)
-const error = ref<string | null>(null)
+const api = useApi();
+const email = ref("");
+const submitted = ref(false);
+const error = ref<string | null>(null);
 
 async function subscribe() {
-  if (!email.value.trim()) return
+  if (!email.value.trim()) return;
   try {
-    await api.post('/newsletter/subscribe', { email: email.value })
-    submitted.value = true
+    await api.post("/newsletter/subscribe", { email: email.value });
+    submitted.value = true;
   } catch {
-    error.value = 'Erreur lors de l\'inscription. Veuillez réessayer.'
+    error.value = "Erreur lors de l'inscription. Veuillez réessayer.";
   }
 }
 </script>
@@ -659,7 +643,7 @@ Intégrer dans le footer de `AppFooter.vue` ou dans la page boutique (état vide
 
 ---
 
-### A2 — Recherche produits : ajouter l'UI
+### ✅ A2 — Recherche produits : ajouter l'UI
 
 **Endpoint existant :** `GET /products?search=terme`  
 **Temps estimé :** 4h
@@ -672,7 +656,7 @@ Note : Ajouter l'index FULLTEXT (point I4) avant de brancher la recherche.
 
 ---
 
-### A3 — Endpoint admin : liste des clients
+### ✅ A3 — Endpoint admin : liste des clients
 
 **Temps estimé :** 6h
 
@@ -693,7 +677,7 @@ Avec `UserQueryDto` : `page`, `limit`, `search` (email, nom).
 
 ---
 
-### A4 — Tri des produits côté serveur
+### ✅ A4 — Tri des produits côté serveur
 
 **Fichier :** `apps/api/src/modules/products/dto/product-query.dto.ts` + `products.repository.ts`  
 **Temps estimé :** 3h
@@ -704,14 +688,14 @@ Avec `UserQueryDto` : `page`, `limit`, `search` (email, nom).
 
 ---
 
-### A5 — Champs legacy `address_*` dans orders
+### ✅ A5 — Champs legacy `address_*` dans orders
 
 **Temps estimé :** 2h
 
 Ces colonnes (`address_street`, `address_city`, `address_zip`, `address_country`) dupliquent `shipping_address` JSON. Migration recommandée :
 
 ```sql
-ALTER TABLE orders 
+ALTER TABLE orders
   DROP COLUMN address_street,
   DROP COLUMN address_city,
   DROP COLUMN address_zip,
@@ -722,7 +706,7 @@ Coordonner avec `order.model.ts` pour supprimer les champs correspondants.
 
 ---
 
-### A6 — Mettre à jour le SDK Stripe
+### ✅ A6 — Mettre à jour le SDK Stripe
 
 **Fichier :** `apps/api/package.json`  
 **Temps estimé :** 2h
@@ -736,7 +720,7 @@ Mettre à jour `apiVersion` dans `stripe.service.ts`.
 
 ---
 
-### A7 — Rate limiting par email sur le login
+### ✅ A7 — Rate limiting par email sur le login
 
 **Fichier :** `apps/api/src/modules/auth/auth.controller.ts`  
 **Temps estimé :** 4h
@@ -750,7 +734,7 @@ Utiliser un store en mémoire (ou Redis si disponible) pour compter les tentativ
 
 ---
 
-### A8 — Paramètres généraux admin : sauvegarder
+### ✅ A8 — Paramètres généraux admin : sauvegarder
 
 **Fichier :** `apps/front-office/src/pages/admin/parametres/index.vue`  
 **Temps estimé :** 4h
@@ -764,11 +748,11 @@ Recommandation : Option A, simple et extensible.
 
 ---
 
-## 🟢 OPTIMISATION — Non bloquant
+## 🟢 OPTIMISATION — Non bloquant ✅ TERMINÉ
 
 ---
 
-### O1 — Cache HTTP sur les produits publics
+### ✅ O1 — Cache HTTP sur les produits publics
 
 ```typescript
 // products.controller.ts
@@ -779,23 +763,23 @@ async findAll(@Query() query: ProductQueryDto) { /* ... */ }
 
 ---
 
-### O2 — Update optimiste sur les favoris
+### ✅ O2 — Update optimiste sur les favoris
 
 ```typescript
 // packages/composables/src/useFavorites.ts
 async function add(productId: number) {
-  favoriteIds.value.add(productId)  // Optimiste
+  favoriteIds.value.add(productId); // Optimiste
   try {
-    await api.post(`/favorites/${productId}`)
+    await api.post(`/favorites/${productId}`);
   } catch {
-    favoriteIds.value.delete(productId)  // Rollback
+    favoriteIds.value.delete(productId); // Rollback
   }
 }
 ```
 
 ---
 
-### O3 — Index MySQL complémentaires
+### ✅ O3 — Index MySQL complémentaires
 
 ```sql
 CREATE INDEX idx_orders_user_created ON orders (user_id, created_at DESC);
@@ -805,16 +789,17 @@ CREATE INDEX idx_products_active_order ON products (is_active, display_order);
 
 ---
 
-### O4 — Tests composants Vue
+### ✅ O4 — Tests composants Vue
 
 Ajouter `@vue/test-utils` + `vitest` dans `apps/front-office` et écrire des tests pour :
+
 - `produits/[slug].vue` : ajout panier, sélection variante, toggle favori
 - `commande/index.vue` : validation formulaire, soumission
 - `ProductCard.vue` : rendu avec et sans variante
 
 ---
 
-### O5 — Rotation du refresh token
+### ✅ O5 — Rotation du refresh token
 
 À chaque appel `POST /auth/refresh`, émettre un nouveau refresh token et stocker les tokens émis (table `refresh_tokens` avec contrainte UNIQUE). Invalider l'ancien à la rotation.
 
@@ -883,4 +868,4 @@ La variable CSS `--border` utilisée à deux endroits (lignes 59 et 124) n'exist
 
 ---
 
-*Généré le 26 juin 2026 — Audit Carré Ivoire v1.0*
+_Généré le 26 juin 2026 — Audit Carré Ivoire v1.0_

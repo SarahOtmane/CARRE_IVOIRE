@@ -23,6 +23,7 @@ import { OrderItem } from './order-item.model'
   updatedAt: 'updated_at',
   indexes: [
     { name: 'orders_stripe_payment_intent_id', fields: ['stripe_payment_intent_id'] },
+    { name: 'idx_orders_user_created', fields: ['user_id', 'created_at'] },
   ],
 })
 export class Order extends Model<Order> {
@@ -71,27 +72,6 @@ export class Order extends Model<Order> {
   @AllowNull(true)
   @Column({ type: DataType.STRING(255), field: 'stripe_payment_intent_id' })
   declare stripePaymentIntentId: string | null
-
-  // Legacy address fields kept for DB compatibility
-  @AllowNull(false)
-  @Default('')
-  @Column({ type: DataType.STRING(255), field: 'address_street' })
-  declare addressStreet: string
-
-  @AllowNull(false)
-  @Default('')
-  @Column({ type: DataType.STRING(100), field: 'address_city' })
-  declare addressCity: string
-
-  @AllowNull(false)
-  @Default('')
-  @Column({ type: DataType.STRING(20), field: 'address_zip' })
-  declare addressZip: string
-
-  @AllowNull(false)
-  @Default('France')
-  @Column({ type: DataType.STRING(100), field: 'address_country' })
-  declare addressCountry: string
 
   @HasMany(() => OrderItem)
   declare items: OrderItem[]

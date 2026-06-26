@@ -61,4 +61,5 @@ export interface CreateOrderDto {
     format?: string
   }>
   shippingAddress: ShippingAddress
+  shippingAmount?: number
 }

@@ -1,10 +1,14 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { JwtModule } from '@nestjs/jwt'
+import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
+import { SequelizeModule } from '@nestjs/sequelize'
 import { UsersModule } from '@/modules/users/users.module'
 import { AuthService } from './auth.service'
 import { AuthController } from './auth.controller'
+import { LoginAttemptsService } from './login-attempts.service'
+import { RefreshTokensRepository } from './refresh-tokens.repository'
+import { RefreshToken } from './refresh-token.model'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { AdminGuard } from './guards/admin.guard'
@@ -12,13 +16,14 @@ import { AdminGuard } from './guards/admin.guard'
 @Module({
   imports: [
     ConfigModule,
+    SequelizeModule.forFeature([RefreshToken]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+      useFactory: (configService: ConfigService): JwtModuleOptions => ({
+        secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRATION', '24h'),
+          expiresIn: (configService.get<string>('JWT_EXPIRATION', '24h')) as any,
           algorithm: 'HS256',
         },
       }),
@@ -26,7 +31,7 @@ import { AdminGuard } from './guards/admin.guard'
     }),
     UsersModule,
   ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard, AdminGuard],
+  providers: [AuthService, LoginAttemptsService, RefreshTokensRepository, JwtStrategy, JwtAuthGuard, AdminGuard],
   controllers: [AuthController],
   exports: [JwtAuthGuard, AdminGuard, AuthService],
 })

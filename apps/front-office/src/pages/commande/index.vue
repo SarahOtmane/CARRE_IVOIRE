@@ -52,6 +52,7 @@ async function handlePaymentSubmit() {
     const { orderId, totalAmount } = await submitOrder(
       cartStore.items,
       shippingAddress,
+      Math.round(shippingFee.value * 100),
     );
 
     globalThis.sessionStorage.setItem(

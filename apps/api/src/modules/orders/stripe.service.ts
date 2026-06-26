@@ -16,7 +16,7 @@ export class StripeService {
     }
 
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2023-10-16',
+      apiVersion: '2025-02-24.acacia',
     })
 
     this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET') ?? ''

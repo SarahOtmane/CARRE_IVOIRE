@@ -1,12 +1,17 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { useAuthStore } from '@carre-ivoire/stores'
+import { initializeAuth } from './useTokenRefresh'
 
-export function appGuard(
+export async function appGuard(
   to: RouteLocationNormalized,
   _from: RouteLocationNormalized,
   next: NavigationGuardNext,
-): void {
+): Promise<void> {
   const authStore = useAuthStore()
+
+  if (!authStore.initialized) {
+    await initializeAuth()
+  }
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'connexion', query: { redirect: to.fullPath } })

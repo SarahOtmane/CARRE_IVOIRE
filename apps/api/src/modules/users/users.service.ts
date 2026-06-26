@@ -1,14 +1,26 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, UnauthorizedException } from '@nestjs/common'
+import * as bcrypt from 'bcrypt'
 import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
 import { UsersRepository } from './users.repository'
 import type { User } from './users.model'
 import type { UpdateUserDto } from './dto/update-user.dto'
+import type { ChangePasswordDto } from './dto/change-password.dto'
+import type { UserQueryDto } from './dto/user-query.dto'
 import type { UserResponseDto } from './dto/user-response.dto'
+import type { UsersPage } from './users.repository'
 
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) { }
+
+  async findAll(query: UserQueryDto): Promise<{ items: UserResponseDto[]; total: number; page: number; totalPages: number }> {
+    const page = await this.usersRepository.findAll(query)
+    return {
+      ...page,
+      items: page.items.map((u) => this.toResponseDto(u)),
+    }
+  }
 
   async findById(id: number): Promise<UserResponseDto> {
     const user = await this.usersRepository.findById(id)
@@ -27,6 +39,19 @@ export class UsersService {
       ...(dto.addressCountry !== undefined && { address_country: dto.addressCountry }),
     } as Partial<User>)
     return this.toResponseDto(user)
+  }
+
+  async changePassword(userId: number, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.usersRepository.findById(userId)
+    if (!user) throwApiError(ErrorCodes.USER_NOT_FOUND, 'Utilisateur introuvable')
+
+    const valid = await bcrypt.compare(dto.currentPassword, user.password_hash)
+    if (!valid) {
+      throw new UnauthorizedException({ code: 'INVALID_CURRENT_PASSWORD', message: 'Mot de passe actuel incorrect' })
+    }
+
+    const hash = await bcrypt.hash(dto.newPassword, 12)
+    await this.usersRepository.update(userId, { password_hash: hash } as Partial<User>)
   }
 
   toResponseDto(user: User): UserResponseDto {

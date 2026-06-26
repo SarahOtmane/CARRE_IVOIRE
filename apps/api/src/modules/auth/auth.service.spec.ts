@@ -2,6 +2,8 @@ import { Test } from '@nestjs/testing'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import { AuthService } from './auth.service'
+import { LoginAttemptsService } from './login-attempts.service'
+import { RefreshTokensRepository } from './refresh-tokens.repository'
 import { UsersRepository } from '@/modules/users/users.repository'
 import { MailService } from '@/modules/mail/mail.service'
 
@@ -45,6 +47,23 @@ describe('AuthService', () => {
         {
           provide: MailService,
           useValue: { sendPasswordReset: jest.fn().mockResolvedValue(undefined) },
+        },
+        {
+          provide: LoginAttemptsService,
+          useValue: {
+            check: jest.fn(),
+            recordFailure: jest.fn(),
+            clearAttempts: jest.fn(),
+          },
+        },
+        {
+          provide: RefreshTokensRepository,
+          useValue: {
+            store: jest.fn().mockResolvedValue(undefined),
+            findValid: jest.fn().mockResolvedValue(null),
+            revoke: jest.fn().mockResolvedValue(undefined),
+            revokeAllForUser: jest.fn().mockResolvedValue(undefined),
+          },
         },
       ],
     }).compile()

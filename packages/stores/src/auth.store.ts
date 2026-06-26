@@ -9,6 +9,7 @@ export const useAuthStore = defineStore(
   () => {
     const token = ref<string | null>(null)
     const user = ref<User | null>(null)
+    const initialized = ref(false)
 
     const isAuthenticated = computed(() => !!token.value && !!user.value)
     const isAdmin = computed(() => user.value?.role === 'admin')
@@ -26,7 +27,15 @@ export const useAuthStore = defineStore(
       user.value = null
     }
 
-    return { token, user, isAuthenticated, isAdmin, fullName, setAuth, logout }
+    function setInitialized() {
+      initialized.value = true
+    }
+
+    return { token, user, initialized, isAuthenticated, isAdmin, fullName, setAuth, logout, setInitialized }
   },
-  { persist: true },
+  {
+    persist: {
+      paths: ['user'],
+    },
+  },
 )

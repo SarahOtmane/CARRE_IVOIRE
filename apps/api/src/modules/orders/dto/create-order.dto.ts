@@ -8,6 +8,7 @@ import {
   ValidateNested,
   ArrayMinSize,
 } from 'class-validator'
+
 import { Type } from 'class-transformer'
 
 class OrderItemDto {
@@ -63,4 +64,9 @@ export class CreateOrderDto {
   @ValidateNested()
   @Type(() => ShippingAddressDto)
   shippingAddress: ShippingAddressDto
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  shippingAmount?: number
 }

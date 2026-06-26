@@ -49,6 +49,7 @@ export function useCheckout() {
   async function submitOrder(
     cartItems: CartItem[],
     shippingAddress: ShippingAddress,
+    shippingAmount: number = 0,
   ): Promise<{ orderId: number; totalAmount: number }> {
     if (!_stripe || !_cardElement) throw new Error('Stripe non initialisé')
 
@@ -67,6 +68,7 @@ export function useCheckout() {
             format: i.format,
           })),
           shippingAddress,
+          shippingAmount,
         },
       )
 

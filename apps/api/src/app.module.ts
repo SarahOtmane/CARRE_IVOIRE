@@ -16,6 +16,7 @@ import { FavoritesModule } from './modules/favorites/favorites.module'
 import { MailModule } from './modules/mail/mail.module'
 import { SitemapModule } from './modules/sitemap/sitemap.module'
 import { NewsletterModule } from './modules/newsletter/newsletter.module'
+import { SettingsModule } from './modules/settings/settings.module'
 import { envValidationSchema } from './config/env.validation'
 
 @Module({
@@ -45,6 +46,7 @@ import { envValidationSchema } from './config/env.validation'
     FavoritesModule,
     SitemapModule,
     NewsletterModule,
+    SettingsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
