@@ -4,6 +4,7 @@ import { useApi } from './useApi'
 import { useLoading } from './useLoading'
 
 interface ProductQuery {
+  search?: string
   categoryId?: number
   page?: number
   limit?: number
