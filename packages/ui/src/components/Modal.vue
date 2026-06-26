@@ -28,11 +28,11 @@ defineEmits<{
 
 <style scoped>
 .modal-overlay {
-  background-color: rgba(58, 31, 20, 0.35);
+  background-color: var(--scrim);
 }
 
 .modal-border {
-  border: 1px solid rgba(58, 31, 20, 0.12);
+  border: 1px solid var(--cacao-a12);
 }
 
 .modal-enter-active,
