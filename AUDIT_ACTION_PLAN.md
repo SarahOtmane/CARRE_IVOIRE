@@ -14,7 +14,7 @@ Le projet a une architecture backend solide (pattern Repository strict, transact
 | ---------------------------------- | --------- | ---------- | ----------- |
 | 🔴 Critique (bloquant fonctionnel) | 5         | ~14h       | ✅ 5/5 fait |
 | 🟠 Important (avant production)    | 8         | ~32h       | ✅ 8/8 fait |
-| 🟡 Amélioration (prochainement)    | 8         | ~28h       | ⬜ 0/8      |
+| 🟡 Amélioration (prochainement)    | 8         | ~28h       | ✅ 8/8 fait |
 | 🟢 Optimisation (non bloquant)     | 5         | ~16h       |
 | **Total**                          | **26**    | **~90h**   |
 
@@ -606,11 +606,11 @@ Si des vulnérabilités actuelles empêchent cela, les documenter dans `.nsprc` 
 
 ---
 
-## 🟡 AMÉLIORATION — Prochainement
+## 🟡 AMÉLIORATION — Prochainement ✅ TERMINÉ
 
 ---
 
-### A1 — Newsletter : connecter le frontend
+### ✅ A1 — Newsletter : connecter le frontend
 
 **Endpoint existant :** `POST /newsletter/subscribe`  
 **Temps estimé :** 3h
@@ -643,7 +643,7 @@ Intégrer dans le footer de `AppFooter.vue` ou dans la page boutique (état vide
 
 ---
 
-### A2 — Recherche produits : ajouter l'UI
+### ✅ A2 — Recherche produits : ajouter l'UI
 
 **Endpoint existant :** `GET /products?search=terme`  
 **Temps estimé :** 4h
@@ -656,7 +656,7 @@ Note : Ajouter l'index FULLTEXT (point I4) avant de brancher la recherche.
 
 ---
 
-### A3 — Endpoint admin : liste des clients
+### ✅ A3 — Endpoint admin : liste des clients
 
 **Temps estimé :** 6h
 
@@ -677,7 +677,7 @@ Avec `UserQueryDto` : `page`, `limit`, `search` (email, nom).
 
 ---
 
-### A4 — Tri des produits côté serveur
+### ✅ A4 — Tri des produits côté serveur
 
 **Fichier :** `apps/api/src/modules/products/dto/product-query.dto.ts` + `products.repository.ts`  
 **Temps estimé :** 3h
@@ -688,7 +688,7 @@ Avec `UserQueryDto` : `page`, `limit`, `search` (email, nom).
 
 ---
 
-### A5 — Champs legacy `address_*` dans orders
+### ✅ A5 — Champs legacy `address_*` dans orders
 
 **Temps estimé :** 2h
 
@@ -706,7 +706,7 @@ Coordonner avec `order.model.ts` pour supprimer les champs correspondants.
 
 ---
 
-### A6 — Mettre à jour le SDK Stripe
+### ✅ A6 — Mettre à jour le SDK Stripe
 
 **Fichier :** `apps/api/package.json`  
 **Temps estimé :** 2h
@@ -720,7 +720,7 @@ Mettre à jour `apiVersion` dans `stripe.service.ts`.
 
 ---
 
-### A7 — Rate limiting par email sur le login
+### ✅ A7 — Rate limiting par email sur le login
 
 **Fichier :** `apps/api/src/modules/auth/auth.controller.ts`  
 **Temps estimé :** 4h
@@ -734,7 +734,7 @@ Utiliser un store en mémoire (ou Redis si disponible) pour compter les tentativ
 
 ---
 
-### A8 — Paramètres généraux admin : sauvegarder
+### ✅ A8 — Paramètres généraux admin : sauvegarder
 
 **Fichier :** `apps/front-office/src/pages/admin/parametres/index.vue`  
 **Temps estimé :** 4h
