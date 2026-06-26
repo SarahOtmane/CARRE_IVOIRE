@@ -22,27 +22,22 @@ const searchTerm = ref('')
 let searchTimeout: ReturnType<typeof setTimeout> | undefined
 
 const SORT_OPTIONS = [
-  { value: 'nouveaute', label: 'Nouveauté' },
-  { value: 'prix-asc', label: 'Prix croissant' },
-  { value: 'prix-desc', label: 'Prix décroissant' },
+  { value: 'display_order', label: 'Nouveauté', apiValue: 'display_order' as const },
+  { value: 'price_asc', label: 'Prix croissant', apiValue: 'price_asc' as const },
+  { value: 'price_desc', label: 'Prix décroissant', apiValue: 'price_desc' as const },
 ]
 
-const sort = ref('nouveaute')
+const sort = ref('display_order')
 const sortOpen = ref(false)
 
 const currentSort = computed(() => SORT_OPTIONS.find((s) => s.value === sort.value)!)
-
-const sortedProducts = computed(() => {
-  const list = result.value.items
-  if (sort.value === 'prix-asc') return [...list].sort((a, b) => a.price - b.price)
-  if (sort.value === 'prix-desc') return [...list].sort((a, b) => b.price - a.price)
-  return list
-})
+const sortedProducts = computed(() => result.value.items)
 
 function applyFilters() {
   fetch({
     search: searchTerm.value.trim() || undefined,
     categoryId: selectedCategoryId.value,
+    sort: currentSort.value.apiValue,
     limit: 12,
   })
 }
@@ -181,7 +176,7 @@ onUnmounted(() => {
             :key="opt.value"
             class="block w-full px-4 py-2.5 text-left font-sans text-[12px] tracking-[0.02em] transition-colors duration-180 hover:bg-ivoire"
             :class="sort === opt.value ? 'text-cacao' : 'text-cacao-2'"
-            @click="sort = opt.value; sortOpen = false"
+            @click="sort = opt.value; sortOpen = false; applyFilters()"
           >{{ opt.label }}</button>
         </div>
       </div>

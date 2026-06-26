@@ -46,10 +46,13 @@ export class ProductsRepository {
       offset: (page - 1) * limit,
       order: search
         ? [[Sequelize.literal('relevance'), 'DESC']]
-        : [
-            ['displayOrder', 'ASC'],
-            ['created_at', 'DESC'],
-          ],
+        : query.sort === 'price_asc'
+          ? [['price', 'ASC'], ['displayOrder', 'ASC']]
+          : query.sort === 'price_desc'
+            ? [['price', 'DESC'], ['displayOrder', 'ASC']]
+            : query.sort === 'newest'
+              ? [['created_at', 'DESC']]
+              : [['displayOrder', 'ASC'], ['created_at', 'DESC']],
       replacements: search ? { search } : undefined,
       distinct: true,
     })

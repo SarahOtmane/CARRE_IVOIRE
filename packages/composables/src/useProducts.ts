@@ -6,6 +6,7 @@ import { useLoading } from './useLoading'
 interface ProductQuery {
   search?: string
   categoryId?: number
+  sort?: 'price_asc' | 'price_desc' | 'newest' | 'display_order'
   page?: number
   limit?: number
 }
