@@ -15,7 +15,7 @@ Le projet a une architecture backend solide (pattern Repository strict, transact
 | 🔴 Critique (bloquant fonctionnel) | 5         | ~14h       | ✅ 5/5 fait |
 | 🟠 Important (avant production)    | 8         | ~32h       | ✅ 8/8 fait |
 | 🟡 Amélioration (prochainement)    | 8         | ~28h       | ✅ 8/8 fait |
-| 🟢 Optimisation (non bloquant)     | 5         | ~16h       |
+| 🟢 Optimisation (non bloquant)     | 5         | ~16h       | ✅ 5/5 fait |
 | **Total**                          | **26**    | **~90h**   |
 
 ---
@@ -748,11 +748,11 @@ Recommandation : Option A, simple et extensible.
 
 ---
 
-## 🟢 OPTIMISATION — Non bloquant
+## 🟢 OPTIMISATION — Non bloquant ✅ TERMINÉ
 
 ---
 
-### O1 — Cache HTTP sur les produits publics
+### ✅ O1 — Cache HTTP sur les produits publics
 
 ```typescript
 // products.controller.ts
@@ -763,7 +763,7 @@ async findAll(@Query() query: ProductQueryDto) { /* ... */ }
 
 ---
 
-### O2 — Update optimiste sur les favoris
+### ✅ O2 — Update optimiste sur les favoris
 
 ```typescript
 // packages/composables/src/useFavorites.ts
@@ -779,7 +779,7 @@ async function add(productId: number) {
 
 ---
 
-### O3 — Index MySQL complémentaires
+### ✅ O3 — Index MySQL complémentaires
 
 ```sql
 CREATE INDEX idx_orders_user_created ON orders (user_id, created_at DESC);
@@ -789,7 +789,7 @@ CREATE INDEX idx_products_active_order ON products (is_active, display_order);
 
 ---
 
-### O4 — Tests composants Vue
+### ✅ O4 — Tests composants Vue
 
 Ajouter `@vue/test-utils` + `vitest` dans `apps/front-office` et écrire des tests pour :
 
@@ -799,7 +799,7 @@ Ajouter `@vue/test-utils` + `vitest` dans `apps/front-office` et écrire des tes
 
 ---
 
-### O5 — Rotation du refresh token
+### ✅ O5 — Rotation du refresh token
 
 À chaque appel `POST /auth/refresh`, émettre un nouveau refresh token et stocker les tokens émis (table `refresh_tokens` avec contrainte UNIQUE). Invalider l'ancien à la rotation.
 
