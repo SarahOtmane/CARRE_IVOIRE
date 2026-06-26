@@ -1,8 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { createRouter, createMemoryHistory } from 'vue-router'
 import ProductCard from '../ProductCard.vue'
-import type { ProductResponse } from '@carre-ivoire/types'
+import { type ProductResponse, StockStatus } from '@carre-ivoire/types'
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 
@@ -40,13 +39,18 @@ const baseProduct: ProductResponse = {
   description: 'Un chocolat vibrant.',
   price: 1200,
   imageUrl: '/assets/ganache-yuzu.jpg',
-  badge: null,
+  badge: undefined,
   isActive: true,
   isSeasonal: false,
+  stock: 10,
+  stockStatus: StockStatus.IN_STOCK,
+  categoryId: 2,
   variants: [],
   category: { id: 2, name: 'Ganaches', slug: 'ganaches' },
-  taxRate: null,
+  taxRate: undefined,
   displayOrder: 1,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
 }
 
 function mountCard(product = baseProduct) {
@@ -100,7 +104,7 @@ describe('ProductCard', () => {
   })
 
   it('ne rend pas le badge si absent', () => {
-    const wrapper = mountCard({ ...baseProduct, badge: null })
+    const wrapper = mountCard({ ...baseProduct, badge: undefined })
     expect(wrapper.find('[class*="absolute left-3 top-3"]').exists()).toBe(false)
   })
 

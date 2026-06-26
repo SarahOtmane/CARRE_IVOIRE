@@ -21,7 +21,7 @@ async function fillValidForm(wrapper: ReturnType<typeof mountForm>) {
 }
 
 describe('CheckoutForm', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => { vi.clearAllMocks() })
 
   it('pré-remplit les champs depuis le store auth', () => {
     const wrapper = mountForm()

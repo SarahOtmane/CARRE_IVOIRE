@@ -34,7 +34,7 @@ async function save() {
   saveError.value = null
 
   try {
-    const res = await api.patch<{ success: boolean; data: { firstName: string; lastName: string; email: string; role: string } }>(
+    const res = await api.patch<{ success: boolean; data: { firstName: string; lastName: string; email: string; role: 'client' | 'admin' } }>(
       '/users/me',
       {
         firstName: form.value.firstName.trim() || undefined,
