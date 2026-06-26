@@ -1,6 +1,7 @@
-import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common'
+import { Controller, Get, Patch, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { ChangePasswordDto } from './dto/change-password.dto'
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { CurrentUser } from '@/common/decorators/current-user.decorator'
 import type { JwtUser } from '@/modules/auth/strategies/jwt.strategy'
@@ -18,5 +19,11 @@ export class UsersController {
   @Patch('me')
   updateMe(@CurrentUser() user: JwtUser, @Body() dto: UpdateUserDto) {
     return this.usersService.update(user.id, dto)
+  }
+
+  @Patch('me/password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async changePassword(@CurrentUser() user: JwtUser, @Body() dto: ChangePasswordDto) {
+    await this.usersService.changePassword(user.id, dto)
   }
 }

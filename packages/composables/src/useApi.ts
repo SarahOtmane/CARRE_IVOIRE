@@ -3,30 +3,30 @@ import axios from 'axios'
 import type { AxiosInstance } from 'axios'
 import { useAuthStore, useNotificationStore } from '@carre-ivoire/stores'
 
-export function useApi(): AxiosInstance {
+const _api: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1',
+  timeout: 10000,
+  withCredentials: true,
+})
+
+_api.interceptors.request.use((config) => {
   const authStore = useAuthStore()
-  const notificationStore = useNotificationStore()
+  if (authStore.token) {
+    config.headers.Authorization = `Bearer ${authStore.token}`
+  }
+  return config
+})
 
-  const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1',
-    timeout: 10000,
-  })
+_api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const notificationStore = useNotificationStore()
+    const message = error.response?.data?.error?.message || 'Une erreur est survenue'
+    notificationStore.addNotification({ type: 'error', message })
+    return Promise.reject(error)
+  },
+)
 
-  api.interceptors.request.use((config) => {
-    if (authStore.token) {
-      config.headers.Authorization = `Bearer ${authStore.token}`
-    }
-    return config
-  })
-
-  api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      const message = error.response?.data?.error?.message || 'Une erreur est survenue'
-      notificationStore.addNotification({ type: 'error', message })
-      return Promise.reject(error)
-    },
-  )
-
-  return api
+export function useApi(): AxiosInstance {
+  return _api
 }

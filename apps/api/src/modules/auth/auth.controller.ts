@@ -8,26 +8,13 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { IsEmail, IsString, MinLength } from 'class-validator'
-
-class ForgotPasswordDto {
-  @IsEmail()
-  email: string
-}
-
-class ResetPasswordDto {
-  @IsString()
-  token: string
-
-  @IsString()
-  @MinLength(8)
-  newPassword: string
-}
 import type { Request, Response } from 'express'
 import { Throttle } from '@nestjs/throttler'
 import { AuthService } from './auth.service'
 import { RegisterDto } from './dto/register.dto'
 import { LoginDto } from './dto/login.dto'
+import { ForgotPasswordDto } from './dto/forgot-password.dto'
+import { ResetPasswordDto } from './dto/reset-password.dto'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 
 const REFRESH_COOKIE_OPTIONS = {

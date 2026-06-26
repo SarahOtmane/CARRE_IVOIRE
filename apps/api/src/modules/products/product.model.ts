@@ -21,6 +21,9 @@ import { ProductVariant } from './product-variant.model'
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  indexes: [
+    { type: 'FULLTEXT', fields: ['name', 'short_description', 'description'] },
+  ],
 })
 export class Product extends Model<Product> {
   @PrimaryKey

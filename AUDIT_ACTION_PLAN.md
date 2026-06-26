@@ -13,7 +13,7 @@ Le projet a une architecture backend solide (pattern Repository strict, transact
 | Priorité                           | Nb points | Estimation | Avancement  |
 | ---------------------------------- | --------- | ---------- | ----------- |
 | 🔴 Critique (bloquant fonctionnel) | 5         | ~14h       | ✅ 5/5 fait |
-| 🟠 Important (avant production)    | 8         | ~32h       | ⬜ 0/8      |
+| 🟠 Important (avant production)    | 8         | ~32h       | ✅ 8/8 fait |
 | 🟡 Amélioration (prochainement)    | 8         | ~28h       | ⬜ 0/8      |
 | 🟢 Optimisation (non bloquant)     | 5         | ~16h       |
 | **Total**                          | **26**    | **~90h**   |
@@ -267,11 +267,11 @@ async findById(id: number): Promise<Product> {
 
 ---
 
-## 🟠 IMPORTANT — Avant mise en production
+## 🟠 IMPORTANT — Avant mise en production ✅ TERMINÉ
 
 ---
 
-### I1 — HTTPS en production
+### ✅ I1 — HTTPS en production
 
 **Fichiers :** `docker/nginx/nginx.conf`, `docker-compose.prod.yml`  
 **Problème :** Port 80 uniquement. Tokens JWT, données de commande et cookies transitent en clair.  
@@ -315,7 +315,7 @@ certbot:
 
 ---
 
-### I2 — Endpoint changement de mot de passe
+### ✅ I2 — Endpoint changement de mot de passe
 
 **Problème :** La page `/compte/informations` propose un formulaire de changement de mot de passe mais aucun endpoint API ne le supporte.  
 **Temps estimé :** 4h
@@ -377,7 +377,7 @@ async function changePassword() {
 
 ---
 
-### I3 — Access token hors localStorage
+### ✅ I3 — Access token hors localStorage
 
 **Fichier :** `packages/stores/src/auth.store.ts`  
 **Problème :** `{ persist: true }` stocke le token JWT dans `localStorage`. Un XSS peut le voler.  
@@ -432,7 +432,7 @@ export async function refreshTokenOnMount() {
 
 ---
 
-### I4 — Index FULLTEXT pour la recherche
+### ✅ I4 — Index FULLTEXT pour la recherche
 
 **Problème :** `MATCH() AGAINST()` dans `products.repository.findAll()` sans index FULLTEXT = scan complet à chaque recherche.  
 **Temps estimé :** 30min
@@ -462,7 +462,7 @@ export class Product extends Model {
 
 ---
 
-### I5 — Validation des formulaires frontend
+### ✅ I5 — Validation des formulaires frontend
 
 **Fichiers :** `apps/front-office/src/components/checkout/CheckoutForm.vue`, `connexion.vue`, `informations.vue`  
 **Problème :** Aucune validation côté client. L'utilisateur peut soumettre des champs vides.  
@@ -497,7 +497,7 @@ Afficher `errors.firstName` etc. sous chaque input dans le template.
 
 ---
 
-### I6 — DTOs inline dans `auth.controller.ts`
+### ✅ I6 — DTOs inline dans `auth.controller.ts`
 
 **Fichier :** `apps/api/src/modules/auth/auth.controller.ts`, lignes 13–25  
 **Problème :** `ForgotPasswordDto` et `ResetPasswordDto` déclarés dans le controller.  
@@ -538,7 +538,7 @@ export class ResetPasswordDto {
 
 ---
 
-### I7 — `useApi()` → instance singleton
+### ✅ I7 — `useApi()` → instance singleton
 
 **Fichier :** `packages/composables/src/useApi.ts`  
 **Problème :** Nouvelle instance Axios créée à chaque appel. Intercepteurs re-enregistrés × N.  
@@ -589,7 +589,7 @@ export function useApi(): AxiosInstance {
 
 ---
 
-### I8 — CI audit ne doit pas être ignoré
+### ✅ I8 — CI audit ne doit pas être ignoré
 
 **Fichier :** `.github/workflows/ci.yml`  
 **Problème :** `continue-on-error: true` sur `npm audit` — les vulnérabilités high/critical ne bloquent pas le pipeline.  

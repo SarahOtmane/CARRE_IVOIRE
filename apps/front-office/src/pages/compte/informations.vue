@@ -13,9 +13,19 @@ const form = ref({
   addressStreet: '',
 })
 
+const passwordForm = ref({
+  currentPassword: '',
+  newPassword: '',
+})
+
 const saved = ref(false)
 const saveError = ref<string | null>(null)
 const isSaving = ref(false)
+
+const passwordSaved = ref(false)
+const passwordError = ref<string | null>(null)
+const isSavingPassword = ref(false)
+
 let savedTimeout: ReturnType<typeof setTimeout> | undefined
 
 async function save() {
@@ -49,6 +59,35 @@ async function save() {
     isSaving.value = false
   }
 }
+
+async function changePassword() {
+  if (isSavingPassword.value) return
+  passwordError.value = null
+
+  if (!passwordForm.value.currentPassword || !passwordForm.value.newPassword) {
+    passwordError.value = 'Veuillez renseigner les deux champs.'
+    return
+  }
+  if (passwordForm.value.newPassword.length < 8) {
+    passwordError.value = 'Le nouveau mot de passe doit contenir au moins 8 caractères.'
+    return
+  }
+
+  isSavingPassword.value = true
+  try {
+    await api.patch('/users/me/password', {
+      currentPassword: passwordForm.value.currentPassword,
+      newPassword: passwordForm.value.newPassword,
+    })
+    passwordForm.value = { currentPassword: '', newPassword: '' }
+    passwordSaved.value = true
+    globalThis.setTimeout(() => { passwordSaved.value = false }, 2400)
+  } catch {
+    passwordError.value = 'Mot de passe actuel incorrect ou erreur serveur.'
+  } finally {
+    isSavingPassword.value = false
+  }
+}
 </script>
 
 <template>
@@ -69,132 +108,177 @@ async function save() {
     </section>
 
     <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_320px]">
-      <div class="max-w-[640px] space-y-7">
-        <!-- Email (lecture seule) -->
-        <div>
-          <label
-            for="account-email"
-            class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
-          >
-            Email
-          </label>
-          <input
-            id="account-email"
-            :value="authStore.user?.email ?? ''"
-            type="email"
-            disabled
-            class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao-3 outline-none"
-            style="border-bottom: 1px solid var(--cacao-a24)"
-          />
-        </div>
+      <div class="max-w-[640px] space-y-10">
 
-        <!-- Prénom + Nom -->
-        <div class="grid grid-cols-2 gap-6">
+        <!-- Informations personnelles -->
+        <div class="space-y-7">
+          <!-- Email (lecture seule) -->
           <div>
             <label
-              for="account-first-name"
+              for="account-email"
               class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
-              Prénom
+              Email
             </label>
             <input
-              id="account-first-name"
-              v-model="form.firstName"
-              type="text"
-              class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
+              id="account-email"
+              :value="authStore.user?.email ?? ''"
+              type="email"
+              disabled
+              class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao-3 outline-none"
+              style="border-bottom: 1px solid var(--cacao-a24)"
+            />
+          </div>
+
+          <!-- Prénom + Nom -->
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label
+                for="account-first-name"
+                class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
+              >
+                Prénom
+              </label>
+              <input
+                id="account-first-name"
+                v-model="form.firstName"
+                type="text"
+                class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
+                style="border-bottom: 1px solid var(--brun-cacao)"
+              />
+            </div>
+            <div>
+              <label
+                for="account-last-name"
+                class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
+              >
+                Nom
+              </label>
+              <input
+                id="account-last-name"
+                v-model="form.lastName"
+                type="text"
+                class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
+                style="border-bottom: 1px solid var(--brun-cacao)"
+              />
+            </div>
+          </div>
+
+          <!-- Téléphone -->
+          <div>
+            <label
+              for="account-phone"
+              class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
+            >
+              Téléphone
+            </label>
+            <input
+              id="account-phone"
+              v-model="form.phone"
+              type="tel"
+              placeholder="+33 6 00 00 00 00"
+              class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
               style="border-bottom: 1px solid var(--brun-cacao)"
             />
           </div>
+
+          <!-- Adresse -->
           <div>
             <label
-              for="account-last-name"
+              for="account-address"
               class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
-              Nom
+              Adresse de livraison
             </label>
             <input
-              id="account-last-name"
-              v-model="form.lastName"
+              id="account-address"
+              v-model="form.addressStreet"
               type="text"
-              class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
+              placeholder="4 rue du Nil, 75002 Paris"
+              class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
               style="border-bottom: 1px solid var(--brun-cacao)"
             />
           </div>
+
+          <!-- Actions profil -->
+          <div class="flex items-center gap-6 pt-2">
+            <button
+              class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+              :disabled="isSaving"
+              @click="save"
+            >
+              {{ isSaving ? 'Enregistrement…' : 'Enregistrer' }}
+            </button>
+            <span
+              v-if="saved"
+              class="font-sans text-[12px] uppercase tracking-[0.14em] text-dore"
+            >
+              Modifications enregistrées
+            </span>
+            <span v-if="saveError" class="font-sans text-[12px] text-cacao-2">
+              {{ saveError }}
+            </span>
+          </div>
         </div>
 
-        <!-- Téléphone -->
-        <div>
-          <label
-            for="account-phone"
-            class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
-          >
-            Téléphone
-          </label>
-          <input
-            id="account-phone"
-            v-model="form.phone"
-            type="tel"
-            placeholder="+33 6 00 00 00 00"
-            class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
-            style="border-bottom: 1px solid var(--brun-cacao)"
-          />
-        </div>
-
-        <!-- Adresse de livraison -->
-        <div>
-          <label
-            for="account-address"
-            class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
-          >
-            Adresse de livraison
-          </label>
-          <input
-            id="account-address"
-            v-model="form.addressStreet"
-            type="text"
-            placeholder="4 rue du Nil, 75002 Paris"
-            class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
-            style="border-bottom: 1px solid var(--brun-cacao)"
-          />
-        </div>
-
-        <!-- Actions -->
-        <div class="flex items-center gap-6 pt-2">
-          <button
-            class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="isSaving"
-            @click="save"
-          >
-            {{ isSaving ? 'Enregistrement…' : 'Enregistrer' }}
-          </button>
-          <span
-            v-if="saved"
-            class="font-sans text-[12px] uppercase tracking-[0.14em] text-dore transition-opacity duration-400"
-          >
-            Modifications enregistrées
-          </span>
-          <span
-            v-if="saveError"
-            class="font-sans text-[12px] leading-[1.6] text-cacao-2"
-          >
-            {{ saveError }}
-          </span>
-        </div>
-
-        <!-- Mot de passe -->
-        <div class="border-t pt-8" style="border-color: var(--cacao-a12)">
+        <!-- Changer le mot de passe -->
+        <div class="border-t pt-8 space-y-7" style="border-color: var(--cacao-a12)">
           <div class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3">
             Modifier le mot de passe
           </div>
-          <p class="mt-4 font-sans text-[14px] leading-[1.7] text-cacao-2">
-            Le changement de mot de passe est disponible depuis la page
-            <RouterLink
-              to="/mot-de-passe-oublie"
-              class="border-b border-cacao-2 pb-px text-cacao transition-opacity duration-180 hover:opacity-60"
+
+          <div>
+            <label
+              for="account-current-password"
+              class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
-              mot de passe oublié
-            </RouterLink>.
-          </p>
+              Mot de passe actuel
+            </label>
+            <input
+              id="account-current-password"
+              v-model="passwordForm.currentPassword"
+              type="password"
+              autocomplete="current-password"
+              class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
+              style="border-bottom: 1px solid var(--brun-cacao)"
+            />
+          </div>
+          <div>
+            <label
+              for="account-new-password"
+              class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
+            >
+              Nouveau mot de passe
+            </label>
+            <input
+              id="account-new-password"
+              v-model="passwordForm.newPassword"
+              type="password"
+              autocomplete="new-password"
+              placeholder="8 caractères minimum"
+              class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
+              style="border-bottom: 1px solid var(--brun-cacao)"
+            />
+          </div>
+
+          <div class="flex items-center gap-6">
+            <button
+              class="border border-cacao bg-transparent px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+              :disabled="isSavingPassword"
+              @click="changePassword"
+            >
+              {{ isSavingPassword ? 'Mise à jour…' : 'Changer le mot de passe' }}
+            </button>
+            <span
+              v-if="passwordSaved"
+              class="font-sans text-[12px] uppercase tracking-[0.14em] text-dore"
+            >
+              Mot de passe mis à jour
+            </span>
+            <span v-if="passwordError" class="font-sans text-[12px] text-cacao-2">
+              {{ passwordError }}
+            </span>
+          </div>
         </div>
       </div>
 
