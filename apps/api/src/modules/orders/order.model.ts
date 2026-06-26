@@ -23,6 +23,7 @@ import { OrderItem } from './order-item.model'
   updatedAt: 'updated_at',
   indexes: [
     { name: 'orders_stripe_payment_intent_id', fields: ['stripe_payment_intent_id'] },
+    { name: 'idx_orders_user_created', fields: ['user_id', 'created_at'] },
   ],
 })
 export class Order extends Model<Order> {

@@ -23,6 +23,8 @@ import { ProductVariant } from './product-variant.model'
   updatedAt: 'updated_at',
   indexes: [
     { type: 'FULLTEXT', fields: ['name', 'short_description', 'description'] },
+    { name: 'idx_products_category_active_order', fields: ['category_id', 'is_active', 'display_order'] },
+    { name: 'idx_products_active_order', fields: ['is_active', 'display_order'] },
   ],
 })
 export class Product extends Model<Product> {
