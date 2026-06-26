@@ -26,7 +26,7 @@ export class SettingsRepository {
   }
 
   async set(key: string, value: string): Promise<void> {
-    await this.model.upsert({ key, value })
+    await this.model.upsert({ key, value } as any)
   }
 
   async setMany(entries: Record<string, string>): Promise<void> {

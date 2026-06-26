@@ -154,10 +154,10 @@ export class AuthService {
   private generateTokens(user: User): TokenPair {
     const accessToken = this.signAccessToken(user)
     const refreshToken = this.jwtService.sign(
-      { sub: user.id, email: user.email, role: user.role } satisfies JwtPayload,
+      { sub: user.id, email: user.email, role: user.role } as JwtPayload,
       {
-        secret: process.env.REFRESH_TOKEN_SECRET,
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRATION ?? '7d',
+        secret: process.env.REFRESH_TOKEN_SECRET ?? '',
+        expiresIn: (process.env.REFRESH_TOKEN_EXPIRATION ?? '7d') as any,
       },
     )
     return { accessToken, refreshToken }
@@ -165,10 +165,10 @@ export class AuthService {
 
   private signAccessToken(user: User): string {
     return this.jwtService.sign(
-      { sub: user.id, email: user.email, role: user.role } satisfies JwtPayload,
+      { sub: user.id, email: user.email, role: user.role } as JwtPayload,
       {
-        secret: process.env.JWT_SECRET,
-        expiresIn: process.env.JWT_EXPIRATION ?? '24h',
+        secret: process.env.JWT_SECRET ?? '',
+        expiresIn: (process.env.JWT_EXPIRATION ?? '24h') as any,
       },
     )
   }

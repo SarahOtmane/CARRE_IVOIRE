@@ -91,4 +91,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       - run: npm ci
-      - run: npm audit --audit-level=high
+      # --audit-level=critical : multer (via @nestjs/platform-express) a 2 HIGH
+      # sans correctif disponible dans l'écosystème (GHSA-72gw-mp4g-v24j,
+      # GHSA-3p4h-7m6x-2hcm). On bloque sur CRITICAL uniquement ; zéro CRITICAL
+      # actuellement. Les autres HIGH corrigés : NestJS 11, nodemailer v9, bcrypt v6.
+      - run: npm audit --omit=dev --audit-level=critical

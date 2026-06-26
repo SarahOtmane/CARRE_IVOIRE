@@ -1,4 +1,4 @@
-import { Injectable, TooManyRequestsException } from '@nestjs/common'
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common'
 
 interface AttemptRecord {
   count: number
@@ -20,8 +20,9 @@ export class LoginAttemptsService {
     const now = Date.now()
     if (record.blockedUntil && now < record.blockedUntil) {
       const remainingSeconds = Math.ceil((record.blockedUntil - now) / 1000)
-      throw new TooManyRequestsException(
+      throw new HttpException(
         `Trop de tentatives. Réessayez dans ${remainingSeconds} secondes.`,
+        HttpStatus.TOO_MANY_REQUESTS,
       )
     }
 
