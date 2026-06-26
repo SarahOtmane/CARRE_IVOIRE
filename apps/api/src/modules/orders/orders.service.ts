@@ -84,13 +84,15 @@ export class OrdersService {
         }
       }
 
-      const totalAmount = dto.items.reduce((acc, item) => {
+      const itemsTotal = dto.items.reduce((acc, item) => {
         const variant = item.variantId ? variantsById.get(item.variantId) : undefined
         if (variant) return acc + variant.price * item.quantity
         const product = products.find((p) => p.id === item.productId)
         if (!product) return acc
         return acc + product.price * item.quantity
       }, 0)
+
+      const totalAmount = itemsTotal + (dto.shippingAmount ?? 0)
 
       const order = await this.ordersRepository.create(
         { userId, totalAmount, shippingAddress: dto.shippingAddress },

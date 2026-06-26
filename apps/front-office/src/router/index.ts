@@ -66,6 +66,17 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/inscription',
+    component: () => import('@/layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'inscription',
+        component: () => import('@/pages/inscription.vue'),
+      },
+    ],
+  },
+  {
     path: '/mot-de-passe-oublie',
     name: 'mot-de-passe-oublie',
     component: () => import('@/pages/mot-de-passe-oublie.vue'),

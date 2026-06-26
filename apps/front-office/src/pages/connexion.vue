@@ -224,6 +224,18 @@ function goToAccount() {
               </RouterLink>
             </div>
 
+            <div class="border-t pt-5" style="border-color: var(--cacao-a12)">
+              <p class="font-sans text-[13px] leading-[1.7] text-cacao-2">
+                Pas encore de compte ?
+                <RouterLink
+                  to="/inscription"
+                  class="ml-1 border-b border-cacao pb-px text-cacao transition-opacity duration-180 hover:opacity-60"
+                >
+                  Créer un compte
+                </RouterLink>
+              </p>
+            </div>
+
             <p
               class="max-w-[420px] font-sans text-[11px] leading-[1.6] tracking-[0.04em] text-cacao-2"
             >
