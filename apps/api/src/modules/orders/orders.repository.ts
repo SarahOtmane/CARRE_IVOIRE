@@ -39,10 +39,6 @@ export class OrdersRepository {
         totalAmount: data.totalAmount,
         shippingAddress: data.shippingAddress,
         orderNumber: `TEMP-${Date.now()}`,
-        addressStreet: address.line1 ?? '',
-        addressCity: address.city ?? '',
-        addressZip: address.postalCode ?? '',
-        addressCountry: address.country ?? 'France',
       } as any,
       { transaction: t },
     )
