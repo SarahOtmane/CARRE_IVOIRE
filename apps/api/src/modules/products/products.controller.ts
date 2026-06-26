@@ -11,6 +11,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Header,
 } from '@nestjs/common'
 import { ProductsService } from './products.service'
 import { ProductVariantsService } from './product-variants.service'
@@ -30,11 +31,13 @@ export class ProductsController {
   ) {}
 
   @Get()
+  @Header('Cache-Control', 'public, max-age=60, stale-while-revalidate=30')
   findAll(@Query() query: ProductQueryDto) {
     return this.productsService.findAll(query)
   }
 
   @Get(':slug')
+  @Header('Cache-Control', 'public, max-age=300, stale-while-revalidate=60')
   findBySlug(@Param('slug') slug: string) {
     return this.productsService.findBySlug(slug)
   }
