@@ -6,11 +6,21 @@ import { UsersRepository } from './users.repository'
 import type { User } from './users.model'
 import type { UpdateUserDto } from './dto/update-user.dto'
 import type { ChangePasswordDto } from './dto/change-password.dto'
+import type { UserQueryDto } from './dto/user-query.dto'
 import type { UserResponseDto } from './dto/user-response.dto'
+import type { UsersPage } from './users.repository'
 
 @Injectable()
 export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) { }
+
+  async findAll(query: UserQueryDto): Promise<{ items: UserResponseDto[]; total: number; page: number; totalPages: number }> {
+    const page = await this.usersRepository.findAll(query)
+    return {
+      ...page,
+      items: page.items.map((u) => this.toResponseDto(u)),
+    }
+  }
 
   async findById(id: number): Promise<UserResponseDto> {
     const user = await this.usersRepository.findById(id)

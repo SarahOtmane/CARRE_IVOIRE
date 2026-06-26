@@ -4,6 +4,14 @@ import { Op } from 'sequelize'
 import { ErrorCodes } from '@/common/constants'
 import { User } from './users.model'
 import throwApiError from '@/common/errors/throw-api-error'
+import type { UserQueryDto } from './dto/user-query.dto'
+
+export interface UsersPage {
+  items: User[]
+  total: number
+  page: number
+  totalPages: number
+}
 
 export interface CreateUserInput {
   email: string
@@ -54,6 +62,36 @@ export class UsersRepository {
     const user = await this.findById(id)
     if (!user) throwApiError(ErrorCodes.USER_NOT_FOUND, 'Utilisateur introuvable')
     return user.update(data)
+  }
+
+  async findAll(query: UserQueryDto): Promise<UsersPage> {
+    const page = query.page ?? 1
+    const limit = query.limit ?? 25
+    const offset = (page - 1) * limit
+
+    const where: Record<string, unknown> = {}
+    if (query.search) {
+      where[Op.or as unknown as string] = [
+        { email: { [Op.like]: `%${query.search}%` } },
+        { first_name: { [Op.like]: `%${query.search}%` } },
+        { last_name: { [Op.like]: `%${query.search}%` } },
+      ]
+    }
+
+    const { count, rows } = await this.userModel.findAndCountAll({
+      where,
+      limit,
+      offset,
+      order: [['created_at', 'DESC']],
+      attributes: { exclude: ['password_hash', 'resetToken', 'resetTokenExpires'] },
+    })
+
+    return {
+      items: rows,
+      total: count,
+      page,
+      totalPages: Math.ceil(count / limit),
+    }
   }
 
   async emailExists(email: string): Promise<boolean> {
