@@ -33,6 +33,7 @@ export class MailService {
     orderNumber: string
     totalAmount: number
     items: { productName: string; quantity: number; unitPrice: number }[]
+    bcc?: string
   }): Promise<void> {
     const total = (params.totalAmount / 100).toFixed(2).replace('.', ',')
     const itemsHtml = params.items
@@ -68,7 +69,7 @@ export class MailService {
       </div>
     `
 
-    await this.send({ to: params.to, subject: `Commande ${params.orderNumber} confirmée — Carré Ivoire`, html })
+    await this.send({ to: params.to, bcc: params.bcc, subject: `Commande ${params.orderNumber} confirmée — Carré Ivoire`, html })
   }
 
   async sendPasswordReset(params: { to: string; firstName: string; resetUrl: string }): Promise<void> {
@@ -85,7 +86,7 @@ export class MailService {
     await this.send({ to: params.to, subject: 'Réinitialisation de votre mot de passe — Carré Ivoire', html })
   }
 
-  private async send(params: { to: string; subject: string; html: string }): Promise<void> {
+  private async send(params: { to: string; bcc?: string; subject: string; html: string }): Promise<void> {
     if (!this.transporter) {
       this.logger.log(`[EMAIL] To: ${params.to} | Subject: ${params.subject}`)
       return

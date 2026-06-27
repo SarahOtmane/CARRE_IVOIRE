@@ -202,11 +202,13 @@ export class OrdersService {
     const fullOrder = await this.ordersRepository.findById(order.id)
     const user = await this.usersRepository.findById(order.userId)
     if (fullOrder && user) {
+      const bccEmail = await this.settingsService.getAll().then((s) => s.bccEmail || undefined).catch(() => undefined)
       this.mailService.sendOrderConfirmation({
         to: user.email,
         firstName: user.first_name,
         orderNumber: fullOrder.orderNumber ?? `#${fullOrder.id}`,
         totalAmount: fullOrder.totalAmount,
+        bcc: bccEmail,
         items: ((fullOrder.items ?? []) as OrderItem[]).map((item) => ({
           productName: (item as any).productName ?? `Produit ${item.productId}`,
           quantity: item.quantity,
