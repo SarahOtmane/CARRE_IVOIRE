@@ -9,7 +9,6 @@ import {
   Unique,
   ForeignKey,
   BelongsTo,
-  Index,
 } from 'sequelize-typescript'
 import { User } from '@/modules/users/users.model'
 
@@ -18,6 +17,7 @@ import { User } from '@/modules/users/users.model'
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false,
+  indexes: [{ name: 'refresh_tokens_user_id', fields: ['user_id'] }],
 })
 export class RefreshToken extends Model<RefreshToken> {
   @PrimaryKey
@@ -27,7 +27,6 @@ export class RefreshToken extends Model<RefreshToken> {
 
   @ForeignKey(() => User)
   @AllowNull(false)
-  @Index
   @Column({ type: DataType.INTEGER.UNSIGNED, field: 'user_id' })
   declare userId: number
 

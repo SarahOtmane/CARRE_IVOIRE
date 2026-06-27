@@ -1,19 +1,19 @@
 # ─── Stage 1: Production dependencies (cacheable) ────────────────────
 FROM node:20-alpine AS dependencies
 WORKDIR /app
-# Copy root and app manifests + local packages so production dependencies can be resolved
+# Keep root workspace package.json so npm resolves @carre-ivoire/* packages via workspaces
 COPY package.json package-lock.json ./
-COPY apps/api/package*.json ./
 COPY packages ./packages
+COPY apps/api/package.json ./apps/api/package.json
 RUN npm install --only=production --legacy-peer-deps
 
 # ─── Stage 2: All dependencies (cacheable) ───────────────────────────
 FROM node:20-alpine AS build-deps
 WORKDIR /app
-# Copy manifests and local packages to resolve workspaces during build
+# Keep root workspace package.json so npm resolves @carre-ivoire/* packages via workspaces
 COPY package.json package-lock.json ./
-COPY apps/api/package*.json ./
 COPY packages ./packages
+COPY apps/api/package.json ./apps/api/package.json
 RUN npm install --legacy-peer-deps
 
 # ─── Stage 3: Build (cacheable si src inchangé) ──────────────────────
