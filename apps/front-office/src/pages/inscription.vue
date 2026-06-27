@@ -1,67 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useApi } from '@carre-ivoire/composables'
+import { useRegisterForm } from '@carre-ivoire/composables'
 import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Créer un compte — Carré Ivoire',
   meta: [{ name: 'description', content: 'Rejoignez Carré Ivoire pour commander, suivre vos envois et sauvegarder vos favoris.' }, { name: 'robots', content: 'noindex' }],
 })
-import { useAuthStore } from '@carre-ivoire/stores'
 
-const router = useRouter()
-const api = useApi()
-const authStore = useAuthStore()
-
-const form = ref({
-  firstName: '',
-  lastName: '',
-  email: '',
-  password: '',
-})
-
-const error = ref('')
-const loading = ref(false)
-
-async function register() {
-  error.value = ''
-
-  if (!form.value.firstName.trim() || !form.value.lastName.trim()) {
-    error.value = 'Veuillez renseigner votre prénom et votre nom.'
-    return
-  }
-  if (!form.value.email.trim()) {
-    error.value = 'Veuillez renseigner votre email.'
-    return
-  }
-  if (form.value.password.length < 8) {
-    error.value = 'Le mot de passe doit contenir au moins 8 caractères.'
-    return
-  }
-
-  loading.value = true
-  try {
-    const res = await api.post('/auth/register', {
-      firstName: form.value.firstName.trim(),
-      lastName: form.value.lastName.trim(),
-      email: form.value.email.trim(),
-      password: form.value.password,
-    })
-    const { accessToken, user } = res.data.data
-    authStore.setAuth(accessToken, user)
-    router.replace('/compte')
-  } catch (e: any) {
-    const code = e.response?.data?.error?.code
-    if (code === 'EMAIL_ALREADY_EXISTS') {
-      error.value = 'Un compte existe déjà avec cet email.'
-    } else {
-      error.value = 'Une erreur est survenue. Veuillez réessayer.'
-    }
-  } finally {
-    loading.value = false
-  }
-}
+const { form, error, loading, register } = useRegisterForm()
 </script>
 
 <template>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@carre-ivoire/stores";
+import { useLoginForm } from "@carre-ivoire/composables";
 import { useHead } from '@unhead/vue'
 
 useHead({
@@ -13,47 +14,12 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 
-import { useApi } from "@carre-ivoire/composables";
-
-const api = useApi();
-
-const form = ref({
-  email: authStore.user?.email ?? "",
-  password: "",
-});
-
-const error = ref("");
-const loading = ref(false);
-
 const redirectPath = computed(() => {
   const value = route.query.redirect;
   return typeof value === "string" && value.startsWith("/") ? value : "/compte";
 });
 
-async function login() {
-  error.value = "";
-
-  if (!form.value.email.trim() || !form.value.password.trim()) {
-    error.value = "Veuillez renseigner votre email et votre mot de passe.";
-    return;
-  }
-
-  loading.value = true;
-  try {
-    const res = await api.post("/auth/login", {
-      email: form.value.email.trim(),
-      password: form.value.password,
-    });
-    const { accessToken, user } = res.data.data;
-    authStore.setAuth(accessToken, user);
-    const target = user.role === "admin" && redirectPath.value === "/compte" ? "/admin" : redirectPath.value;
-    router.replace(target);
-  } catch {
-    error.value = "Email ou mot de passe incorrect.";
-  } finally {
-    loading.value = false;
-  }
-}
+const { email, password, error, loading, login } = useLoginForm(() => redirectPath.value);
 
 function goToAccount() {
   router.push(authStore.isAdmin ? "/admin" : "/compte");
@@ -156,7 +122,7 @@ function goToAccount() {
               </label>
               <input
                 id="login-email"
-                v-model="form.email"
+                v-model="email"
                 type="email"
                 autocomplete="email"
                 class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
@@ -173,7 +139,7 @@ function goToAccount() {
               </label>
               <input
                 id="login-password"
-                v-model="form.password"
+                v-model="password"
                 type="password"
                 autocomplete="current-password"
                 class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
