@@ -9,6 +9,7 @@ import { AuthController } from './auth.controller'
 import { LoginAttemptsService } from './login-attempts.service'
 import { RefreshTokensRepository } from './refresh-tokens.repository'
 import { RefreshToken } from './refresh-token.model'
+import { LoginAttempt } from './login-attempt.model'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { AdminGuard } from './guards/admin.guard'
@@ -17,7 +18,7 @@ import { RefreshTokensCleanupService } from './refresh-tokens-cleanup.service'
 @Module({
   imports: [
     ConfigModule,
-    SequelizeModule.forFeature([RefreshToken]),
+    SequelizeModule.forFeature([RefreshToken, LoginAttempt]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

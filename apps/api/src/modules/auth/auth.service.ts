@@ -52,24 +52,24 @@ export class AuthService {
 
   async login(dto: LoginDto): Promise<AuthResponseDto & TokenPair> {
     // Vérifier le blocage par email avant toute requête DB
-    this.loginAttempts.check(dto.email)
+    await this.loginAttempts.check(dto.email)
 
     // Même message d'erreur pour email inconnu ou mot de passe incorrect (anti-énumération)
     const INVALID_CREDENTIALS = () => throwApiError(ErrorCodes.INVALID_CREDENTIALS, 'Identifiants invalides')
 
     const user = await this.usersRepository.findByEmail(dto.email)
     if (!user || !user.is_active) {
-      this.loginAttempts.recordFailure(dto.email)
+      await this.loginAttempts.recordFailure(dto.email)
       INVALID_CREDENTIALS()
     }
 
     const passwordValid = await bcrypt.compare(dto.password, user!.password_hash)
     if (!passwordValid) {
-      this.loginAttempts.recordFailure(dto.email)
+      await this.loginAttempts.recordFailure(dto.email)
       INVALID_CREDENTIALS()
     }
 
-    this.loginAttempts.clearAttempts(dto.email)
+    await this.loginAttempts.clearAttempts(dto.email)
     const tokens = this.generateTokens(user!)
     await this.storeRefreshToken(user!.id, tokens.refreshToken)
     return { ...tokens, user: this.toAuthUserDto(user!) }
