@@ -19,6 +19,7 @@ const { categories } = useCategories()
 
 const selectedCategoryId = ref<number | undefined>()
 const searchTerm = ref('')
+const currentPage = ref(1)
 let searchTimeout: ReturnType<typeof setTimeout> | undefined
 
 const SORT_OPTIONS = [
@@ -33,18 +34,25 @@ const sortOpen = ref(false)
 const currentSort = computed(() => SORT_OPTIONS.find((s) => s.value === sort.value)!)
 const sortedProducts = computed(() => result.value.items)
 
-function applyFilters() {
+function applyFilters(page = 1) {
+  currentPage.value = page
   fetch({
     search: searchTerm.value.trim() || undefined,
     categoryId: selectedCategoryId.value,
     sort: currentSort.value.apiValue,
     limit: 12,
+    page,
   })
 }
 
 function filterByCategory(categoryId?: number) {
   selectedCategoryId.value = categoryId
-  applyFilters()
+  applyFilters(1)
+}
+
+function goToPage(page: number) {
+  applyFilters(page)
+  globalThis.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 watch(searchTerm, () => {
@@ -206,6 +214,36 @@ onUnmounted(() => {
         :key="product.id"
         :product="product"
       />
+    </div>
+
+    <!-- Pagination -->
+    <div
+      v-else-if="result.totalPages > 1"
+      class="mt-16 flex items-center justify-center gap-2"
+    >
+      <button
+        v-if="currentPage > 1"
+        class="border border-cacao px-4 py-2.5 font-sans text-[12px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire"
+        @click="goToPage(currentPage - 1)"
+      >
+        Précédent
+      </button>
+      <button
+        v-for="page in result.totalPages"
+        :key="page"
+        class="border px-4 py-2.5 font-sans text-[12px] tracking-[0.08em] transition-all duration-180"
+        :class="page === currentPage ? 'border-cacao bg-cacao text-ivoire' : 'border-cacao text-cacao hover:bg-cacao hover:text-ivoire'"
+        @click="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+      <button
+        v-if="currentPage < result.totalPages"
+        class="border border-cacao px-4 py-2.5 font-sans text-[12px] tracking-[0.08em] text-cacao transition-all duration-180 hover:bg-cacao hover:text-ivoire"
+        @click="goToPage(currentPage + 1)"
+      >
+        Suivant
+      </button>
     </div>
 
     <!-- État vide -->
