@@ -11,7 +11,7 @@ export class SettingsController {
   @Get('public')
   async getPublic() {
     const { shippingFlat, shippingFreeFrom } = await this.settingsService.getAll()
-    return { success: true, data: { shippingFlat, shippingFreeFrom } }
+    return { shippingFlat, shippingFreeFrom }
   }
 
   @Get()

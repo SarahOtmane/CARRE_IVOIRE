@@ -27,10 +27,7 @@ export interface AuthUser {
   role: UserRole
 }
 
-export interface UserProfile extends User {
-  ordersCount: number
-  favoritesCount: number
-}
+export type UserProfile = User
 
 // email, customerNumber et role ne sont pas modifiables via cet endpoint (cf. apps/api UpdateUserDto)
 export interface UpdateUserDto {
