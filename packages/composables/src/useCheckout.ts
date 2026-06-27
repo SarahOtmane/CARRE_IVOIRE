@@ -1,13 +1,11 @@
 /// <reference types="vite/client" />
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { loadStripe } from '@stripe/stripe-js'
 import type { Stripe, StripeCardElement } from '@stripe/stripe-js'
 import type { CartItem, ShippingAddress } from '@carre-ivoire/types'
 import { useApi } from './useApi'
 
-// Singleton Stripe — partagé entre tous les appels à useCheckout()
-const processing = ref(false)
-const stripeError = ref<string | null>(null)
+// _stripe est un singleton module-level : le SDK Stripe est lourd à charger
 let _stripe: Stripe | null = null
 let _cardElement: StripeCardElement | null = null
 
@@ -19,6 +17,17 @@ async function initStripe(): Promise<Stripe | null> {
 }
 
 export function useCheckout() {
+  // États par instance — pas partagés entre composants
+  const processing = ref(false)
+  const stripeError = ref<string | null>(null)
+
+  onUnmounted(() => {
+    if (_cardElement) {
+      _cardElement.destroy()
+      _cardElement = null
+    }
+  })
+
   async function mountCard(container: HTMLElement): Promise<void> {
     const stripe = await initStripe()
     if (!stripe) return
