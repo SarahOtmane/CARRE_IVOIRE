@@ -2,6 +2,12 @@
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@carre-ivoire/stores";
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Commande confirmée — Carré Ivoire',
+  meta: [{ name: 'robots', content: 'noindex' }],
+})
 
 const router = useRouter();
 const route = useRoute();

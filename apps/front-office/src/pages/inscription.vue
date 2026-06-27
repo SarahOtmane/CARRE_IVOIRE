@@ -2,6 +2,12 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApi } from '@carre-ivoire/composables'
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Créer un compte — Carré Ivoire',
+  meta: [{ name: 'description', content: 'Rejoignez Carré Ivoire pour commander, suivre vos envois et sauvegarder vos favoris.' }, { name: 'robots', content: 'noindex' }],
+})
 import { useAuthStore } from '@carre-ivoire/stores'
 
 const router = useRouter()

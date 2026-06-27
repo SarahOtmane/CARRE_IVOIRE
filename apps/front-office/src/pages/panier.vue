@@ -2,6 +2,12 @@
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@carre-ivoire/stores";
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Panier — Carré Ivoire',
+  meta: [{ name: 'robots', content: 'noindex' }],
+})
 import { useCartStore } from "@carre-ivoire/stores";
 import { usePublicSettings } from "@carre-ivoire/composables";
 import CartItem from "@/components/cart/CartItem.vue";

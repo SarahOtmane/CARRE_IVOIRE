@@ -2,6 +2,12 @@
 import { useRouter } from "vue-router";
 import { useFavorites } from "@carre-ivoire/composables";
 import ProductCard from "@/components/product/ProductCard.vue";
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Mes favoris — Carré Ivoire',
+  meta: [{ name: 'robots', content: 'noindex' }],
+})
 
 const router = useRouter();
 const { favorites, isLoading } = useFavorites();

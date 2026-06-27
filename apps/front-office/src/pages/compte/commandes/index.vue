@@ -2,6 +2,12 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserOrders } from '@carre-ivoire/composables'
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Mes commandes — Carré Ivoire',
+  meta: [{ name: 'robots', content: 'noindex' }],
+})
 
 const router = useRouter()
 const { orders, isLoading, error, totalSpent, fetchOrders } = useUserOrders()

@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Nous contacter — Carré Ivoire',
+  meta: [{ name: 'description', content: 'Une question sur votre commande, un projet de collaboration ou simplement l\'envie d\'échanger — contactez l\'atelier Carré Ivoire.' }],
+})
 
 type ContactForm = {
   subject: string;

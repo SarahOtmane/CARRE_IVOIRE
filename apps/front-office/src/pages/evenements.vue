@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 
 const router = useRouter()
+
+useHead({
+  title: 'Nos événements — Carré Ivoire',
+  meta: [{ name: 'description', content: 'Marchés, ateliers de dégustation et collaborations : retrouvez Carré Ivoire lors de nos prochains événements.' }],
+})
 
 interface Evenement {
   id: string

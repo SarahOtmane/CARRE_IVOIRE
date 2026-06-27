@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 
 const router = useRouter()
+
+useHead({
+  title: 'Nos engagements — Carré Ivoire',
+  meta: [{ name: 'description', content: 'Bean-to-bar, origines tracées, emballages sobres : découvrez les engagements de Carré Ivoire pour un chocolat artisanal responsable.' }],
+})
 
 const engagements = [
   {

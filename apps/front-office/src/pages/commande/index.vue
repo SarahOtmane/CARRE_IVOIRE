@@ -2,6 +2,12 @@
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useCartStore } from "@carre-ivoire/stores";
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Commande — Carré Ivoire',
+  meta: [{ name: 'robots', content: 'noindex' }],
+})
 import { useCheckout } from "@carre-ivoire/composables";
 import type { ShippingAddress } from "@carre-ivoire/types";
 import CheckoutForm from "@/components/checkout/CheckoutForm.vue";

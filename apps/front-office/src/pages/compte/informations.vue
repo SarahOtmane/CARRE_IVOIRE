@@ -2,6 +2,12 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@carre-ivoire/stores'
 import { useApi } from '@carre-ivoire/composables'
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Mes informations — Carré Ivoire',
+  meta: [{ name: 'robots', content: 'noindex' }],
+})
 
 const authStore = useAuthStore()
 const api = useApi()

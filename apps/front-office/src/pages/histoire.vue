@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useHead } from '@unhead/vue'
 
 const router = useRouter()
+
+useHead({
+  title: 'Notre histoire — Carré Ivoire',
+  meta: [{ name: 'description', content: 'De la fève au carré : découvrez l\'histoire de Carré Ivoire, chocolaterie artisanale bean-to-bar.' }],
+})
 
 const etapes = [
   {
