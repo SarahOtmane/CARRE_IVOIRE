@@ -9,7 +9,13 @@ const router = useRouter();
 const { products, fetchAll: fetchProducts } = useAdminProducts();
 const { orders, fetchAll: fetchOrders } = useAdminOrders();
 
-onMounted(() => Promise.all([fetchProducts(), fetchOrders()]));
+onMounted(async () => {
+  try {
+    await Promise.all([fetchProducts(), fetchOrders()])
+  } catch {
+    /* les erreurs individuelles sont déjà gérées par chaque composable */
+  }
+});
 
 function formatPrice(centimes: number) {
   return `${(centimes / 100).toFixed(2).replace(".", ",")} €`;
