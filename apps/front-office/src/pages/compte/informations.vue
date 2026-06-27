@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@carre-ivoire/stores'
 import { useApi } from '@carre-ivoire/composables'
 
@@ -14,6 +14,18 @@ const form = ref({
   addressCity: '',
   addressZip: '',
   addressCountry: 'France',
+})
+
+onMounted(async () => {
+  try {
+    const res = await api.get<{ data: { phone: string | null; addressStreet: string | null; addressCity: string | null; addressZip: string | null; addressCountry: string } }>('/users/me')
+    const u = res.data.data
+    form.value.phone = u.phone ?? ''
+    form.value.addressStreet = u.addressStreet ?? ''
+    form.value.addressCity = u.addressCity ?? ''
+    form.value.addressZip = u.addressZip ?? ''
+    form.value.addressCountry = u.addressCountry ?? 'France'
+  } catch { /* silencieux — le formulaire reste utilisable vide */ }
 })
 
 const passwordForm = ref({
