@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { Op } from 'sequelize'
+import { createHash } from 'crypto'
 import { ErrorCodes } from '@/common/constants'
 import { User } from './users.model'
 import throwApiError from '@/common/errors/throw-api-error'
@@ -100,16 +101,18 @@ export class UsersRepository {
   }
 
   async findByResetToken(token: string): Promise<User | null> {
+    const tokenHash = createHash('sha256').update(token).digest('hex')
     return this.userModel.findOne({
       where: {
-        resetToken: token,
+        resetToken: tokenHash,
         resetTokenExpires: { [Op.gt]: new Date() },
       },
     })
   }
 
   async setResetToken(id: number, token: string, expiresAt: Date): Promise<void> {
-    await this.userModel.update({ resetToken: token, resetTokenExpires: expiresAt } as any, { where: { id } })
+    const tokenHash = createHash('sha256').update(token).digest('hex')
+    await this.userModel.update({ resetToken: tokenHash, resetTokenExpires: expiresAt } as any, { where: { id } })
   }
 
   async clearResetToken(id: number, newPasswordHash: string): Promise<void> {
