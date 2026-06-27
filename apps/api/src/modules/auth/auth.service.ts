@@ -32,7 +32,8 @@ export class AuthService {
   async register(dto: RegisterDto): Promise<AuthResponseDto & TokenPair> {
     const exists = await this.usersRepository.emailExists(dto.email)
     if (exists) {
-      throwApiError(ErrorCodes.EMAIL_ALREADY_EXISTS, 'Un compte existe déjà avec cette adresse email')
+      // Réponse générique — ne pas révéler si l'email est déjà enregistré (anti-énumération)
+      throwApiError(ErrorCodes.EMAIL_ALREADY_EXISTS, 'Vérifiez vos informations et réessayez.')
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 12)
