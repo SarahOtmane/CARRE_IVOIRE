@@ -17,7 +17,12 @@ const togglingFavorite = ref(false)
 const slug = route.params.slug as string
 const { product, isLoading } = useProduct(slug)
 
-const { result: relatedResult } = useProducts({ limit: 3 })
+const { result: relatedResult, fetch: refetchRelated } = useProducts({ limit: 4 })
+
+// Refetch related products with the current product's category once loaded
+watch(product, (p) => {
+  if (p?.categoryId) refetchRelated({ categoryId: p.categoryId, limit: 4 })
+}, { immediate: false })
 
 useHead(computed(() => ({
   title: product.value ? `${product.value.name} — Carré Ivoire` : 'Carré Ivoire',

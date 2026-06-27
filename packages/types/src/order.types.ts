@@ -31,6 +31,7 @@ export interface OrderItem {
 
 export interface Order {
   id: number
+  orderNumber: string
   userId: number
   status: OrderStatus
   totalAmount: number
@@ -61,5 +62,5 @@ export interface CreateOrderDto {
     format?: string
   }>
   shippingAddress: ShippingAddress
-  shippingAmount?: number
+  deliveryType?: 'pickup' | 'delivery'
 }

@@ -3,13 +3,17 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@carre-ivoire/stores";
 import { useCartStore } from "@carre-ivoire/stores";
+import { usePublicSettings } from "@carre-ivoire/composables";
 import CartItem from "@/components/cart/CartItem.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const cartStore = useCartStore();
+const { shippingFlatEuros, shippingFreeFromEuros } = usePublicSettings();
 
-const shippingFee = computed(() => (cartStore.total >= 70 ? 0 : 8));
+const shippingFee = computed(() =>
+  cartStore.total >= shippingFreeFromEuros() ? 0 : shippingFlatEuros()
+);
 const grandTotal = computed(() => cartStore.total + shippingFee.value);
 
 function goToCheckout() {
@@ -156,7 +160,7 @@ function goToCheckout() {
         </div>
 
         <p class="font-sans text-[13px] leading-[1.7] text-cacao-2">
-          Livraison offerte dès 70 €. Si vous êtes connecté, vous passerez
+          Livraison offerte dès {{ shippingFreeFromEuros().toFixed(0) }} €. Si vous êtes connecté, vous passerez
           directement au tunnel de commande.
         </p>
 

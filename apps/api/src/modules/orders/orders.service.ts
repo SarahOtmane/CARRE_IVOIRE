@@ -10,6 +10,7 @@ import { OrdersRepository } from './orders.repository'
 import { StripeService } from './stripe.service'
 import { MailService } from '@/modules/mail/mail.service'
 import { UsersRepository } from '@/modules/users/users.repository'
+import { SettingsService } from '@/modules/settings/settings.service'
 import type { Order } from './order.model'
 import type { OrderItem } from './order-item.model'
 import type { CreateOrderDto } from './dto/create-order.dto'
@@ -26,12 +27,16 @@ export class OrdersService {
     private readonly stripeService: StripeService,
     private readonly mailService: MailService,
     private readonly usersRepository: UsersRepository,
+    private readonly settingsService: SettingsService,
   ) { }
 
   async createOrder(dto: CreateOrderDto, userId: number): Promise<OrderCreatedResponseDto> {
     if (!dto.items || dto.items.length === 0) {
       throwApiError(ErrorCodes.CART_EMPTY, 'Le panier est vide')
     }
+
+    // Récupérer les settings avant la transaction pour calculer les frais de livraison côté serveur
+    const settings = await this.settingsService.getAll()
 
     // 1. Réservation atomique du stock + création de la commande (statut payment_pending),
     //    dans une transaction courte qui ne contient aucun appel réseau externe.
@@ -92,7 +97,11 @@ export class OrdersService {
         return acc + product.price * item.quantity
       }, 0)
 
-      const totalAmount = itemsTotal + (dto.shippingAmount ?? 0)
+      // Frais calculés serveur — le client ne peut pas imposer un montant
+      const shippingAmount = dto.deliveryType === 'pickup'
+        ? 0
+        : (itemsTotal >= settings.shippingFreeFrom ? 0 : settings.shippingFlat)
+      const totalAmount = itemsTotal + shippingAmount
 
       const order = await this.ordersRepository.create(
         { userId, totalAmount, shippingAddress: dto.shippingAddress },
@@ -130,6 +139,7 @@ export class OrdersService {
 
       return {
         orderId: order.id,
+        orderNumber: order.orderNumber,
         status: 'payment_pending',
         clientSecret: paymentIntent.client_secret,
         totalAmount,
@@ -195,7 +205,7 @@ export class OrdersService {
       this.mailService.sendOrderConfirmation({
         to: user.email,
         firstName: user.first_name,
-        orderNumber: (fullOrder as any).orderNumber ?? `#${fullOrder.id}`,
+        orderNumber: fullOrder.orderNumber ?? `#${fullOrder.id}`,
         totalAmount: fullOrder.totalAmount,
         items: ((fullOrder.items ?? []) as OrderItem[]).map((item) => ({
           productName: (item as any).productName ?? `Produit ${item.productId}`,
@@ -228,6 +238,7 @@ export class OrdersService {
   private toResponseDto(order: Order): OrderResponseDto {
     return {
       id: order.id,
+      orderNumber: order.orderNumber ?? `#${order.id}`,
       userId: order.userId,
       status: order.status,
       totalAmount: order.totalAmount,

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useAuthStore } from "@carre-ivoire/stores";
+import { usePublicSettings } from "@carre-ivoire/composables";
 
 type ShippingPayload = {
   firstName: string;
@@ -21,19 +22,20 @@ const emit = defineEmits<{
 }>();
 
 const authStore = useAuthStore();
+const { shippingFlatEuros } = usePublicSettings();
 
-const deliveryOptions = [
+const deliveryOptions = computed(() => [
   {
     id: "courier",
     name: "Coursier Paris",
     detail: "24h — Paris intra-muros",
-    price: 8,
+    price: shippingFlatEuros(),
   },
   {
     id: "chrono",
     name: "ChronoFresh",
     detail: "24–48h — France métropolitaine",
-    price: 14,
+    price: shippingFlatEuros() + 6,
   },
   {
     id: "pickup",
@@ -41,7 +43,7 @@ const deliveryOptions = [
     detail: "4 rue du Nil, Paris 2",
     price: 0,
   },
-] as const;
+]);
 
 const form = ref({
   firstName: authStore.user?.firstName ?? "",
@@ -59,8 +61,8 @@ const errors = ref<Record<string, string>>({});
 
 const selectedDelivery = computed(
   () =>
-    deliveryOptions.find((option) => option.id === form.value.deliveryId) ??
-    deliveryOptions[0],
+    deliveryOptions.value.find((option) => option.id === form.value.deliveryId) ??
+    deliveryOptions.value[0],
 );
 
 function validate(): boolean {

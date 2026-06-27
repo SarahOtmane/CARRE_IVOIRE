@@ -15,6 +15,7 @@ import {
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  indexes: [{ name: 'idx_users_reset_token', fields: ['reset_token'] }],
 })
 export class User extends Model<User> {
   @PrimaryKey

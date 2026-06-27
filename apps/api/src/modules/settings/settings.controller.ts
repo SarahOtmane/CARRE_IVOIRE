@@ -5,16 +5,23 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard'
 import { AdminGuard } from '@/modules/auth/guards/admin.guard'
 
 @Controller('settings')
-@UseGuards(JwtAuthGuard, AdminGuard)
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
 
+  @Get('public')
+  async getPublic() {
+    const { shippingFlat, shippingFreeFrom } = await this.settingsService.getAll()
+    return { success: true, data: { shippingFlat, shippingFreeFrom } }
+  }
+
   @Get()
+  @UseGuards(JwtAuthGuard, AdminGuard)
   getAll() {
     return this.settingsService.getAll()
   }
 
   @Patch()
+  @UseGuards(JwtAuthGuard, AdminGuard)
   update(@Body() dto: UpdateSettingsDto) {
     return this.settingsService.update(dto)
   }

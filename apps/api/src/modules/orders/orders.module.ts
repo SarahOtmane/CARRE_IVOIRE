@@ -13,9 +13,10 @@ import { StripeService } from './stripe.service'
 import { StripeController } from './stripe.controller'
 import { StripeWebhookEventsRepository } from './stripe-webhook-events.repository'
 import { UsersModule } from '@/modules/users/users.module'
+import { SettingsModule } from '@/modules/settings/settings.module'
 
 @Module({
-  imports: [SequelizeModule.forFeature([Order, OrderItem, StripeWebhookEvent, Product, ProductVariant]), ProductsModule, UsersModule],
+  imports: [SequelizeModule.forFeature([Order, OrderItem, StripeWebhookEvent, Product, ProductVariant]), ProductsModule, UsersModule, SettingsModule],
   providers: [OrdersRepository, OrdersService, StripeService, StripeWebhookEventsRepository],
   controllers: [OrdersController, StripeController],
   exports: [OrdersService],

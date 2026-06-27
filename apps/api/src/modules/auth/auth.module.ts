@@ -12,6 +12,7 @@ import { RefreshToken } from './refresh-token.model'
 import { JwtStrategy } from './strategies/jwt.strategy'
 import { JwtAuthGuard } from './guards/jwt-auth.guard'
 import { AdminGuard } from './guards/admin.guard'
+import { RefreshTokensCleanupService } from './refresh-tokens-cleanup.service'
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { AdminGuard } from './guards/admin.guard'
       useFactory: (configService: ConfigService): JwtModuleOptions => ({
         secret: configService.getOrThrow<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: (configService.get<string>('JWT_EXPIRATION', '24h')) as any,
+          expiresIn: (configService.get<string>('JWT_EXPIRATION', '1h')) as any,
           algorithm: 'HS256',
         },
       }),
@@ -31,7 +32,7 @@ import { AdminGuard } from './guards/admin.guard'
     }),
     UsersModule,
   ],
-  providers: [AuthService, LoginAttemptsService, RefreshTokensRepository, JwtStrategy, JwtAuthGuard, AdminGuard],
+  providers: [AuthService, LoginAttemptsService, RefreshTokensRepository, JwtStrategy, JwtAuthGuard, AdminGuard, RefreshTokensCleanupService],
   controllers: [AuthController],
   exports: [JwtAuthGuard, AdminGuard, AuthService],
 })

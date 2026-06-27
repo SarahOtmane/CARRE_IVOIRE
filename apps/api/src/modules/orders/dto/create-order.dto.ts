@@ -66,7 +66,6 @@ export class CreateOrderDto {
   shippingAddress: ShippingAddressDto
 
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  shippingAmount?: number
+  @IsString()
+  deliveryType?: 'pickup' | 'delivery'
 }

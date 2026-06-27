@@ -7,6 +7,7 @@ import { ProductVariantsRepository } from '@/modules/products/product-variants.r
 import { StripeService } from './stripe.service'
 import { MailService } from '@/modules/mail/mail.service'
 import { UsersRepository } from '@/modules/users/users.repository'
+import { SettingsService } from '@/modules/settings/settings.service'
 
 const mockTransaction = { commit: jest.fn(), rollback: jest.fn() }
 const mockSequelize = { transaction: jest.fn((cb) => cb(mockTransaction)) }
@@ -77,6 +78,12 @@ describe('OrdersService', () => {
         {
           provide: UsersRepository,
           useValue: { findById: jest.fn().mockResolvedValue(mockUser) },
+        },
+        {
+          provide: SettingsService,
+          useValue: {
+            getAll: jest.fn().mockResolvedValue({ shippingFlat: 0, shippingFreeFrom: 0, bccEmail: '', address: '' }),
+          },
         },
       ],
     }).compile()

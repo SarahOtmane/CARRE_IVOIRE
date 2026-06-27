@@ -11,6 +11,9 @@ const form = ref({
   lastName: authStore.user?.lastName ?? '',
   phone: '',
   addressStreet: '',
+  addressCity: '',
+  addressZip: '',
+  addressCountry: 'France',
 })
 
 const passwordForm = ref({
@@ -41,6 +44,9 @@ async function save() {
         lastName: form.value.lastName.trim() || undefined,
         phone: form.value.phone.trim() || undefined,
         addressStreet: form.value.addressStreet.trim() || undefined,
+        addressCity: form.value.addressCity.trim() || undefined,
+        addressZip: form.value.addressZip.trim() || undefined,
+        addressCountry: form.value.addressCountry.trim() || undefined,
       },
     )
 
@@ -188,13 +194,70 @@ async function changePassword() {
               for="account-address"
               class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
-              Adresse de livraison
+              Rue
             </label>
             <input
               id="account-address"
               v-model="form.addressStreet"
               type="text"
-              placeholder="4 rue du Nil, 75002 Paris"
+              autocomplete="address-line1"
+              placeholder="4 rue du Nil"
+              class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
+              style="border-bottom: 1px solid var(--brun-cacao)"
+            />
+          </div>
+
+          <!-- Ville + Code postal -->
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label
+                for="account-city"
+                class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
+              >
+                Ville
+              </label>
+              <input
+                id="account-city"
+                v-model="form.addressCity"
+                type="text"
+                autocomplete="address-level2"
+                placeholder="Paris"
+                class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
+                style="border-bottom: 1px solid var(--brun-cacao)"
+              />
+            </div>
+            <div>
+              <label
+                for="account-zip"
+                class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
+              >
+                Code postal
+              </label>
+              <input
+                id="account-zip"
+                v-model="form.addressZip"
+                type="text"
+                autocomplete="postal-code"
+                placeholder="75002"
+                class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
+                style="border-bottom: 1px solid var(--brun-cacao)"
+              />
+            </div>
+          </div>
+
+          <!-- Pays -->
+          <div>
+            <label
+              for="account-country"
+              class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
+            >
+              Pays
+            </label>
+            <input
+              id="account-country"
+              v-model="form.addressCountry"
+              type="text"
+              autocomplete="country-name"
               class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
               style="border-bottom: 1px solid var(--brun-cacao)"
             />
@@ -297,7 +360,7 @@ async function changePassword() {
             Livraison
           </div>
           <p class="mt-3 font-serif text-[18px] leading-[1.45] text-cacao">
-            {{ form.addressStreet }}
+            {{ form.addressStreet }}<span v-if="form.addressCity">, {{ form.addressZip }} {{ form.addressCity }}</span>
           </p>
         </div>
       </aside>

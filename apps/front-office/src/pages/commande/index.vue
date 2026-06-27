@@ -48,17 +48,19 @@ async function handlePaymentSubmit() {
     country: shipping.value.country,
   };
 
+  const deliveryType = shipping.value.deliveryId === "pickup" ? "pickup" : "delivery";
+
   try {
-    const { orderId, totalAmount } = await submitOrder(
+    const { orderNumber, totalAmount } = await submitOrder(
       cartStore.items,
       shippingAddress,
-      Math.round(shippingFee.value * 100),
+      deliveryType,
     );
 
     globalThis.sessionStorage.setItem(
       "ci:last-checkout",
       JSON.stringify({
-        orderNumber: `#${orderId}`,
+        orderNumber,
         total: totalAmount / 100,
         shipping: shipping.value,
         items: cartStore.items,
@@ -69,7 +71,7 @@ async function handlePaymentSubmit() {
     router.replace({
       name: "checkout-confirmation",
       query: {
-        order: `#${orderId}`,
+        order: orderNumber,
         total: (totalAmount / 100).toFixed(2),
       },
     });

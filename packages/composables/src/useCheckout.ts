@@ -49,8 +49,8 @@ export function useCheckout() {
   async function submitOrder(
     cartItems: CartItem[],
     shippingAddress: ShippingAddress,
-    shippingAmount: number = 0,
-  ): Promise<{ orderId: number; totalAmount: number }> {
+    deliveryType: 'pickup' | 'delivery' = 'delivery',
+  ): Promise<{ orderId: number; orderNumber: string; totalAmount: number }> {
     if (!_stripe || !_cardElement) throw new Error('Stripe non initialisé')
 
     processing.value = true
@@ -58,7 +58,7 @@ export function useCheckout() {
 
     try {
       const api = useApi()
-      const response = await api.post<{ data: { orderId: number; clientSecret: string; totalAmount: number } }>(
+      const response = await api.post<{ data: { orderId: number; orderNumber: string; clientSecret: string; totalAmount: number } }>(
         '/orders',
         {
           items: cartItems.map((i) => ({
@@ -68,11 +68,11 @@ export function useCheckout() {
             format: i.format,
           })),
           shippingAddress,
-          shippingAmount,
+          deliveryType,
         },
       )
 
-      const { orderId, clientSecret, totalAmount } = response.data.data
+      const { orderId, orderNumber, clientSecret, totalAmount } = response.data.data
       if (!clientSecret) throw new Error('Réponse serveur invalide')
 
       const result = await _stripe.confirmCardPayment(clientSecret, {
@@ -84,7 +84,7 @@ export function useCheckout() {
         throw new Error(stripeError.value)
       }
 
-      return { orderId, totalAmount }
+      return { orderId, orderNumber, totalAmount }
     } catch (error) {
       // Les erreurs API sont déjà notifiées par l'intercepteur useApi
       // On re-throw pour que la page puisse interrompre le flux

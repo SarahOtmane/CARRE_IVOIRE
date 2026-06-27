@@ -83,42 +83,16 @@ function goToAccount() {
         </p>
       </div>
 
-      <div class="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
-          <div
-            class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
-          >
-            Commandes
-          </div>
-          <div
-            class="mt-2 font-serif text-[32px] font-medium leading-none text-cacao"
-          >
-            12
-          </div>
+      <div class="mt-16 border-t pt-4" style="border-color: var(--cacao-a12)">
+        <div
+          class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
+        >
+          Retour
         </div>
-        <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
-          <div
-            class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
-          >
-            Favoris
-          </div>
-          <div
-            class="mt-2 font-serif text-[32px] font-medium leading-none text-cacao"
-          >
-            4
-          </div>
-        </div>
-        <div class="border-t pt-4" style="border-color: var(--cacao-a12)">
-          <div
-            class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
-          >
-            Retour
-          </div>
-          <div
-            class="mt-2 font-serif text-[32px] font-medium leading-none text-cacao"
-          >
-            Rapide
-          </div>
+        <div
+          class="mt-2 font-serif text-[32px] font-medium leading-none text-cacao"
+        >
+          Rapide
         </div>
       </div>
     </section>

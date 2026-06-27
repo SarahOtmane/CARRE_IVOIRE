@@ -27,6 +27,8 @@ export function useProducts(initialQuery: ProductQuery = {}) {
     withLoading(async () => {
       const params = new URLSearchParams()
       if (query.categoryId) params.set('categoryId', String(query.categoryId))
+      if (query.search) params.set('search', query.search)
+      if (query.sort) params.set('sort', query.sort)
       if (query.page) params.set('page', String(query.page))
       if (query.limit) params.set('limit', String(query.limit))
 

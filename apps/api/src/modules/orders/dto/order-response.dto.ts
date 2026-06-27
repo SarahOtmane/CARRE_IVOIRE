@@ -11,6 +11,7 @@ export interface OrderItemResponseDto {
 
 export interface OrderResponseDto {
   id: number
+  orderNumber: string
   userId: number
   status: string
   totalAmount: number
@@ -23,6 +24,7 @@ export interface OrderResponseDto {
 
 export interface OrderCreatedResponseDto {
   orderId: number
+  orderNumber: string
   status: string
   clientSecret: string | null
   totalAmount: number
