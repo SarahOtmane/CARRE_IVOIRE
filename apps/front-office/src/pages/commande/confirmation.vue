@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@carre-ivoire/stores";
+import { useApi } from "@carre-ivoire/composables";
 import { useHead } from '@unhead/vue'
 
 useHead({
@@ -12,25 +13,52 @@ useHead({
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const api = useApi();
 
-const checkoutSnapshot = computed(() => {
-  const raw = globalThis.sessionStorage.getItem("ci:last-checkout");
-  return raw
-    ? (JSON.parse(raw) as {
-        orderNumber?: string;
-        total?: number;
-        shipping?: {
-          firstName?: string;
-          lastName?: string;
-          email?: string;
-          address?: string;
-          postalCode?: string;
-          city?: string;
-          deliveryLabel?: string;
-        };
-        items?: Array<{ name: string; quantity: number }>;
-      })
-    : null;
+type Snapshot = {
+  orderNumber?: string;
+  total?: number;
+  shipping?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    address?: string;
+    postalCode?: string;
+    city?: string;
+    deliveryLabel?: string;
+  };
+  items?: Array<{ name: string; quantity: number }>;
+};
+
+const checkoutSnapshot = ref<Snapshot | null>(null);
+
+onMounted(async () => {
+  const raw = globalThis.sessionStorage?.getItem("ci:last-checkout");
+  if (raw) {
+    checkoutSnapshot.value = JSON.parse(raw) as Snapshot;
+    return;
+  }
+  // Repli sur l'API si sessionStorage est vide (ex: onglet réouvert)
+  const orderNumber = typeof route.query.order === "string" ? route.query.order : null;
+  if (!orderNumber) return;
+  try {
+    const res = await api.get(`/orders/by-number/${orderNumber}`);
+    const o = res.data?.data;
+    if (o) {
+      checkoutSnapshot.value = {
+        orderNumber: o.orderNumber,
+        total: o.totalAmount / 100,
+        shipping: o.shippingAddress ? {
+          firstName: o.shippingAddress.firstName,
+          lastName: o.shippingAddress.lastName,
+          address: o.shippingAddress.line1,
+          postalCode: o.shippingAddress.postalCode,
+          city: o.shippingAddress.city,
+        } : undefined,
+        items: (o.items ?? []).map((i: { productName?: string; quantity: number }) => ({ name: i.productName ?? '—', quantity: i.quantity })),
+      };
+    }
+  } catch { /* sessionStorage vide + API inaccessible : affiche les valeurs par défaut */ }
 });
 
 const orderNumber = computed(() =>
