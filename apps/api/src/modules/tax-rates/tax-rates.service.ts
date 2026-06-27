@@ -47,7 +47,14 @@ export class TaxRatesService {
   async delete(id: number): Promise<void> {
     const existing = await this.repo.findById(id)
     if (!existing) throwApiError(ErrorCodes.TAX_RATE_NOT_FOUND, 'Taux de TVA introuvable')
-    await this.repo.delete(id)
+    try {
+      await this.repo.delete(id)
+    } catch (err: any) {
+      if (err?.name === 'SequelizeForeignKeyConstraintError') {
+        throwApiError(ErrorCodes.CONFLICT, 'Ce taux de TVA est utilisé par des produits et ne peut pas être supprimé.')
+      }
+      throw err
+    }
   }
 
   private toDto(row: { id: number; label: string; rate: number; isDefault: number }): TaxRateResponse {

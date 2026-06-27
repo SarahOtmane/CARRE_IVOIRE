@@ -39,7 +39,14 @@ export class CategoriesService {
     if (!existing) {
       throwApiError(ErrorCodes.CATEGORY_NOT_FOUND, 'Catégorie introuvable')
     }
-    await this.categoriesRepository.delete(id)
+    try {
+      await this.categoriesRepository.delete(id)
+    } catch (err: any) {
+      if (err?.name === 'SequelizeForeignKeyConstraintError') {
+        throwApiError(ErrorCodes.CONFLICT, 'Cette catégorie est utilisée par des produits et ne peut pas être supprimée.')
+      }
+      throw err
+    }
   }
 
   private toResponseDto(c: Category): CategoryResponseDto {
