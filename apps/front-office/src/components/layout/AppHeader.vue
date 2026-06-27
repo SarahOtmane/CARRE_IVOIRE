@@ -2,12 +2,13 @@
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useCartStore } from "@carre-ivoire/stores";
-import { useProductSearch } from "@carre-ivoire/composables";
+import { useProductSearch, useCategories } from "@carre-ivoire/composables";
 
 const router = useRouter();
 const route = useRoute();
 const cartStore = useCartStore();
 const { results: searchResults, isSearching, search: runSearch } = useProductSearch();
+const { categories: megaCategories } = useCategories();
 
 const scrolled = ref(false);
 const hovered = ref(false);
@@ -67,17 +68,7 @@ const navItems = [
   { id: "contact", label: "nous contacter", path: "/contact" },
 ];
 
-const boutiqueCats = [
-  { label: "Carrés Signature", slug: "carres-signature" },
-  { label: "Mini Carrés", slug: "mini-carres" },
-  { label: "Tablettes", slug: "tablettes" },
-  { label: "Gourmandises", slug: "gourmandises" },
-  { label: "Sablés", slug: "sables" },
-  { label: "Mendiants", slug: "mendiants" },
-  { label: "Oursons", slug: "oursons" },
-  { label: "Chocobombs", slug: "chocobombs" },
-  { label: "Pâtes à tartiner", slug: "pates-a-tartiner" },
-];
+const boutiqueCats = megaCategories;
 
 const suggestions = [
   "Carrés Signature",
@@ -343,7 +334,7 @@ function toggleSearch() {
             :key="cat.slug"
             class="group cursor-pointer font-serif text-xl text-cacao transition-all duration-200 hover:italic"
             @click="navigate('/boutique/' + cat.slug)"
-            >{{ cat.label }}</a
+            >{{ cat.name }}</a
           >
         </div>
 
