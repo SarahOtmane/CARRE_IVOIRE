@@ -6,7 +6,22 @@ vi.mock('@carre-ivoire/stores', () => ({
   useAuthStore: () => ({
     user: { firstName: 'Sara', lastName: 'Otmane', email: 'sara@test.fr' },
   }),
+  useNotificationStore: () => ({ addNotification: vi.fn() }),
 }))
+
+vi.mock('@carre-ivoire/composables', async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+  const actual = await importOriginal<typeof import('@carre-ivoire/composables')>()
+  return {
+    ...actual,
+    usePublicSettings: () => ({
+      settings: { value: null },
+      shippingFlatEuros: () => 8,
+      shippingFreeFromEuros: () => 70,
+      fetch: vi.fn(),
+    }),
+  }
+})
 
 function mountForm() {
   return mount(CheckoutForm, {

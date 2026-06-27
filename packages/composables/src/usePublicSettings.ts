@@ -23,7 +23,8 @@ export function usePublicSettings() {
     settings.value = _cache
   }
 
-  onMounted(fetch)
+  // Silently ignore fetch errors — les valeurs par défaut prennent le relais
+  onMounted(() => fetch().catch(() => {}))
 
   const shippingFlatEuros = () => (_cache?.shippingFlat ?? 800) / 100
   const shippingFreeFromEuros = () => (_cache?.shippingFreeFrom ?? 7000) / 100
