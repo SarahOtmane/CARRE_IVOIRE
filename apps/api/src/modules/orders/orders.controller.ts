@@ -35,6 +35,11 @@ export class OrdersController {
     return this.ordersService.findUserOrders(user.id)
   }
 
+  @Get('by-number/:orderNumber')
+  findByOrderNumber(@Param('orderNumber') orderNumber: string, @CurrentUser() user: JwtUser) {
+    return this.ordersService.findByOrderNumber(orderNumber, user.id, user.role === 'admin')
+  }
+
   @Get()
   @UseGuards(AdminGuard)
   findAll(

@@ -180,6 +180,15 @@ export class OrdersService {
     return this.toResponseDto(order)
   }
 
+  async findByOrderNumber(orderNumber: string, userId: number, isAdmin: boolean): Promise<OrderResponseDto> {
+    const order = await this.ordersRepository.findByOrderNumber(orderNumber)
+    if (!order) throwApiError(ErrorCodes.ORDER_NOT_FOUND, 'Commande introuvable')
+    if (!isAdmin && order.userId !== userId) {
+      throwApiError(ErrorCodes.FORBIDDEN, 'Accès refusé')
+    }
+    return this.toResponseDto(order)
+  }
+
   async findAll(query: { status?: string; page?: number; limit?: number }): Promise<{ items: OrderResponseDto[]; total: number }> {
     const { rows, count } = await this.ordersRepository.findAll(query)
     return { items: rows.map((o) => this.toResponseDto(o)), total: count }

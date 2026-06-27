@@ -71,6 +71,10 @@ export class OrdersRepository {
     })
   }
 
+  async findByOrderNumber(orderNumber: string): Promise<Order | null> {
+    return this.orderDb.findOne({ where: { orderNumber }, include: [OrderItem] })
+  }
+
   async findByPaymentIntentId(paymentIntentId: string): Promise<Order | null> {
     return this.orderDb.findOne({ where: { stripePaymentIntentId: paymentIntentId } })
   }
