@@ -153,6 +153,8 @@ async function toggleFavorite() {
           <img
             :src="product.imageUrl ?? '/assets/placeholder.svg'"
             :alt="product.name"
+            loading="lazy"
+            decoding="async"
             class="h-full w-full object-cover"
           />
         </div>
