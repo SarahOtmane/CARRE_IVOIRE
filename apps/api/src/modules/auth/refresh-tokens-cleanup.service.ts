@@ -1,20 +1,15 @@
-import { Injectable, OnApplicationBootstrap, Logger } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
+import { Cron, CronExpression } from '@nestjs/schedule'
 import { RefreshTokensRepository } from './refresh-tokens.repository'
 
-const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000
-
 @Injectable()
-export class RefreshTokensCleanupService implements OnApplicationBootstrap {
+export class RefreshTokensCleanupService {
   private readonly logger = new Logger(RefreshTokensCleanupService.name)
 
   constructor(private readonly refreshTokensRepository: RefreshTokensRepository) {}
 
-  onApplicationBootstrap() {
-    this.runCleanup()
-    setInterval(() => this.runCleanup(), TWENTY_FOUR_HOURS_MS)
-  }
-
-  private async runCleanup(): Promise<void> {
+  @Cron(CronExpression.EVERY_DAY_AT_3AM)
+  async runCleanup(): Promise<void> {
     try {
       await this.refreshTokensRepository.pruneExpired()
       this.logger.debug('Refresh tokens expirés purgés')
