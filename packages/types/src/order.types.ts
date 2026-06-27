@@ -23,6 +23,7 @@ export interface ShippingAddress {
 export interface OrderItem {
   id: number
   productId: number
+  productName?: string
   variantId?: number
   quantity: number
   unitPrice: number

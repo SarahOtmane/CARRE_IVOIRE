@@ -247,6 +247,7 @@ export class OrdersService {
       items: ((order.items ?? []) as OrderItem[]).map((item) => ({
         id: item.id,
         productId: item.productId,
+        productName: (item as any).productName ?? undefined,
         variantId: item.variantId ?? undefined,
         quantity: item.quantity,
         unitPrice: item.unitPrice,

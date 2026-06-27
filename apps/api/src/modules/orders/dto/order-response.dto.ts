@@ -3,6 +3,7 @@ import type { ShippingAddress } from '@carre-ivoire/types'
 export interface OrderItemResponseDto {
   id: number
   productId: number
+  productName?: string
   variantId?: number
   quantity: number
   unitPrice: number

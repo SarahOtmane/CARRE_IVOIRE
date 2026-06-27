@@ -122,7 +122,7 @@ async function changeStatus(event: Event) {
             >
               <div>
                 <div class="font-display text-lg text-cacao">
-                  Produit #{{ item.productId }}
+                  {{ item.productName ?? `Produit #${item.productId}` }}
                 </div>
                 <div class="font-body text-[11px] text-cacao/55">
                   × {{ item.quantity }}{{ item.format ? ` · ${item.format}` : "" }}
