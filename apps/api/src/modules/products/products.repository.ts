@@ -147,18 +147,25 @@ export class ProductsRepository {
   }
 
   async incrementStock(productId: number, quantity: number, t?: Transaction): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
+    const safeQty = Math.floor(Math.abs(quantity))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal incompatible with model field type
     await this.db.update(
-      { stock: Sequelize.literal(`stock + ${Math.floor(Math.abs(quantity))}`) } as any,
+      {
+        stock: Sequelize.literal(`stock + ${safeQty}`),
+        stockStatus: Sequelize.literal(`CASE WHEN stock + ${safeQty} <= 0 THEN 'out_of_stock' WHEN stock + ${safeQty} <= 5 THEN 'low_stock' ELSE 'in_stock' END`),
+      } as any,
       { where: { id: productId }, transaction: t },
     )
   }
 
   async decrementStock(productId: number, quantity: number, t?: Transaction): Promise<number> {
     const safeQuantity = Math.floor(Math.abs(quantity))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal incompatible with model field type
     const [rowsAffected] = await this.db.update(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
-      { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
+      {
+        stock: Sequelize.literal(`stock - ${safeQuantity}`),
+        stockStatus: Sequelize.literal(`CASE WHEN stock - ${safeQuantity} <= 0 THEN 'out_of_stock' WHEN stock - ${safeQuantity} <= 5 THEN 'low_stock' ELSE 'in_stock' END`),
+      } as any,
       {
         where: {
           id: productId,
