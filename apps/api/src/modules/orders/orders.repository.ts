@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
+import { randomUUID } from 'crypto'
 import type { Transaction } from 'sequelize'
 import { Order } from './order.model'
 import { OrderItem } from './order-item.model'
@@ -38,7 +39,7 @@ export class OrdersRepository {
         status: 'payment_pending',
         totalAmount: data.totalAmount,
         shippingAddress: data.shippingAddress,
-        orderNumber: `TEMP-${Date.now()}`,
+        orderNumber: `TEMP-${randomUUID()}`,
       } as any,
       { transaction: t },
     )
