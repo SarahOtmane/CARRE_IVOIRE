@@ -30,7 +30,7 @@ export class UsersRepository {
   ) { }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.userModel.findOne({ where: { email } })
+    return this.userModel.findOne({ where: { email: email.toLowerCase().trim() } })
   }
 
   async findById(id: number): Promise<User | null> {
@@ -44,12 +44,11 @@ export class UsersRepository {
       // Création initiale avec un customer_number temporaire unique
       const user = await this.userModel.create(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        { ...data, customer_number: `TEMP-${Date.now()}` } as any,
+        { ...data, email: data.email.toLowerCase().trim(), customer_number: `TEMP-${Date.now()}` } as any,
         { transaction: t },
       )
-      // customer_number définitif basé sur l'ID auto-incrémenté
-      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-      const customerNumber = `CI-${dateStr}-${String(user.id).padStart(4, '0')}`
+      // customer_number basé uniquement sur l'ID — pas de collision par date
+      const customerNumber = `CI-${String(user.id).padStart(8, '0')}`
       await user.update({ customer_number: customerNumber }, { transaction: t })
       await t.commit()
       return user
@@ -96,7 +95,7 @@ export class UsersRepository {
   }
 
   async emailExists(email: string): Promise<boolean> {
-    const count = await this.userModel.count({ where: { email } })
+    const count = await this.userModel.count({ where: { email: email.toLowerCase().trim() } })
     return count > 0
   }
 

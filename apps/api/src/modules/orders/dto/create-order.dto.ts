@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -66,6 +67,6 @@ export class CreateOrderDto {
   shippingAddress: ShippingAddressDto
 
   @IsOptional()
-  @IsString()
+  @IsIn(['pickup', 'delivery'])
   deliveryType?: 'pickup' | 'delivery'
 }
