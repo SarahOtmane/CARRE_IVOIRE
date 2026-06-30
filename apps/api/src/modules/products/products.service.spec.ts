@@ -68,6 +68,20 @@ describe('ProductsService', () => {
       expect(result.items).toHaveLength(1)
       expect(result.totalPages).toBe(1)
     })
+
+    it('gère variants=undefined dans toProductResponseDto', async () => {
+      const productWithoutVariants = { ...mockProduct, variants: undefined }
+      repo.findAll.mockResolvedValue({ rows: [productWithoutVariants as any], count: 1 })
+      const result = await service.findAll({})
+      expect(result.items[0].variants).toEqual([])
+    })
+
+    it('gère variants=[] (branche gauche du ??)', async () => {
+      const productWithVariants = { ...mockProduct, variants: [] }
+      repo.findAll.mockResolvedValue({ rows: [productWithVariants as any], count: 1 })
+      const result = await service.findAll({})
+      expect(result.items[0].variants).toEqual([])
+    })
   })
 
   describe('create', () => {
@@ -93,6 +107,53 @@ describe('ProductsService', () => {
       repo.delete.mockResolvedValue()
       await expect(service.delete(1)).resolves.toBeUndefined()
       expect(repo.delete).toHaveBeenCalledWith(1)
+    })
+  })
+
+  describe('update', () => {
+    it('lève PRODUCT_NOT_FOUND si le produit n\'existe pas', async () => {
+      repo.findById.mockResolvedValue(null)
+      await expect(service.update(99, { name: 'X' } as any)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'PRODUCT_NOT_FOUND' }),
+      })
+    })
+
+    it('met à jour et retourne le DTO', async () => {
+      repo.findById.mockResolvedValue(mockProduct as any)
+      repo.update.mockResolvedValue(mockProduct as any)
+      const result = await service.update(1, { name: 'Updated' } as any)
+      expect(result.id).toBe(1)
+      expect(repo.update).toHaveBeenCalled()
+    })
+
+    it('auto-déduit le stock à 0 si stockStatus=out_of_stock et stock non fourni', async () => {
+      repo.findById.mockResolvedValue(mockProduct as any)
+      repo.update.mockResolvedValue(mockProduct as any)
+      await service.update(1, { stockStatus: 'out_of_stock' } as any)
+      expect(repo.update).toHaveBeenCalledWith(1, expect.objectContaining({ stock: 0 }))
+    })
+
+    it('auto-déduit le stock à 999 si stockStatus=in_stock et stock non fourni', async () => {
+      repo.findById.mockResolvedValue(mockProduct as any)
+      repo.update.mockResolvedValue(mockProduct as any)
+      await service.update(1, { stockStatus: 'in_stock' } as any)
+      expect(repo.update).toHaveBeenCalledWith(1, expect.objectContaining({ stock: 999 }))
+    })
+  })
+
+  describe('create', () => {
+    it('auto-assigne stockStatus=in_stock si non fourni', async () => {
+      repo.create.mockResolvedValue(mockProduct as any)
+      await service.create({ name: 'X', slug: 'x', price: 100, categoryId: 1 } as any)
+      expect(repo.create).toHaveBeenCalledWith(
+        expect.objectContaining({ stockStatus: 'in_stock', stock: 999 }),
+      )
+    })
+
+    it('stock=0 si stockStatus=out_of_stock et stock non fourni', async () => {
+      repo.create.mockResolvedValue(mockProduct as any)
+      await service.create({ name: 'X', slug: 'x', price: 100, categoryId: 1, stockStatus: 'out_of_stock' } as any)
+      expect(repo.create).toHaveBeenCalledWith(expect.objectContaining({ stock: 0 }))
     })
   })
 })
