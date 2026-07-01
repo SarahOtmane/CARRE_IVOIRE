@@ -10,6 +10,7 @@ const cartStore = useCartStore();
 const { results: searchResults, isSearching, search: runSearch } = useProductSearch();
 const { categories: megaCategories } = useCategories();
 
+const alwaysActive = true; // mettre false pour réactiver le comportement au scroll uniquement
 const scrolled = ref(false);
 const hovered = ref(false);
 const boutiqueOpen = ref(false);
@@ -57,7 +58,7 @@ function navigateMobile(path: string) {
 }
 
 const isActive = computed(
-  () => scrolled.value || hovered.value || searchOpen.value || mobileMenuOpen.value,
+  () => alwaysActive || scrolled.value || hovered.value || searchOpen.value || mobileMenuOpen.value,
 );
 
 const navItems = [

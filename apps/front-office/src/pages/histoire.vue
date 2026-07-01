@@ -79,7 +79,7 @@ const dates = [
         <!-- Image atelier -->
         <div class="overflow-hidden" style="aspect-ratio: 4/5">
           <img
-            src="/assets/maison-atelier.svg"
+            src="/assets/maison-atelier.jpg"
             alt="L'atelier Carré Ivoire, rue du Nil, Paris"
             class="h-full w-full object-cover"
           />

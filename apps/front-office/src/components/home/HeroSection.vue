@@ -10,11 +10,14 @@ const router = useRouter()
     style="height: 100vh; min-height: 720px; margin-top: -72px"
   >
     <!-- Image de fond -->
-    <img
-      src="/assets/hero-pour.svg"
+    <video
+      src="/assets/heroChocolate.mp4"
       alt=""
       class="absolute inset-0 h-full w-full object-cover"
       aria-hidden="true"
+      autoplay
+      muted
+      loop
     />
 
     <!-- Voile pour lisibilité -->
@@ -38,7 +41,7 @@ const router = useRouter()
         <!-- H1 -->
         <h1
           class="mb-14 font-serif font-normal"
-          style="font-size: clamp(44px, 7.5vw, 116px); line-height: 0.95; letter-spacing: -0.02em"
+          style="font-size: clamp(44px, 7.5vw, 116px); line-height: 0.95; letter-spacing: -0.02em; color: var(--ivoire)"
         >
           Le carré,<br/>
           <em>à l'état pur.</em>
