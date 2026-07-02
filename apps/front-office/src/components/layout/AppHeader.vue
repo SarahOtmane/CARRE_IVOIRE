@@ -333,7 +333,7 @@ function toggleSearch() {
           <a
             v-for="cat in boutiqueCats"
             :key="cat.slug"
-            class="group cursor-pointer font-serif text-xl text-cacao transition-all duration-200 hover:italic"
+            class="cursor-pointer font-serif text-xl text-cacao transition-opacity duration-180 hover:opacity-60"
             @click="navigate('/boutique/' + cat.slug)"
             >{{ cat.name }}</a
           >

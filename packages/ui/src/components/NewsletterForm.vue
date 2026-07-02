@@ -11,7 +11,7 @@ const props = withDefaults(
   }>(),
   {
     theme: 'dark',
-    label: 'Lettre',
+    label: 'Newsletter',
     description: 'Une fois par mois. Rien de plus.',
     placeholder: 'vous@maison.fr',
   },
@@ -20,6 +20,7 @@ const props = withDefaults(
 const { isLoading, subscribe } = useNewsletter()
 const email = ref('')
 const submitted = ref(false)
+const emailError = ref('')
 
 const textColor = props.theme === 'dark' ? 'text-ivoire' : 'text-cacao'
 const borderStyle = props.theme === 'dark' ? 'var(--ivoire-a40)' : 'var(--cacao-a24)'
@@ -28,7 +29,15 @@ const opacityLabel = props.theme === 'dark' ? 'opacity-60' : 'opacity-50'
 const opacityBody = props.theme === 'dark' ? 'opacity-70' : 'opacity-70'
 
 async function handleSubmit() {
-  if (!email.value.trim()) return
+  emailError.value = ''
+  if (!email.value.trim()) {
+    emailError.value = 'Veuillez remplir ce champs'
+    return
+  }
+  if (!/^[^@]+@[^@]+\.[^@]+$/.test(email.value.trim())) {
+    emailError.value = "Le format de votre email n'est pas bon"
+    return
+  }
   await subscribe(email.value.trim())
   submitted.value = true
   email.value = ''
@@ -48,23 +57,23 @@ async function handleSubmit() {
       >
         Merci. À bientôt.
       </p>
-      <form
-        v-else
-        class="flex"
-        :style="{ borderBottom: `1px solid ${borderStyle}` }"
-        @submit.prevent="handleSubmit"
-      >
-        <input
-          v-model="email"
-          type="email"
-          required
-          :placeholder="placeholder"
-          :class="[
-            'flex-1 bg-transparent py-2 font-sans text-[13px] outline-none',
-            textColor,
-            placeholderClass,
-          ]"
-        />
+      <div v-else>
+        <form
+          class="flex"
+          :style="{ borderBottom: `1px solid ${emailError ? '#9B1C1C' : borderStyle}` }"
+          novalidate
+          @submit.prevent="handleSubmit"
+        >
+          <input
+            v-model="email"
+            type="email"
+            :placeholder="placeholder"
+            :class="[
+              'flex-1 bg-transparent py-2 font-sans text-[13px] outline-none',
+              textColor,
+              placeholderClass,
+            ]"
+          />
         <button
           type="submit"
           :class="[
@@ -90,7 +99,9 @@ async function handleSubmit() {
             <polyline points="10,3 15,8 10,13" />
           </svg>
         </button>
-      </form>
+        </form>
+        <p v-if="emailError" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ emailError }}</p>
+      </div>
     </Transition>
   </div>
 </template>

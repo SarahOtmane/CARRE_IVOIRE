@@ -189,7 +189,7 @@ const chiffres = [
     >
       <div class="flex flex-col items-start gap-10 lg:flex-row lg:items-end lg:justify-between">
         <div class="max-w-[560px]">
-          <span class="ci-eyebrow">05 — La boutique</span>
+          <span class="ci-eyebrow">La boutique</span>
           <h2
             class="mt-4 font-serif font-medium text-cacao"
             style="font-size: clamp(32px, 4vw, 56px); line-height: 1"

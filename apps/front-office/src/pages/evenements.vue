@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 
@@ -86,6 +87,14 @@ const evenements: Evenement[] = [
 ]
 
 const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
+
+const selectedType = ref('Tous')
+
+const filteredEvenements = computed(() =>
+  selectedType.value === 'Tous'
+    ? evenements
+    : evenements.filter((evt) => evt.type === selectedType.value),
+)
 </script>
 
 <template>
@@ -102,7 +111,7 @@ const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
           class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(48px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.02em"
         >
-          L\'atelier<br/>
+          L'atelier<br/>
           <em class="text-cacao-2">vous ouvre ses portes.</em>
         </h1>
         <p
@@ -131,7 +140,11 @@ const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
           <a
             v-for="type in types"
             :key="type"
-            class="cursor-pointer font-sans text-[12px] tracking-[0.04em] text-cacao-2 transition-colors duration-180 hover:text-cacao"
+            class="cursor-pointer border-b pb-0.5 font-sans text-[12px] tracking-[0.04em] transition-[border-color,color] duration-180"
+            :class="selectedType === type
+              ? 'border-cacao text-cacao'
+              : 'border-transparent text-cacao-2 hover:border-cacao hover:text-cacao'"
+            @click="selectedType = type"
           >{{ type }}</a>
         </div>
       </div>
@@ -139,7 +152,7 @@ const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
       <!-- Événements -->
       <div class="space-y-0">
         <article
-          v-for="evt in evenements"
+          v-for="evt in filteredEvenements"
           :key="evt.id"
           class="group grid grid-cols-1 items-start gap-8 border-t py-12 lg:grid-cols-[140px_1fr_200px]"
           :class="evt.complet ? 'opacity-50' : 'cursor-pointer'"
@@ -207,7 +220,7 @@ const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
               v-else
               class="font-sans text-[12px] tracking-[0.04em] text-cacao-3"
             >
-              Liste d\'attente →
+              Liste d'attente →
             </span>
           </div>
         </article>
@@ -233,7 +246,7 @@ const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
           </h2>
           <p class="mt-6 font-sans text-[15px] leading-relaxed text-cacao-2" style="max-width: 440px">
             Une fois par mois, les événements du trimestre, les nouvelles fèves,
-            ce qui se passe dans l\'atelier. Rien de superflu.
+            ce qui se passe dans l'atelier. Rien de superflu.
           </p>
         </div>
 
@@ -249,7 +262,7 @@ const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
             />
             <button
               class="flex shrink-0 cursor-pointer items-center py-3 text-cacao transition-opacity duration-180 hover:opacity-60"
-              aria-label="S\'inscrire"
+              aria-label="S'inscrire"
             >
               <svg
                 width="16" height="16" fill="none" stroke="currentColor"
@@ -281,7 +294,7 @@ const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
             style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
           >
             La boutique,<br/>
-            <em class="text-cacao-2">elle, n\'attend pas.</em>
+            <em class="text-cacao-2">elle, n'attend pas.</em>
           </h2>
         </div>
         <div class="flex flex-col gap-4 sm:flex-row">

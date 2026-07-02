@@ -80,6 +80,8 @@ function validate(): boolean {
     errors.value.postalCode = "Code postal invalide";
   if (!form.value.city.trim())
     errors.value.city = "Ville requise";
+  if (form.value.phone.trim() && !/^\+?[\d\s.\-()]{7,20}$/.test(form.value.phone.trim()))
+    errors.value.phone = "Numéro de téléphone invalide";
 
   return Object.keys(errors.value).length === 0;
 }
@@ -95,7 +97,7 @@ function submit() {
 </script>
 
 <template>
-  <form class="space-y-10" @submit.prevent="submit">
+  <form class="space-y-10" novalidate @submit.prevent="submit">
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
       <div>
         <label
@@ -167,8 +169,11 @@ function submit() {
           type="tel"
           autocomplete="tel"
           class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
+          :style="{ borderColor: errors.phone ? '#9B1C1C' : 'var(--cacao-a24)' }"
         />
+        <p v-if="errors.phone" class="mt-1 font-sans text-[11px] text-red-800">
+          {{ errors.phone }}
+        </p>
       </div>
       <div class="sm:col-span-2">
         <label

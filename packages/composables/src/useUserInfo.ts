@@ -107,6 +107,23 @@ export function useUserInfo() {
     }
   }
 
+  const isDeleting = ref(false)
+  const deleteError = ref<string | null>(null)
+
+  async function deleteAccount() {
+    if (isDeleting.value) return
+    isDeleting.value = true
+    deleteError.value = null
+    try {
+      await api.delete('/users/me')
+      authStore.logout()
+    } catch {
+      deleteError.value = 'Une erreur est survenue. Veuillez réessayer.'
+    } finally {
+      isDeleting.value = false
+    }
+  }
+
   return {
     form,
     passwordForm,
@@ -116,7 +133,10 @@ export function useUserInfo() {
     passwordSaved,
     passwordError,
     isSavingPassword,
+    isDeleting,
+    deleteError,
     save,
     changePassword,
+    deleteAccount,
   }
 }

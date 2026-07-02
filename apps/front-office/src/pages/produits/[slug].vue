@@ -41,7 +41,7 @@ const relatedProducts = computed(() => {
 })
 
 const quantity = ref(1)
-const tab = ref<'composition' | 'degustation' | 'conservation'>('composition')
+const tab = ref<'composition' | 'degustation' | 'conservation' | 'allergenes'>('composition')
 const added = ref(false)
 const selectedVariantId = ref<number | null>(null)
 
@@ -170,14 +170,18 @@ async function toggleFavorite() {
           <span class="ci-eyebrow">{{ product.category?.name ?? 'Carré Ivoire' }}</span>
           <button
             type="button"
-            class="flex h-9 w-9 flex-shrink-0 items-center justify-center border border-[var(--cacao-a24)] transition-opacity duration-180 disabled:cursor-not-allowed disabled:opacity-60"
+            class="flex h-12 w-12 flex-shrink-0 items-center justify-center border border-[var(--cacao-a24)] transition-opacity duration-180 disabled:cursor-not-allowed disabled:opacity-60"
             :aria-label="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
             :aria-pressed="isFav"
             :disabled="togglingFavorite"
             @click="toggleFavorite"
           >
-            <svg width="16" height="16" :fill="isFav ? 'var(--dore)' : 'none'" stroke="var(--brun-cacao)" stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter">
-              <use href="/assets/icons/sprite.svg#ci-heart" />
+            <svg width="30" height="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter">
+              <path
+                d="M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z"
+                :fill="isFav ? 'var(--dore)' : 'none'"
+                :stroke="isFav ? 'var(--dore)' : 'var(--brun-cacao)'"
+              />
             </svg>
           </button>
         </div>
@@ -285,6 +289,12 @@ async function toggleFavorite() {
               :class="tab === 'conservation' ? 'border-cacao text-cacao' : 'border-transparent text-cacao-3'"
               @click="tab = 'conservation'"
             >Conservation</button>
+            <button
+              type="button"
+              class="border-b pb-1 font-sans text-[11px] uppercase tracking-[0.22em]"
+              :class="tab === 'allergenes' ? 'border-cacao text-cacao' : 'border-transparent text-cacao-3'"
+              @click="tab = 'allergenes'"
+            >Allergènes</button>
           </div>
 
           <div class="pt-5">
@@ -307,9 +317,18 @@ async function toggleFavorite() {
               {{ product.description ?? product.shortDescription ?? 'Notes de dégustation à venir.' }}
             </p>
 
-            <p v-else class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-cacao-2">
-              {{ product.allergens ?? 'Informations de conservation à venir.' }}
+            <p v-else-if="tab === 'conservation'" class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-cacao-2">
+              Conserver dans un endroit frais et sec, à l'abri de la lumière et des odeurs. Température idéale : entre 16 et 18 °C.
             </p>
+
+            <div v-else>
+              <p v-if="product.allergens" class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-cacao-2">
+                {{ product.allergens }}
+              </p>
+              <p v-else class="font-sans text-[15px] leading-[1.8] text-cacao-2">
+                Allergènes non renseignés.
+              </p>
+            </div>
           </div>
         </div>
       </div>

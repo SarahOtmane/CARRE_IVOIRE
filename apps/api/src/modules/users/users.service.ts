@@ -41,6 +41,10 @@ export class UsersService {
     return this.toResponseDto(user)
   }
 
+  async deleteMe(id: number): Promise<void> {
+    await this.usersRepository.delete(id)
+  }
+
   async changePassword(userId: number, dto: ChangePasswordDto): Promise<void> {
     const user = await this.usersRepository.findById(userId)
     if (!user) throwApiError(ErrorCodes.USER_NOT_FOUND, 'Utilisateur introuvable')

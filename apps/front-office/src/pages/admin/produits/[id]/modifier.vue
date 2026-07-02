@@ -279,6 +279,16 @@ async function deleteProduct() {
           />
         </label>
 
+        <label class="grid gap-2">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Allergènes</span>
+          <input
+            v-model="draft.allergens"
+            type="text"
+            placeholder="Contient : fruits à coque, lait, soja…"
+            class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
+          />
+        </label>
+
         <div class="grid gap-4 border-t border-cacao pt-6">
           <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Variantes (poids / prix)</span>
 

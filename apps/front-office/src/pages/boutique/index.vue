@@ -110,7 +110,7 @@ onUnmounted(() => {
       </svg>
       <input
         v-model="searchTerm"
-        type="search"
+        type="text"
         placeholder="Rechercher un chocolat…"
         class="flex-1 bg-transparent py-2.5 font-sans text-[14px] text-cacao outline-none placeholder:text-cacao-2 placeholder:opacity-50"
       />

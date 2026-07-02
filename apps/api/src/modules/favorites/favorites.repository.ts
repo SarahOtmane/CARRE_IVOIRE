@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
 import { Favorite } from './favorite.model'
 import { Product } from '@/modules/products/product.model'
+import { ProductVariant } from '@/modules/products/product-variant.model'
 import { Category } from '@/modules/categories/category.model'
 
 @Injectable()
@@ -11,7 +12,7 @@ export class FavoritesRepository {
   async findByUserId(userId: number): Promise<Favorite[]> {
     return this.db.findAll({
       where: { userId },
-      include: [{ model: Product, include: [Category] }],
+      include: [{ model: Product, include: [Category, ProductVariant] }],
       order: [['created_at', 'DESC']],
     })
   }

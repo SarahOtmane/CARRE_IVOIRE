@@ -1,7 +1,23 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useForgotPasswordForm } from '@carre-ivoire/composables'
 
 const { email, sent, error, loading, submit } = useForgotPasswordForm()
+
+const emailError = ref('')
+
+function handleSubmit() {
+  emailError.value = ''
+  if (!email.value.trim()) {
+    emailError.value = 'Veuillez remplir ce champs'
+    return
+  }
+  if (!/^[^@]+@[^@]+\.[^@]+$/.test(email.value.trim())) {
+    emailError.value = "Le format de votre email n'est pas bon"
+    return
+  }
+  submit()
+}
 </script>
 
 <template>
@@ -35,20 +51,21 @@ const { email, sent, error, loading, submit } = useForgotPasswordForm()
         </p>
       </div>
 
-      <form v-else class="mt-10 space-y-6" @submit.prevent="submit">
-        <label class="block space-y-2">
+      <form v-else class="mt-10 space-y-6" novalidate @submit.prevent="handleSubmit">
+        <div class="block space-y-2">
           <span class="font-sans text-[10px] uppercase tracking-[0.18em] text-cacao-2">
             Adresse email
           </span>
           <input
             v-model="email"
             type="email"
-            required
             autocomplete="email"
             placeholder="votre@email.fr"
-            class="w-full border border-cacao/25 bg-papier px-4 py-3 font-sans text-[15px] text-cacao outline-none transition-colors focus:border-cacao/60"
+            class="w-full border bg-papier px-4 py-3 font-sans text-[15px] text-cacao outline-none transition-colors focus:border-cacao/60"
+            :style="{ borderColor: emailError ? '#9B1C1C' : 'rgba(58,31,20,0.25)' }"
           />
-        </label>
+          <p v-if="emailError" class="font-sans text-[11px]" style="color: #9B1C1C">{{ emailError }}</p>
+        </div>
 
         <p v-if="error" class="font-sans text-[13px] text-red-700">{{ error }}</p>
 

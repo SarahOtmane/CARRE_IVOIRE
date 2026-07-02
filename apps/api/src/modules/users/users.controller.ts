@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Query, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common'
+import { Controller, Get, Patch, Delete, Query, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common'
 import { UsersService } from './users.service'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { ChangePasswordDto } from './dto/change-password.dto'
@@ -33,5 +33,11 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async changePassword(@CurrentUser() user: JwtUser, @Body() dto: ChangePasswordDto) {
     await this.usersService.changePassword(user.id, dto)
+  }
+
+  @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteMe(@CurrentUser() user: JwtUser) {
+    await this.usersService.deleteMe(user.id)
   }
 }
