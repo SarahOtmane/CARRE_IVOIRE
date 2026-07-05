@@ -6,6 +6,10 @@ COPY package.json package-lock.json ./
 COPY packages ./packages
 COPY apps/api/package.json ./apps/api/package.json
 RUN npm install --only=production --legacy-peer-deps
+# Ensure this exists even when npm hoists everything to the root — the
+# production stage COPYs it unconditionally to catch cases where a
+# workspace-specific version conflict forces npm to nest a package here.
+RUN mkdir -p apps/api/node_modules
 
 # ─── Stage 2: All dependencies (cacheable) ───────────────────────────
 FROM node:20-alpine AS build-deps
@@ -18,15 +22,18 @@ RUN npm install --legacy-peer-deps
 
 # ─── Stage 3: Build (cacheable si src inchangé) ──────────────────────
 FROM build-deps AS build
-# Copy only the API app source into /app
-COPY apps/api .
+# Keep the app under apps/api/ (not flattened) — npm's workspace hoisting
+# nests some @nestjs/* packages (cli, platform-express, schematics, swagger,
+# testing) under apps/api/node_modules when versions conflict elsewhere in
+# the monorepo. Flattening apps/api onto /app would orphan that folder.
+WORKDIR /app/apps/api
+COPY apps/api ./
 RUN npm run build
 
 # ─── Stage 4: Development (hot reload nodemon) ───────────────────────
 FROM build-deps AS development
-WORKDIR /app
-# Mount or copy app source for development
-COPY apps/api .
+WORKDIR /app/apps/api
+COPY apps/api ./
 EXPOSE 3000
 CMD ["npm", "run", "start:dev"]
 
@@ -36,7 +43,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
+# apps/api/node_modules holds packages npm couldn't hoist to the root
+# (e.g. @nestjs/platform-express, @nestjs/swagger) — merge it in too,
+# otherwise the app is missing modules it needs to boot.
+COPY --from=dependencies /app/apps/api/node_modules ./node_modules
+COPY --from=build /app/apps/api/dist ./dist
 # Ensure production package.json is the app manifest
 COPY apps/api/package.json ./package.json
 
