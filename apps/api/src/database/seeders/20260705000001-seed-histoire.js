@@ -6,8 +6,7 @@ const sections = [
   {
     key: "enfance",
     display_order: 0,
-    image:
-      "https://images.unsplash.com/photo-1511381939415-e44015466834?auto=format&fit=crop&w=1200&q=80",
+    image: "http://localhost:3000/uploads/e3ecf26b-9fee-4681-b319-3e9808dc3002.webp",
     image_alt: "Cabosses et fèves de cacao",
     paragraphs: JSON.stringify([
       "Pour moi, ils ont la couleur d'une cabosse de cacao mûrie sous le soleil de Côte d'Ivoire.",
@@ -18,8 +17,7 @@ const sections = [
   {
     key: "parcours",
     display_order: 1,
-    image:
-      "https://images.unsplash.com/photo-1549007994-cb92caebd54b?auto=format&fit=crop&w=1200&q=80",
+    image: "http://localhost:3000/uploads/8d32b956-61a2-4037-99b8-3907cbd72c02.webp",
     image_alt: "Artisan chocolatier au travail",
     paragraphs: JSON.stringify([
       "Les années ont passé.",
@@ -31,8 +29,7 @@ const sections = [
   {
     key: "naissance",
     display_order: 2,
-    image:
-      "https://images.unsplash.com/photo-1481391319762-47dff72954d9?auto=format&fit=crop&w=1200&q=80",
+    image: "http://localhost:3000/uploads/3abb9067-bec9-4f5c-ba28-8ca8c1fd73bc.webp",
     image_alt: "Tablettes de chocolat artisanal",
     paragraphs: JSON.stringify([
       "C'est de cette réflexion qu'est né Carré Ivoire.",
@@ -44,14 +41,14 @@ const sections = [
   {
     key: "hommage",
     display_order: 3,
-    image:
-      "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?auto=format&fit=crop&w=1200&q=80",
+    image: "http://localhost:3000/uploads/876624e9-c4a3-419f-9380-c9b1b7501206.webp",
     image_alt: "Plantation de cacao",
     paragraphs: JSON.stringify([
       "Carré Ivoire est aussi un hommage à mes racines.",
       "À cette terre qui m'a vu grandir.",
       "À celles et ceux qui travaillent les plantations avec courage.",
       "À tous ceux qui croient qu'un chocolat peut être plus qu'une gourmandise : un lien entre les cultures, un savoir-faire, une mémoire et une émotion.",
+      "Lorsque vous dégustez un chocolat Carré Ivoire, vous ne découvrez pas seulement une tablette. Vous découvrez une histoire, la mienne et, je l'espère, un peu de la vôtre.",
     ]),
   },
 ];
