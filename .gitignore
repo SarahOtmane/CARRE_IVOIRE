@@ -28,6 +28,10 @@ Thumbs.db
 # Docker — SSL non commité
 docker/nginx/ssl/
 
+# Fichiers uploadés en local (produits, logo…) — jamais commités
+apps/api/uploads/*
+!apps/api/uploads/.gitkeep
+
 # IDE
 .idea/
 .vscode/

@@ -19,7 +19,7 @@ describe('usePublicSettings', () => {
 
   it('fetch() charge les paramètres depuis l\'API et met à jour settings', async () => {
     const mockGet = vi.fn().mockResolvedValue({
-      data: { data: { shippingFlat: 500, shippingFreeFrom: 5000 } },
+      data: { data: { shippingFlat: 500, shippingFreeFrom: 5000, logoUrl: 'https://example.com/logo.webp' } },
     })
     vi.doMock('./useApi', () => ({ useApi: () => ({ get: mockGet }) }))
 
@@ -31,6 +31,7 @@ describe('usePublicSettings', () => {
     expect(mockGet).toHaveBeenCalledWith('/settings/public')
     expect(settings.value?.shippingFlat).toBe(500)
     expect(settings.value?.shippingFreeFrom).toBe(5000)
+    expect(settings.value?.logoUrl).toBe('https://example.com/logo.webp')
   })
 
   it('shippingFlatEuros() retourne le bon montant en euros après fetch', async () => {

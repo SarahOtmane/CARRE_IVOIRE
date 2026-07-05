@@ -2,13 +2,15 @@
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useCartStore } from "@carre-ivoire/stores";
-import { useProductSearch, useCategories } from "@carre-ivoire/composables";
+import { useProductSearch, useCategories, usePublicSettings } from "@carre-ivoire/composables";
+import { Logo } from "@carre-ivoire/ui";
 
 const router = useRouter();
 const route = useRoute();
 const cartStore = useCartStore();
 const { results: searchResults, isSearching, search: runSearch } = useProductSearch();
 const { categories: megaCategories } = useCategories();
+const { settings: publicSettings } = usePublicSettings();
 
 const alwaysActive = true; // mettre false pour réactiver le comportement au scroll uniquement
 const scrolled = ref(false);
@@ -132,11 +134,7 @@ function toggleSearch() {
     <div class="flex h-[72px] items-center justify-between px-5 lg:px-[104px]">
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-3.5">
-        <div
-          class="flex h-8 w-8 shrink-0 items-center justify-center border border-cacao font-serif text-[15px] font-medium text-cacao"
-        >
-          CI
-        </div>
+        <Logo :logo-url="publicSettings?.logoUrl" />
         <span
           class="hidden font-serif text-[13px] font-medium tracking-[0.22em] text-cacao lg:block"
         >

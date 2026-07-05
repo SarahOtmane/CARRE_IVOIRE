@@ -11,6 +11,7 @@ describe('SettingsService', () => {
     shipping_free_from: '7000',
     bcc_email: 'bcc@test.com',
     address: '4 rue du Nil',
+    logo_url: 'https://example.com/logo.webp',
   }
 
   beforeEach(async () => {
@@ -38,6 +39,7 @@ describe('SettingsService', () => {
       expect(result.shippingFreeFrom).toBe(7000)
       expect(result.bccEmail).toBe('bcc@test.com')
       expect(result.address).toBe('4 rue du Nil')
+      expect(result.logoUrl).toBe('https://example.com/logo.webp')
     })
 
     it('utilise les valeurs par défaut si les clés sont absentes', async () => {
@@ -60,6 +62,13 @@ describe('SettingsService', () => {
       await service.update({ shippingFreeFrom: 5000, address: '4 rue du Nil' })
       expect(repo.setMany).toHaveBeenCalledWith(
         expect.objectContaining({ shipping_free_from: '5000', address: '4 rue du Nil' }),
+      )
+    })
+
+    it('inclut logoUrl dans les entrées', async () => {
+      await service.update({ logoUrl: 'https://example.com/new-logo.webp' })
+      expect(repo.setMany).toHaveBeenCalledWith(
+        expect.objectContaining({ logo_url: 'https://example.com/new-logo.webp' }),
       )
     })
 

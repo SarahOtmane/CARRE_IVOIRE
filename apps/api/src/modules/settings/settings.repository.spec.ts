@@ -47,6 +47,18 @@ describe('SettingsRepository', () => {
       const result = await repo.getAll()
       expect(result.bcc_email).toBe('')
     })
+
+    it('retourne logo_url vide par défaut', async () => {
+      model.findAll.mockResolvedValue([])
+      const result = await repo.getAll()
+      expect(result.logo_url).toBe('')
+    })
+
+    it('fusionne logo_url depuis la DB', async () => {
+      model.findAll.mockResolvedValue([{ key: 'logo_url', value: 'https://example.com/logo.webp' }])
+      const result = await repo.getAll()
+      expect(result.logo_url).toBe('https://example.com/logo.webp')
+    })
   })
 
   describe('set', () => {

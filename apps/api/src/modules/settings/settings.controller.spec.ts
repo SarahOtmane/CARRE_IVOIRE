@@ -2,7 +2,13 @@ import { Test } from '@nestjs/testing'
 import { SettingsController } from './settings.controller'
 import { SettingsService } from './settings.service'
 
-const mockSettings = { shippingFlat: 800, shippingFreeFrom: 7000, bccEmail: 'bcc@test.com', address: '4 rue du Nil' }
+const mockSettings = {
+  shippingFlat: 800,
+  shippingFreeFrom: 7000,
+  bccEmail: 'bcc@test.com',
+  address: '4 rue du Nil',
+  logoUrl: 'https://example.com/logo.webp',
+}
 
 describe('SettingsController', () => {
   let controller: SettingsController
@@ -26,9 +32,9 @@ describe('SettingsController', () => {
     service = module.get(SettingsService)
   })
 
-  it('getPublic retourne uniquement shippingFlat et shippingFreeFrom', async () => {
+  it('getPublic retourne shippingFlat, shippingFreeFrom et logoUrl uniquement', async () => {
     const result = await controller.getPublic()
-    expect(result).toEqual({ shippingFlat: 800, shippingFreeFrom: 7000 })
+    expect(result).toEqual({ shippingFlat: 800, shippingFreeFrom: 7000, logoUrl: 'https://example.com/logo.webp' })
     expect(result).not.toHaveProperty('bccEmail')
   })
 

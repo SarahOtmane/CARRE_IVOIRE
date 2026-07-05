@@ -2,8 +2,9 @@
 import { computed, onMounted } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@carre-ivoire/stores";
-import { useAdminProducts, useAdminOrders, useAdminCategories } from "@carre-ivoire/composables";
+import { useAdminProducts, useAdminOrders, useAdminCategories, usePublicSettings } from "@carre-ivoire/composables";
 import { OrderStatus } from "@carre-ivoire/types";
+import { Logo } from "@carre-ivoire/ui";
 
 const route = useRoute();
 const router = useRouter();
@@ -12,6 +13,7 @@ const authStore = useAuthStore();
 const { products, fetchAll: fetchProducts } = useAdminProducts();
 const { orders, fetchAll: fetchOrders } = useAdminOrders();
 const { categories } = useAdminCategories();
+const { settings: publicSettings } = usePublicSettings();
 
 onMounted(() => Promise.all([fetchProducts(), fetchOrders()]));
 
@@ -46,11 +48,7 @@ function logout() {
   <aside class="flex h-full w-72 flex-col border-r border-cacao/40 bg-ivoire">
     <div class="border-b border-cacao/40 px-6 py-6">
       <div class="flex items-center gap-4">
-        <div
-          class="flex h-12 w-12 items-center justify-center border border-cacao font-display text-xl text-cacao"
-        >
-          CI
-        </div>
+        <Logo :logo-url="publicSettings?.logoUrl" size="lg" />
         <div class="min-w-0">
           <div class="truncate font-display text-xl text-cacao">
             Carré Ivoire
