@@ -8,23 +8,26 @@
     "
   >
     <img
-      v-if="logoUrl"
-      :src="logoUrl"
+      :src="resolvedLogoUrl"
       alt="Carré Ivoire"
       class="h-full w-full object-contain"
     />
-    <span v-else>CI</span>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+import defaultLogoUrl from "../assets/logo.webp";
+
 interface Props {
   logoUrl?: string | null;
   size?: "sm" | "lg";
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   logoUrl: null,
   size: "sm",
 });
+
+const resolvedLogoUrl = computed(() => props.logoUrl || defaultLogoUrl);
 </script>
