@@ -1,9 +1,9 @@
 <template>
   <div
     class="flex shrink-0 items-center justify-center overflow-hidden border border-cacao text-cacao"
-    :class="size === 'lg' ? 'h-12 w-12 font-display text-xl' : 'h-8 w-8 font-serif text-[15px] font-medium'"
+    :class="size === 'lg' ? 'h-16 w-16 font-display text-2xl' : 'h-11 w-11 font-serif text-lg font-medium'"
   >
-    <img v-if="logoUrl" :src="logoUrl" alt="Carré Ivoire" class="h-full w-full object-cover" />
+    <img v-if="logoUrl" :src="logoUrl" alt="Carré Ivoire" class="h-full w-full object-contain" />
     <span v-else>CI</span>
   </div>
 </template>
