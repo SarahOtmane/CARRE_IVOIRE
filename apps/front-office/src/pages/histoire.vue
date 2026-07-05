@@ -89,16 +89,7 @@ useHead({
       style="padding: clamp(96px, 12vw, 192px) clamp(20px, 6vw, 104px)"
     >
       <div class="mx-auto max-w-[860px] text-center">
-        <p
-          class="font-serif italic text-cacao"
-          style="font-size: clamp(26px, 3.2vw, 40px); line-height: 1.2"
-        >
-          Lorsque vous dégustez un chocolat Carré Ivoire, vous ne découvrez pas
-          seulement une tablette. Vous découvrez une histoire, la mienne et, je
-          l'espère, un peu de la vôtre.
-        </p>
-
-        <div class="mt-14 flex flex-col justify-center gap-4 sm:flex-row">
+        <div class="flex flex-col justify-center gap-4 sm:flex-row">
           <button
             class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
             @click="router.push('/boutique')"
