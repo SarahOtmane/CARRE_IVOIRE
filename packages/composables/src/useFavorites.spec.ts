@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { setActivePinia, createPinia } from 'pinia'
 
 vi.mock('./useApi', () => ({ useApi: vi.fn() }))
 
@@ -20,6 +21,7 @@ const makeFavItem = (productId: number) => ({
 
 describe('useFavorites', () => {
   beforeEach(() => {
+    setActivePinia(createPinia())
     vi.clearAllMocks()
     ;(useApi as ReturnType<typeof vi.fn>).mockReturnValue(mockApi)
   })
