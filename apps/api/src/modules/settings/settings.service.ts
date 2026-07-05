@@ -7,6 +7,7 @@ export interface SettingsResponse {
   shippingFreeFrom: number
   bccEmail: string
   address: string
+  logoUrl: string
 }
 
 @Injectable()
@@ -20,6 +21,7 @@ export class SettingsService {
       shippingFreeFrom: parseInt(raw.shipping_free_from ?? '7000', 10),
       bccEmail: raw.bcc_email ?? '',
       address: raw.address ?? '',
+      logoUrl: raw.logo_url ?? '',
     }
   }
 
@@ -29,6 +31,7 @@ export class SettingsService {
     if (dto.shippingFreeFrom !== undefined) entries.shipping_free_from = String(dto.shippingFreeFrom)
     if (dto.bccEmail !== undefined) entries.bcc_email = dto.bccEmail
     if (dto.address !== undefined) entries.address = dto.address
+    if (dto.logoUrl !== undefined) entries.logo_url = dto.logoUrl
 
     if (Object.keys(entries).length > 0) {
       await this.settingsRepository.setMany(entries)

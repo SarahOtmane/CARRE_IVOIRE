@@ -2,8 +2,14 @@
 import { computed, onMounted } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@carre-ivoire/stores";
-import { useAdminProducts, useAdminOrders, useAdminCategories } from "@carre-ivoire/composables";
+import {
+  useAdminProducts,
+  useAdminOrders,
+  useAdminCategories,
+  usePublicSettings,
+} from "@carre-ivoire/composables";
 import { OrderStatus } from "@carre-ivoire/types";
+import { Logo } from "@carre-ivoire/ui";
 
 const route = useRoute();
 const router = useRouter();
@@ -12,24 +18,53 @@ const authStore = useAuthStore();
 const { products, fetchAll: fetchProducts } = useAdminProducts();
 const { orders, fetchAll: fetchOrders } = useAdminOrders();
 const { categories } = useAdminCategories();
+const { settings: publicSettings } = usePublicSettings();
 
 onMounted(() => Promise.all([fetchProducts(), fetchOrders()]));
 
-const pendingOrdersCount = computed(() =>
-  orders.value.filter(
-    (o) => o.status === OrderStatus.PENDING || o.status === OrderStatus.PAYMENT_PENDING,
-  ).length,
+const pendingOrdersCount = computed(
+  () =>
+    orders.value.filter(
+      (o) =>
+        o.status === OrderStatus.PENDING ||
+        o.status === OrderStatus.PAYMENT_PENDING,
+    ).length,
 );
 
 const navItems = computed(() => [
-  { name: "admin-dashboard", label: "Tableau de bord", badge: undefined, code: "00" },
-  { name: "admin-categories", label: "Catégories", badge: categories.value.length || undefined, code: "01" },
-  { name: "admin-produits", label: "Produits", badge: products.value.length || undefined, code: "02" },
-  { name: "admin-commandes", label: "Commandes", badge: orders.value.length || undefined, code: "03" },
+  {
+    name: "admin-dashboard",
+    label: "Tableau de bord",
+    badge: undefined,
+    code: "00",
+  },
+  {
+    name: "admin-categories",
+    label: "Catégories",
+    badge: categories.value.length || undefined,
+    code: "01",
+  },
+  {
+    name: "admin-produits",
+    label: "Produits",
+    badge: products.value.length || undefined,
+    code: "02",
+  },
+  {
+    name: "admin-commandes",
+    label: "Commandes",
+    badge: orders.value.length || undefined,
+    code: "03",
+  },
   { name: "admin-stocks", label: "Stocks", badge: undefined, code: "04" },
   { name: "admin-pages", label: "Pages", badge: undefined, code: "05" },
   { name: "admin-clients", label: "Clients", badge: undefined, code: "06" },
-  { name: "admin-parametres", label: "Paramètres", badge: undefined, code: "07" },
+  {
+    name: "admin-parametres",
+    label: "Paramètres",
+    badge: undefined,
+    code: "07",
+  },
 ]);
 
 function isActive(name: string) {
@@ -46,15 +81,8 @@ function logout() {
   <aside class="flex h-full w-72 flex-col border-r border-cacao/40 bg-ivoire">
     <div class="border-b border-cacao/40 px-6 py-6">
       <div class="flex items-center gap-4">
-        <div
-          class="flex h-12 w-12 items-center justify-center border border-cacao font-display text-xl text-cacao"
-        >
-          CI
-        </div>
+        <Logo :logo-url="publicSettings?.logoUrl" size="lg" />
         <div class="min-w-0">
-          <div class="truncate font-display text-xl text-cacao">
-            Carré Ivoire
-          </div>
           <div
             class="font-body text-[10px] uppercase tracking-[0.28em] text-cacao/45"
           >

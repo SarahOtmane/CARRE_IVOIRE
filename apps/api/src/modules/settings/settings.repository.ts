@@ -7,6 +7,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   shipping_free_from: '7000',  // en centimes
   bcc_email: '',
   address: '4 rue du Nil, 75002 Paris',
+  logo_url: '',
 }
 
 @Injectable()

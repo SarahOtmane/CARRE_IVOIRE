@@ -10,8 +10,8 @@ export class SettingsController {
 
   @Get('public')
   async getPublic() {
-    const { shippingFlat, shippingFreeFrom } = await this.settingsService.getAll()
-    return { shippingFlat, shippingFreeFrom }
+    const { shippingFlat, shippingFreeFrom, logoUrl } = await this.settingsService.getAll()
+    return { shippingFlat, shippingFreeFrom, logoUrl }
   }
 
   @Get()

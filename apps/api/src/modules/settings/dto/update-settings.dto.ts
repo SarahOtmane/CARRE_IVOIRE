@@ -22,4 +22,9 @@ export class UpdateSettingsDto {
   @IsString()
   @MaxLength(255)
   address?: string
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  logoUrl?: string
 }
