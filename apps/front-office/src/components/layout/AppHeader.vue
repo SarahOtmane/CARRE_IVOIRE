@@ -2,13 +2,21 @@
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useCartStore } from "@carre-ivoire/stores";
-import { useProductSearch, useCategories, usePublicSettings } from "@carre-ivoire/composables";
+import {
+  useProductSearch,
+  useCategories,
+  usePublicSettings,
+} from "@carre-ivoire/composables";
 import { Logo } from "@carre-ivoire/ui";
 
 const router = useRouter();
 const route = useRoute();
 const cartStore = useCartStore();
-const { results: searchResults, isSearching, search: runSearch } = useProductSearch();
+const {
+  results: searchResults,
+  isSearching,
+  search: runSearch,
+} = useProductSearch();
 const { categories: megaCategories } = useCategories();
 const { settings: publicSettings } = usePublicSettings();
 
@@ -60,7 +68,12 @@ function navigateMobile(path: string) {
 }
 
 const isActive = computed(
-  () => alwaysActive || scrolled.value || hovered.value || searchOpen.value || mobileMenuOpen.value,
+  () =>
+    alwaysActive ||
+    scrolled.value ||
+    hovered.value ||
+    searchOpen.value ||
+    mobileMenuOpen.value,
 );
 
 const navItems = [
@@ -135,11 +148,6 @@ function toggleSearch() {
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-3.5">
         <Logo :logo-url="publicSettings?.logoUrl" />
-        <span
-          class="hidden font-serif text-[13px] font-medium tracking-[0.22em] text-cacao lg:block"
-        >
-          CARRÉ IVOIRE
-        </span>
       </RouterLink>
 
       <!-- Navigation desktop -->
@@ -305,8 +313,9 @@ function toggleSearch() {
           type="button"
           class="cursor-pointer py-3 text-left font-sans text-[14px] tracking-[0.06em] text-cacao transition-opacity duration-180 hover:opacity-60"
           @click="navigateMobile(item.path)"
-          >{{ item.label }}</button
         >
+          {{ item.label }}
+        </button>
       </nav>
     </div>
 
@@ -496,12 +505,16 @@ function toggleSearch() {
             <a
               class="cursor-pointer font-serif text-[18px] text-cacao transition-opacity duration-180 hover:opacity-60"
               @click="navigateAndClose('/boutique')"
-            >Découvrir la collection</a>
+              >Découvrir la collection</a
+            >
           </div>
         </div>
 
         <!-- ── Recherche en cours ───────────────────────────────────── -->
-        <div v-else-if="isSearching && searchResults.length === 0" class="mt-12 pb-8">
+        <div
+          v-else-if="isSearching && searchResults.length === 0"
+          class="mt-12 pb-8"
+        >
           <span class="ci-eyebrow">Recherche</span>
         </div>
 

@@ -2,7 +2,12 @@
 import { computed, onMounted } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "@carre-ivoire/stores";
-import { useAdminProducts, useAdminOrders, useAdminCategories, usePublicSettings } from "@carre-ivoire/composables";
+import {
+  useAdminProducts,
+  useAdminOrders,
+  useAdminCategories,
+  usePublicSettings,
+} from "@carre-ivoire/composables";
 import { OrderStatus } from "@carre-ivoire/types";
 import { Logo } from "@carre-ivoire/ui";
 
@@ -17,21 +22,49 @@ const { settings: publicSettings } = usePublicSettings();
 
 onMounted(() => Promise.all([fetchProducts(), fetchOrders()]));
 
-const pendingOrdersCount = computed(() =>
-  orders.value.filter(
-    (o) => o.status === OrderStatus.PENDING || o.status === OrderStatus.PAYMENT_PENDING,
-  ).length,
+const pendingOrdersCount = computed(
+  () =>
+    orders.value.filter(
+      (o) =>
+        o.status === OrderStatus.PENDING ||
+        o.status === OrderStatus.PAYMENT_PENDING,
+    ).length,
 );
 
 const navItems = computed(() => [
-  { name: "admin-dashboard", label: "Tableau de bord", badge: undefined, code: "00" },
-  { name: "admin-categories", label: "Catégories", badge: categories.value.length || undefined, code: "01" },
-  { name: "admin-produits", label: "Produits", badge: products.value.length || undefined, code: "02" },
-  { name: "admin-commandes", label: "Commandes", badge: orders.value.length || undefined, code: "03" },
+  {
+    name: "admin-dashboard",
+    label: "Tableau de bord",
+    badge: undefined,
+    code: "00",
+  },
+  {
+    name: "admin-categories",
+    label: "Catégories",
+    badge: categories.value.length || undefined,
+    code: "01",
+  },
+  {
+    name: "admin-produits",
+    label: "Produits",
+    badge: products.value.length || undefined,
+    code: "02",
+  },
+  {
+    name: "admin-commandes",
+    label: "Commandes",
+    badge: orders.value.length || undefined,
+    code: "03",
+  },
   { name: "admin-stocks", label: "Stocks", badge: undefined, code: "04" },
   { name: "admin-pages", label: "Pages", badge: undefined, code: "05" },
   { name: "admin-clients", label: "Clients", badge: undefined, code: "06" },
-  { name: "admin-parametres", label: "Paramètres", badge: undefined, code: "07" },
+  {
+    name: "admin-parametres",
+    label: "Paramètres",
+    badge: undefined,
+    code: "07",
+  },
 ]);
 
 function isActive(name: string) {
@@ -50,9 +83,6 @@ function logout() {
       <div class="flex items-center gap-4">
         <Logo :logo-url="publicSettings?.logoUrl" size="lg" />
         <div class="min-w-0">
-          <div class="truncate font-display text-xl text-cacao">
-            Carré Ivoire
-          </div>
           <div
             class="font-body text-[10px] uppercase tracking-[0.28em] text-cacao/45"
           >
