@@ -64,6 +64,12 @@ export class UsersRepository {
     return user.update(data)
   }
 
+  async delete(id: number): Promise<void> {
+    const user = await this.findById(id)
+    if (!user) throwApiError(ErrorCodes.USER_NOT_FOUND, 'Utilisateur introuvable')
+    await user.destroy()
+  }
+
   async findAll(query: UserQueryDto): Promise<UsersPage> {
     const page = query.page ?? 1
     const limit = query.limit ?? 25

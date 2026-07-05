@@ -38,8 +38,9 @@ function formatPrice(centimes: number) {
 }
 
 const displayPrice = computed(() => {
-  if (props.product.variants.length === 0) return formatPrice(props.product.price)
-  const cheapest = Math.min(...props.product.variants.map((v) => v.price))
+  const variants = props.product.variants ?? []
+  if (variants.length === 0) return formatPrice(props.product.price)
+  const cheapest = Math.min(...variants.map((v) => v.price))
   return `À partir de ${formatPrice(cheapest)}`
 })
 
@@ -76,8 +77,12 @@ const badgeVariants: Record<string, string> = {
         :disabled="togglingFavorite"
         @click="toggleFavorite"
       >
-        <svg width="16" height="16" :fill="isFav ? 'var(--dore)' : 'none'" stroke="var(--brun-cacao)" stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter">
-          <use href="/assets/icons/sprite.svg#ci-heart" />
+        <svg width="30" height="30" viewBox="0 0 24 24" stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z"
+            :fill="isFav ? 'var(--dore)' : 'none'"
+            :stroke="isFav ? 'var(--dore)' : 'var(--brun-cacao)'"
+          />
         </svg>
       </button>
 

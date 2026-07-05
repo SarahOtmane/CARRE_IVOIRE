@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@carre-ivoire/stores'
 import { useUserInfo } from '@carre-ivoire/composables'
 import { useHead } from '@unhead/vue'
@@ -8,6 +10,7 @@ useHead({
   meta: [{ name: 'robots', content: 'noindex' }],
 })
 
+const router = useRouter()
 const authStore = useAuthStore()
 const {
   form,
@@ -18,9 +21,34 @@ const {
   passwordSaved,
   passwordError,
   isSavingPassword,
+  isDeleting,
+  deleteError,
   save,
   changePassword,
+  deleteAccount,
 } = useUserInfo()
+
+const errors = ref<Record<string, string>>({})
+const showDeleteConfirm = ref(false)
+
+async function confirmDelete() {
+  await deleteAccount()
+  if (!deleteError.value) router.push('/')
+}
+
+function validateAndSave() {
+  errors.value = {}
+  if (!form.value.firstName.trim())
+    errors.value.firstName = 'Veuillez remplir ce champs'
+  if (!form.value.lastName.trim())
+    errors.value.lastName = 'Veuillez remplir ce champs'
+  if (form.value.phone?.trim() && !/^\+?[\d\s.\-()]{7,20}$/.test(form.value.phone.trim()))
+    errors.value.phone = "Le format de votre téléphone n'est pas bon"
+  if (form.value.addressZip?.trim() && !/^\d{4,10}$/.test(form.value.addressZip.trim()))
+    errors.value.addressZip = "Le format de votre code postal n'est pas bon"
+  if (Object.keys(errors.value).length > 0) return
+  save()
+}
 </script>
 
 <template>
@@ -77,8 +105,9 @@ const {
                 v-model="form.firstName"
                 type="text"
                 class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
-                style="border-bottom: 1px solid var(--brun-cacao)"
+                :style="{ borderBottom: `1px solid ${errors.firstName ? '#9B1C1C' : 'var(--brun-cacao)'}` }"
               />
+              <p v-if="errors.firstName" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.firstName }}</p>
             </div>
             <div>
               <label
@@ -92,8 +121,9 @@ const {
                 v-model="form.lastName"
                 type="text"
                 class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none"
-                style="border-bottom: 1px solid var(--brun-cacao)"
+                :style="{ borderBottom: `1px solid ${errors.lastName ? '#9B1C1C' : 'var(--brun-cacao)'}` }"
               />
+              <p v-if="errors.lastName" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.lastName }}</p>
             </div>
           </div>
 
@@ -111,8 +141,9 @@ const {
               type="tel"
               placeholder="+33 6 00 00 00 00"
               class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
-              style="border-bottom: 1px solid var(--brun-cacao)"
+              :style="{ borderBottom: `1px solid ${errors.phone ? '#9B1C1C' : 'var(--brun-cacao)'}` }"
             />
+            <p v-if="errors.phone" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.phone }}</p>
           </div>
 
           <!-- Adresse -->
@@ -167,8 +198,9 @@ const {
                 autocomplete="postal-code"
                 placeholder="75002"
                 class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
-                style="border-bottom: 1px solid var(--brun-cacao)"
+                :style="{ borderBottom: `1px solid ${errors.addressZip ? '#9B1C1C' : 'var(--brun-cacao)'}` }"
               />
+              <p v-if="errors.addressZip" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.addressZip }}</p>
             </div>
           </div>
 
@@ -195,7 +227,7 @@ const {
             <button
               class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
               :disabled="isSaving"
-              @click="save"
+              @click="validateAndSave"
             >
               {{ isSaving ? 'Enregistrement…' : 'Enregistrer' }}
             </button>
@@ -213,6 +245,7 @@ const {
 
         <!-- Changer le mot de passe -->
         <div class="border-t pt-8 space-y-7" style="border-color: var(--cacao-a12)">
+
           <div class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3">
             Modifier le mot de passe
           </div>
@@ -270,6 +303,25 @@ const {
             </span>
           </div>
         </div>
+        <!-- Supprimer le compte -->
+        <div class="border-t pt-8 space-y-5" style="border-color: var(--cacao-a12)">
+          <div class="font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3">
+            Supprimer le compte
+          </div>
+          <p class="max-w-[480px] font-sans text-[14px] leading-[1.7] text-cacao-2">
+            Cette action est irréversible. Toutes vos données personnelles, commandes et favoris associés à ce compte seront définitivement supprimés.
+          </p>
+          <div class="flex items-center gap-6">
+            <button
+              type="button"
+              class="border border-red-700/50 px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-red-700 transition-all duration-180 hover:border-red-700 hover:bg-red-700/5 active:translate-y-px"
+              @click="showDeleteConfirm = true"
+            >
+              Supprimer mon compte
+            </button>
+            <span v-if="deleteError" class="font-sans text-[12px] text-red-700">{{ deleteError }}</span>
+          </div>
+        </div>
       </div>
 
       <aside class="space-y-6">
@@ -293,4 +345,44 @@ const {
       </aside>
     </div>
   </div>
+
+  <!-- Modal confirmation suppression -->
+  <Teleport to="body">
+    <div
+      v-if="showDeleteConfirm"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-cacao/40 p-5"
+      @click.self="showDeleteConfirm = false"
+    >
+      <div class="w-full max-w-[440px] border border-cacao bg-ivoire p-10">
+        <p class="font-sans text-[11px] uppercase tracking-[0.22em] text-cacao-3">Suppression définitive</p>
+        <h3
+          class="mt-4 font-serif text-cacao"
+          style="font-size: clamp(22px, 3vw, 30px); line-height: 1.1; font-weight: 500"
+        >
+          Êtes-vous sûr de vouloir supprimer votre compte définitivement ?
+        </h3>
+        <p class="mt-4 font-sans text-[13px] leading-[1.7] text-cacao-2">
+          Cette action ne peut pas être annulée. Toutes vos données seront effacées.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <button
+            type="button"
+            class="border border-red-700 bg-red-700 px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 disabled:cursor-not-allowed disabled:opacity-60 active:translate-y-px"
+            :disabled="isDeleting"
+            @click="confirmDelete"
+          >
+            {{ isDeleting ? 'Suppression…' : 'Oui, supprimer' }}
+          </button>
+          <button
+            type="button"
+            class="border border-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-cacao transition-all duration-180 active:translate-y-px"
+            :disabled="isDeleting"
+            @click="showDeleteConfirm = false"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>

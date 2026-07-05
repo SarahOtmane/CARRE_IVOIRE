@@ -43,9 +43,9 @@ const { favorites, isLoading } = useFavorites();
       </div>
       <button
         class="border-b border-cacao pb-px font-sans text-[13px] text-cacao transition-opacity duration-180 hover:opacity-60"
-        @click="router.push('/boutique')"
+        @click="router.push({ name: 'boutique' })"
       >
-        Ajouter d'autres pièces →
+        Ajouter d'autres produits →
       </button>
     </div>
 
@@ -76,7 +76,7 @@ const { favorites, isLoading } = useFavorites();
       </p>
       <button
         class="mt-6 border-b border-cacao pb-px font-sans text-[13px] text-cacao transition-opacity duration-180 hover:opacity-60"
-        @click="router.push('/boutique')"
+        @click="router.push({ name: 'boutique' })"
       >
         Découvrir la boutique →
       </button>

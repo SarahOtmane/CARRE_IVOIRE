@@ -51,7 +51,7 @@ const dates = [
       style="padding: 120px clamp(20px, 6vw, 104px) clamp(80px, 12vw, 192px)"
     >
       <div class="max-w-[880px]">
-        <span class="ci-eyebrow">Notre Maison</span>
+        <span class="ci-eyebrow">Notre Histoire</span>
         <h1
           class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(48px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.02em"

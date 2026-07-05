@@ -61,7 +61,7 @@ const router = useRouter()
             class="pb-0.5 font-sans text-[13px]"
             style="color: var(--ivoire); border-bottom: 1px solid var(--ivoire)"
           >
-            Notre maison →
+            Notre histoire →
           </RouterLink>
         </div>
       </div>

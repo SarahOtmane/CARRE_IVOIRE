@@ -32,8 +32,9 @@ const cols = [
     items: [
       { label: "Nous contacter", path: "/contact" },
       { label: "Livraison", path: "/contact" },
-      { label: "CGV", path: "/contact" },
-      { label: "Mentions légales", path: "/contact" },
+      { label: "CGV", path: "/cgv" },
+      { label: "Mentions légales", path: "/mentions-legales" },
+      { label: "Politique de confidentialité", path: "/politique-de-confidentialite" },
     ],
   },
 ];
@@ -60,11 +61,12 @@ const cols = [
 
       <!-- Colonnes de liens -->
       <div v-for="col in cols" :key="col.title">
-        <div class="ci-label mb-5 opacity-60">{{ col.title }}</div>
+        <div class="ci-label mb-5 opacity-60" style="color: var(--ivoire)">{{ col.title }}</div>
         <ul class="space-y-2.5">
           <li v-for="item in col.items" :key="item.label">
             <a
-              class="cursor-pointer font-sans text-[13px] text-ivoire opacity-80 transition-opacity duration-180 hover:opacity-100"
+              class="cursor-pointer font-sans text-[13px] opacity-80 transition-opacity duration-180 hover:opacity-100"
+              style="color: var(--ivoire)"
               @click="router.push(item.path)"
               >{{ item.label }}</a
             >

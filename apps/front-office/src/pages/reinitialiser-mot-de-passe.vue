@@ -25,6 +25,14 @@ onMounted(() => {
 
 async function submit() {
   error.value = ''
+  if (!newPassword.value.trim()) {
+    error.value = 'Veuillez remplir ce champs'
+    return
+  }
+  if (!confirm.value.trim()) {
+    error.value = 'Veuillez remplir ce champs'
+    return
+  }
   if (newPassword.value !== confirm.value) {
     error.value = 'Les mots de passe ne correspondent pas.'
     return
@@ -68,7 +76,7 @@ async function submit() {
         </p>
       </div>
 
-      <form v-else class="mt-10 space-y-6" @submit.prevent="submit">
+      <form v-else class="mt-10 space-y-6" novalidate @submit.prevent="submit">
         <label class="block space-y-2">
           <span class="font-sans text-[10px] uppercase tracking-[0.18em] text-cacao-2">
             Nouveau mot de passe
@@ -76,9 +84,7 @@ async function submit() {
           <input
             v-model="newPassword"
             type="password"
-            required
             autocomplete="new-password"
-            minlength="8"
             class="w-full border border-cacao/25 bg-papier px-4 py-3 font-sans text-[15px] text-cacao outline-none transition-colors focus:border-cacao/60"
           />
         </label>
@@ -90,7 +96,6 @@ async function submit() {
           <input
             v-model="confirm"
             type="password"
-            required
             autocomplete="new-password"
             class="w-full border border-cacao/25 bg-papier px-4 py-3 font-sans text-[15px] text-cacao outline-none transition-colors focus:border-cacao/60"
           />

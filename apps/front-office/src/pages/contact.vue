@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useAuthStore } from "@carre-ivoire/stores";
 import { useHead } from '@unhead/vue'
 
 useHead({
@@ -13,24 +14,42 @@ type ContactForm = {
   message: string;
 };
 
+const authStore = useAuthStore();
+
 const form = ref<ContactForm>({
   subject: "",
-  address: "",
+  address: authStore.user?.email ?? "",
   message: "",
 });
 
 const sent = ref(false);
+const errors = ref<Record<string, string>>({});
+
+function validate(): boolean {
+  errors.value = {};
+  if (!form.value.subject.trim())
+    errors.value.subject = "Veuillez remplir ce champs";
+  if (!form.value.address.trim())
+    errors.value.address = "Veuillez remplir ce champs";
+  else if (!/^[^@]+@[^@]+\.[^@]+$/.test(form.value.address.trim()))
+    errors.value.address = "Le format de votre email n'est pas bon";
+  if (!form.value.message.trim())
+    errors.value.message = "Veuillez remplir ce champs";
+  return Object.keys(errors.value).length === 0;
+}
 
 function resetForm() {
   form.value = {
     subject: "",
-    address: "",
+    address: authStore.user?.email ?? "",
     message: "",
   };
+  errors.value = {};
   sent.value = false;
 }
 
 function handleSubmit() {
+  if (!validate()) return;
   const body = `Adresse de réponse : ${form.value.address}\n\n${form.value.message}`;
   const href = `mailto:contact@carre-ivoire.fr?subject=${encodeURIComponent(form.value.subject)}&body=${encodeURIComponent(body)}`;
   globalThis.location.href = href;
@@ -212,6 +231,7 @@ function handleSubmit() {
           v-else
           class="flex flex-col gap-10"
           @submit.prevent="handleSubmit"
+          novalidate
         >
           <div>
             <label
@@ -222,12 +242,12 @@ function handleSubmit() {
             <input
               id="contact-subject"
               v-model="form.subject"
-              required
               type="text"
               placeholder="Une commande, une question, un projet…"
               class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] tracking-[0.01em] text-cacao outline-none focus:border-cacao"
-              style="border-color: var(--cacao-a24)"
+              :style="{ borderColor: errors.subject ? '#9B1C1C' : 'var(--cacao-a24)' }"
             />
+            <p v-if="errors.subject" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.subject }}</p>
           </div>
 
           <div>
@@ -239,12 +259,12 @@ function handleSubmit() {
             <input
               id="contact-address"
               v-model="form.address"
-              required
               type="email"
               placeholder="vous@maison.fr"
               class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] tracking-[0.01em] text-cacao outline-none focus:border-cacao"
-              style="border-color: var(--cacao-a24)"
+              :style="{ borderColor: errors.address ? '#9B1C1C' : 'var(--cacao-a24)' }"
             />
+            <p v-if="errors.address" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.address }}</p>
           </div>
 
           <div>
@@ -256,12 +276,12 @@ function handleSubmit() {
             <textarea
               id="contact-message"
               v-model="form.message"
-              required
               rows="6"
               placeholder="Dites-nous tout — sans formules inutiles."
               class="min-h-[160px] w-full resize-y border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] leading-[1.6] tracking-[0.01em] text-cacao outline-none focus:border-cacao"
-              style="border-color: var(--cacao-a24)"
+              :style="{ borderColor: errors.message ? '#9B1C1C' : 'var(--cacao-a24)' }"
             />
+            <p v-if="errors.message" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.message }}</p>
           </div>
 
           <div class="flex flex-wrap items-center gap-6 pt-2">

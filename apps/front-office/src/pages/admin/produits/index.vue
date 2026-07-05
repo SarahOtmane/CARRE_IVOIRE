@@ -92,43 +92,51 @@ function openProduct(productId: number) {
 
     <section v-else class="overflow-hidden border border-cacao bg-ivoire">
       <div
-        class="grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.4fr)_108px_130px_110px_84px] border-b border-cacao px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45"
+        class="grid grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_110px_140px_110px_80px] border-b border-cacao px-6 py-4 font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45"
       >
         <span>Nom</span>
         <span>Catégorie</span>
-        <span class="text-right">Prix</span>
-        <span>Disponibilité</span>
-        <span>Statut</span>
-        <span class="text-right">Action</span>
+        <span>Prix</span>
+        <span class="text-center">Disponibilité</span>
+        <span class="text-center">Statut</span>
+        <span class="text-center">Action</span>
       </div>
 
       <button
         v-for="product in filteredProducts"
         :key="product.id"
         type="button"
-        class="grid w-full grid-cols-[minmax(0,2.2fr)_minmax(0,1.4fr)_108px_130px_110px_84px] items-center gap-4 border-b border-cacao px-6 py-5 text-left transition-colors duration-200 hover:bg-beige-doux/50 last:border-b-0"
+        class="grid w-full grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)_110px_140px_110px_80px] items-center border-b border-cacao px-6 py-5 text-left transition-colors duration-200 hover:bg-beige-doux/50 last:border-b-0"
         @click="openProduct(product.id)"
       >
-        <span class="min-w-0">
+        <span class="min-w-0 pr-4">
           <span class="block truncate font-display text-xl text-cacao">{{ product.name }}</span>
           <span class="font-body text-[11px] text-cacao/55">{{ product.slug }}</span>
         </span>
-        <span class="font-body text-sm text-cacao">{{ product.category?.name ?? "—" }}</span>
-        <span class="text-right font-body text-sm tabular-nums text-dore">{{ formatPrice(product.price) }}</span>
-        <button
-          type="button"
-          class="w-fit border px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] transition-colors duration-200"
-          :class="product.stockStatus === 'out_of_stock'
-            ? 'border-red-700/30 text-red-700 hover:border-red-700 hover:bg-red-700/5'
-            : 'border-cacao text-cacao hover:border-cacao/50'"
-          @click="toggleAvailability(product, $event)"
-        >
-          {{ product.stockStatus === 'out_of_stock' ? 'Rupture' : 'En stock' }}
-        </button>
-        <span class="border border-cacao px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cacao/70">
-          {{ product.isActive ? "Actif" : "Inactif" }}
-        </span>
-        <span class="text-right font-body text-[11px] uppercase tracking-[0.18em] text-cacao/55">Ouvrir</span>
+        <span class="pr-4 font-body text-sm text-cacao">{{ product.category?.name ?? "—" }}</span>
+        <span class="pr-6 font-body text-sm tabular-nums text-dore">{{ formatPrice(product.price) }}</span>
+        <div class="flex justify-center">
+          <button
+            type="button"
+            class="border px-3 py-1.5 font-body text-[10px] uppercase tracking-[0.18em] transition-colors duration-200 leading-tight text-center"
+            :class="product.stockStatus === 'out_of_stock' || product.stock < 10
+              ? 'border-red-700 text-red-700 hover:border-red-700 hover:bg-red-700/5'
+              : 'border-cacao text-cacao hover:border-cacao hover:bg-[rgba(58,31,20,0.05)]'"
+            @click="toggleAvailability(product, $event)"
+          >
+            <span class="block">{{ product.stockStatus === 'out_of_stock' ? 'Rupture' : 'En stock' }}</span>
+            <span
+              v-if="product.stockStatus !== 'out_of_stock' && product.stock < 10"
+              class="block normal-case tracking-normal text-[9px] font-normal opacity-80"
+            >Plus que {{ product.stock }}</span>
+          </button>
+        </div>
+        <div class="flex justify-center">
+          <span class="border border-cacao px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cacao/70">
+            {{ product.isActive ? "Actif" : "Inactif" }}
+          </span>
+        </div>
+        <span class="text-center font-body text-[11px] uppercase tracking-[0.18em] text-cacao/55">Ouvrir</span>
       </button>
 
       <div v-if="filteredProducts.length === 0 && !isLoading" class="px-6 py-12 text-center font-body text-sm italic text-cacao/45">

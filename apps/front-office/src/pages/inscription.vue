@@ -71,6 +71,7 @@ const { form, error, loading, register } = useRegisterForm()
           class="mt-6 border-t pt-6"
           style="border-color: var(--cacao-a12)"
           @submit.prevent="register"
+          novalidate
         >
           <h2 class="font-serif text-[32px] font-medium leading-[1.1] text-cacao">
             Créez votre espace.
