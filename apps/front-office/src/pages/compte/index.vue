@@ -194,6 +194,13 @@ const shortcuts = [
               Ajouter →
             </button>
           </div>
+          <button
+            v-if="addressLine"
+            class="mt-3 border-b border-cacao pb-px font-sans text-[13px] text-cacao transition-opacity duration-180 hover:opacity-60"
+            @click="router.push('/compte/informations')"
+          >
+            Modifier l'adresse →
+          </button>
         </div>
 
         <div class="border-t pt-4" style="border-color: var(--cacao-a12)">

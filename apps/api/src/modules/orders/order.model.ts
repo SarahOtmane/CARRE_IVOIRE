@@ -42,7 +42,7 @@ export class Order extends Model<Order> {
 
   @Unique('order_number')
   @AllowNull(false)
-  @Column({ type: DataType.STRING(30), field: 'order_number' })
+  @Column({ type: DataType.STRING(50), field: 'order_number' })
   declare orderNumber: string
 
   @AllowNull(false)
