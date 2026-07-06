@@ -137,6 +137,29 @@ export class OrdersService {
       const paymentIntent = await this.stripeService.createPaymentIntent(totalAmount, order.id)
       await this.ordersRepository.update(order.id, { stripePaymentIntentId: paymentIntent.id })
 
+      // Envoi email + facture dès la création de la commande (pour test — à déplacer dans confirmByPaymentIntent une fois le webhook opérationnel)
+      const user = await this.usersRepository.findById(order.userId)
+      const bccEmail = await this.settingsService.getAll().then((s) => s.bccEmail || undefined).catch(() => undefined)
+      if (user) {
+        const fullOrder = await this.ordersRepository.findById(order.id)
+        this.mailService.sendOrderConfirmation({
+          to: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          orderNumber: order.orderNumber ?? `#${order.id}`,
+          totalAmount,
+          orderDate: order.created_at,
+          shippingAddress: fullOrder?.shippingAddress as any,
+          bcc: bccEmail,
+          items: ((fullOrder?.items ?? []) as OrderItem[]).map((item) => ({
+            productName: (item as any).productName ?? `Produit ${item.productId}`,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            format: item.format ?? undefined,
+          })),
+        }).catch(() => { /* ne jamais bloquer sur un échec email */ })
+      }
+
       return {
         orderId: order.id,
         orderNumber: order.orderNumber,
@@ -215,13 +238,17 @@ export class OrdersService {
       this.mailService.sendOrderConfirmation({
         to: user.email,
         firstName: user.first_name,
+        lastName: user.last_name,
         orderNumber: fullOrder.orderNumber ?? `#${fullOrder.id}`,
         totalAmount: fullOrder.totalAmount,
+        orderDate: fullOrder.created_at,
+        shippingAddress: fullOrder.shippingAddress as any,
         bcc: bccEmail,
         items: ((fullOrder.items ?? []) as OrderItem[]).map((item) => ({
           productName: (item as any).productName ?? `Produit ${item.productId}`,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
+          format: item.format ?? undefined,
         })),
       }).catch(() => { /* ne jamais bloquer sur un échec email */ })
     }
