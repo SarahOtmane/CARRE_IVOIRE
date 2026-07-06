@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useAdminTaxRates, useApi } from "@carre-ivoire/composables";
+import { useAdminTaxRates, useApi, useImageUpload } from "@carre-ivoire/composables";
+import { Logo } from "@carre-ivoire/ui";
 
 const api = useApi();
+const { upload, isUploading } = useImageUpload();
 
 const settings = ref({
   shippingFlat: 8,
   shippingFreeFrom: 70,
   bccEmail: "",
   address: "4 rue du Nil, 75002 Paris",
+  logoUrl: "",
 });
 
 const isLoading = ref(false);
@@ -20,13 +23,14 @@ let saveTimeout: ReturnType<typeof setTimeout> | undefined;
 async function loadSettings() {
   isLoading.value = true;
   try {
-    const res = await api.get<{ success: boolean; data: { shippingFlat: number; shippingFreeFrom: number; bccEmail: string; address: string } }>('/settings');
+    const res = await api.get<{ success: boolean; data: { shippingFlat: number; shippingFreeFrom: number; bccEmail: string; address: string; logoUrl: string } }>('/settings');
     const data = res.data.data;
     settings.value = {
       shippingFlat: data.shippingFlat / 100,
       shippingFreeFrom: data.shippingFreeFrom / 100,
       bccEmail: data.bccEmail,
       address: data.address,
+      logoUrl: data.logoUrl,
     };
   } catch {
     // silencieux — les valeurs par défaut restent affichées
@@ -45,6 +49,7 @@ async function save() {
       shippingFreeFrom: Math.round(settings.value.shippingFreeFrom * 100),
       bccEmail: settings.value.bccEmail || undefined,
       address: settings.value.address || undefined,
+      logoUrl: settings.value.logoUrl || undefined,
     });
     saved.value = true;
     if (saveTimeout) clearTimeout(saveTimeout);
@@ -54,6 +59,13 @@ async function save() {
   } finally {
     isSaving.value = false;
   }
+}
+
+async function onLogoChange(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  const url = await upload(file);
+  if (url) settings.value.logoUrl = url;
 }
 
 onMounted(loadSettings);
@@ -166,7 +178,7 @@ async function deleteTva(id: number, label: string) {
         <div class="flex items-center gap-6 pt-2">
           <button
             type="submit"
-            :disabled="isSaving"
+            :disabled="isSaving || isUploading"
             class="border border-cacao bg-cacao px-7 py-4 font-body text-[11px] uppercase tracking-[0.16em] text-ivoire disabled:cursor-not-allowed disabled:opacity-60"
           >
             {{ isSaving ? 'Enregistrement…' : 'Enregistrer' }}
@@ -184,6 +196,23 @@ async function deleteTva(id: number, label: string) {
       </div>
 
       <aside class="space-y-4">
+        <div class="border border-cacao p-5">
+          <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45">Logo</div>
+          <div class="mt-4 flex items-center gap-4">
+            <Logo :logo-url="settings.logoUrl" size="lg" />
+            <label class="cursor-pointer border border-cacao px-4 py-2 font-body text-[10px] uppercase tracking-[0.16em] text-cacao transition-colors hover:border-cacao">
+              <span>{{ isUploading ? "Envoi…" : "Changer" }}</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                class="sr-only"
+                :disabled="isUploading"
+                @change="onLogoChange"
+              />
+            </label>
+          </div>
+        </div>
+
         <div class="border border-cacao p-5">
           <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45">Résumé</div>
           <div class="mt-4 space-y-3 font-body text-sm text-cacao">

@@ -35,6 +35,27 @@ describe('StripeService', () => {
     ).rejects.toThrow(InternalServerErrorException)
   })
 
+  it('démarre sans STRIPE_WEBHOOK_SECRET (webhookSecret vaut chaîne vide)', async () => {
+    const service = await createService({ STRIPE_SECRET_KEY: 'sk_test_xxx' })
+    expect(service).toBeDefined()
+  })
+
+  describe('createPaymentIntent', () => {
+    it('crée un PaymentIntent via la SDK Stripe (mock interne)', async () => {
+      const service = await createService({
+        STRIPE_SECRET_KEY: 'sk_test_xxx',
+        STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET,
+      })
+      const mockCreate = jest.fn().mockResolvedValue({ id: 'pi_test', client_secret: 'cs_test' })
+      ;(service as any).stripe.paymentIntents = { create: mockCreate }
+      const result = await service.createPaymentIntent(500, 42)
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({ amount: 500, currency: 'eur', metadata: { orderId: '42' } }),
+      )
+      expect(result.id).toBe('pi_test')
+    })
+  })
+
   describe('constructEvent', () => {
     it('accepte un événement avec une signature webhook valide', async () => {
       const service = await createService({

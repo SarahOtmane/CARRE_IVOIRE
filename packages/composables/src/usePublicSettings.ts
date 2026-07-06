@@ -4,6 +4,7 @@ import { useApi } from './useApi'
 interface PublicSettings {
   shippingFlat: number
   shippingFreeFrom: number
+  logoUrl: string
 }
 
 // Cached settings — un seul fetch par session

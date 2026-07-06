@@ -1,5 +1,6 @@
 import { ref, computed, onMounted } from 'vue'
 import type { ProductResponse } from '@carre-ivoire/types'
+import { useAuthStore } from '@carre-ivoire/stores'
 import { useApi } from './useApi'
 import { useLoading } from './useLoading'
 
@@ -14,6 +15,7 @@ export function useFavorites() {
   const pendingIds = ref(new Set<number>())
   const { isLoading, withLoading } = useLoading()
   const api = useApi()
+  const authStore = useAuthStore()
 
   const fetch = () =>
     withLoading(async () => {
@@ -80,7 +82,9 @@ export function useFavorites() {
 
   const isPending = computed(() => (productId: number) => pendingIds.value.has(productId))
 
-  onMounted(fetch)
+  onMounted(() => {
+    if (authStore.isAuthenticated) fetch()
+  })
 
   return { favorites, isLoading, isPending, fetch, add, remove, toggle, isFavorite }
 }

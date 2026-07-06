@@ -18,6 +18,7 @@ import { MailModule } from './modules/mail/mail.module'
 import { SitemapModule } from './modules/sitemap/sitemap.module'
 import { NewsletterModule } from './modules/newsletter/newsletter.module'
 import { SettingsModule } from './modules/settings/settings.module'
+import { HistoireModule } from './modules/histoire/histoire.module'
 import { envValidationSchema } from './config/env.validation'
 
 @Module({
@@ -49,6 +50,7 @@ import { envValidationSchema } from './config/env.validation'
     SitemapModule,
     NewsletterModule,
     SettingsModule,
+    HistoireModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

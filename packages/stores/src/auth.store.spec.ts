@@ -18,11 +18,12 @@ describe('useAuthStore', () => {
 
   const adminUser = { ...clientUser, id: 2, role: 'admin' as const }
 
-  it("n'est pas authentifié par défaut", () => {
+  it("n'est pas authentifie par defaut", () => {
     const store = useAuthStore()
     expect(store.isAuthenticated).toBe(false)
     expect(store.isAdmin).toBe(false)
     expect(store.fullName).toBe('')
+    expect(store.initialized).toBe(false)
   })
 
   describe('setAuth', () => {
@@ -35,7 +36,7 @@ describe('useAuthStore', () => {
       expect(store.fullName).toBe('Jean Dupont')
     })
 
-    it('reconnaît un administrateur via isAdmin', () => {
+    it('reconnait un administrateur via isAdmin', () => {
       const store = useAuthStore()
       store.setAuth('token-admin', adminUser)
       expect(store.isAdmin).toBe(true)
@@ -43,13 +44,22 @@ describe('useAuthStore', () => {
   })
 
   describe('logout', () => {
-    it('réinitialise le token et l’utilisateur', () => {
+    it('reinitialise le token et utilisateur', () => {
       const store = useAuthStore()
       store.setAuth('token-abc', clientUser)
       store.logout()
       expect(store.token).toBeNull()
       expect(store.user).toBeNull()
       expect(store.isAuthenticated).toBe(false)
+    })
+  })
+
+  describe('setInitialized', () => {
+    it('passe initialized a true', () => {
+      const store = useAuthStore()
+      expect(store.initialized).toBe(false)
+      store.setInitialized()
+      expect(store.initialized).toBe(true)
     })
   })
 })

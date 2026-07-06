@@ -68,5 +68,49 @@ describe('TaxRatesService', () => {
       })
       expect(repo.clearDefault).not.toHaveBeenCalled()
     })
+
+    it('ne clarifie pas le défaut si isDefault n\'est pas dans le DTO', async () => {
+      await service.update(1, { label: 'Nouveau label' })
+      expect(repo.clearDefault).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('findAll', () => {
+    it('retourne les taux mappés en DTO', async () => {
+      repo.findAll.mockResolvedValue([mockRow as any])
+      const result = await service.findAll()
+      expect(result).toHaveLength(1)
+      expect(result[0].rate).toBe(20)
+      expect(result[0].isDefault).toBe(true)
+    })
+  })
+
+  describe('delete', () => {
+    it('supprime le taux s\'il existe', async () => {
+      repo.delete.mockResolvedValue(1 as any)
+      await expect(service.delete(1)).resolves.toBeUndefined()
+      expect(repo.delete).toHaveBeenCalledWith(1)
+    })
+
+    it('lève TAX_RATE_NOT_FOUND si le taux n\'existe pas', async () => {
+      repo.findById.mockResolvedValue(null)
+      await expect(service.delete(99)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'TAX_RATE_NOT_FOUND' }),
+      })
+    })
+
+    it('lève CONFLICT si des produits utilisent le taux (FK constraint)', async () => {
+      const fkError = new Error('FK')
+      ;(fkError as any).name = 'SequelizeForeignKeyConstraintError'
+      repo.delete.mockRejectedValue(fkError)
+      await expect(service.delete(1)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'CONFLICT' }),
+      })
+    })
+
+    it('relance les erreurs non-FK', async () => {
+      repo.delete.mockRejectedValue(new Error('DB crash'))
+      await expect(service.delete(1)).rejects.toThrow('DB crash')
+    })
   })
 })

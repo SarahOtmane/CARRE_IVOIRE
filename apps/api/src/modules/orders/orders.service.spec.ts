@@ -63,6 +63,7 @@ describe('OrdersService', () => {
             findByUserId: jest.fn(),
             findByPaymentIntentId: jest.fn(),
             findAll: jest.fn(),
+            findByOrderNumber: jest.fn(),
           },
         },
         {
@@ -145,6 +146,14 @@ describe('OrdersService', () => {
       expect(productsRepo.incrementStock).toHaveBeenCalledWith(1, 2, mockTransaction)
       expect(ordersRepo.update).toHaveBeenCalledWith(1, { status: 'cancelled' }, mockTransaction)
     })
+
+    it('lève PRODUCT_NOT_FOUND si findAllByIds ne retourne pas le produit demandé', async () => {
+      productsRepo.findAllByIds.mockResolvedValueOnce([])
+      const dtoMissing = { items: [{ productId: 99, quantity: 1 }], shippingAddress: {} }
+      await expect(service.createOrder(dtoMissing as any, 1)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'PRODUCT_NOT_FOUND' }),
+      })
+    })
   })
 
   describe('cancelByPaymentIntent', () => {
@@ -160,6 +169,20 @@ describe('OrdersService', () => {
       await expect(service.cancelByPaymentIntent('pi_unknown')).resolves.toBeUndefined()
       expect(productsRepo.incrementStock).not.toHaveBeenCalled()
     })
+
+    it('réincremente le stock de la variante si les items ont un variantId', async () => {
+      const orderWithVariant = { ...mockOrder, items: [{ productId: 1, variantId: 10, quantity: 1, unitPrice: 390 }] }
+      ordersRepo.findByPaymentIntentId.mockResolvedValue(mockOrder as any)
+      ordersRepo.findById.mockResolvedValue(orderWithVariant as any)
+      await service.cancelByPaymentIntent('pi_variant')
+      expect(variantsRepo.incrementStock).toHaveBeenCalledWith(10, 1, mockTransaction)
+    })
+
+    it('ne fait rien si fullOrder introuvable', async () => {
+      ordersRepo.findByPaymentIntentId.mockResolvedValue(mockOrder as any)
+      ordersRepo.findById.mockResolvedValue(null)
+      await expect(service.cancelByPaymentIntent('pi_x')).resolves.toBeUndefined()
+    })
   })
 
   describe('confirmByPaymentIntent', () => {
@@ -167,6 +190,175 @@ describe('OrdersService', () => {
       ordersRepo.findByPaymentIntentId.mockResolvedValue(mockOrder as any)
       await service.confirmByPaymentIntent('pi_success')
       expect(ordersRepo.update).toHaveBeenCalledWith(1, { status: 'confirmed' })
+    })
+
+    it('ne fait rien si le payment intent est inconnu', async () => {
+      ordersRepo.findByPaymentIntentId.mockResolvedValue(null)
+      await expect(service.confirmByPaymentIntent('pi_unknown')).resolves.toBeUndefined()
+    })
+  })
+
+  describe('findUserOrders', () => {
+    it('retourne les commandes mappées en DTO', async () => {
+      ordersRepo.findByUserId.mockResolvedValue([mockOrder as any])
+      const result = await service.findUserOrders(1)
+      expect(result).toHaveLength(1)
+      expect(result[0].id).toBe(1)
+    })
+  })
+
+  describe('findById', () => {
+    it('retourne la commande si l\'utilisateur en est propriétaire', async () => {
+      ordersRepo.findById.mockResolvedValue({ ...mockOrder, userId: 1 } as any)
+      const result = await service.findById(1, 1, false)
+      expect(result.id).toBe(1)
+    })
+
+    it('lève ORDER_NOT_FOUND si la commande n\'existe pas', async () => {
+      ordersRepo.findById.mockResolvedValue(null)
+      await expect(service.findById(99, 1, false)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'ORDER_NOT_FOUND' }),
+      })
+    })
+
+    it('lève FORBIDDEN si l\'utilisateur n\'est pas propriétaire et non admin', async () => {
+      ordersRepo.findById.mockResolvedValue({ ...mockOrder, userId: 2 } as any)
+      await expect(service.findById(1, 1, false)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'FORBIDDEN' }),
+      })
+    })
+
+    it('permet à un admin de voir n\'importe quelle commande', async () => {
+      ordersRepo.findById.mockResolvedValue({ ...mockOrder, userId: 2 } as any)
+      await expect(service.findById(1, 1, true)).resolves.toBeDefined()
+    })
+  })
+
+  describe('findAll', () => {
+    it('retourne les commandes paginées', async () => {
+      ordersRepo.findAll.mockResolvedValue({ rows: [mockOrder as any], count: 1 })
+      const result = await service.findAll({})
+      expect(result.total).toBe(1)
+      expect(result.items).toHaveLength(1)
+    })
+  })
+
+  describe('updateStatus', () => {
+    it('met à jour le statut et retourne la commande mise à jour', async () => {
+      ordersRepo.findById
+        .mockResolvedValueOnce(mockOrder as any)
+        .mockResolvedValueOnce({ ...mockOrder, status: 'shipped' } as any)
+      const result = await service.updateStatus(1, { status: 'shipped' } as any)
+      expect(result.status).toBe('shipped')
+    })
+
+    it('lève ORDER_NOT_FOUND si la commande n\'existe pas', async () => {
+      ordersRepo.findById.mockResolvedValue(null)
+      await expect(service.updateStatus(99, { status: 'shipped' } as any)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'ORDER_NOT_FOUND' }),
+      })
+    })
+  })
+
+  describe('findByOrderNumber', () => {
+    it('retourne la commande si le numéro correspond à l\'utilisateur', async () => {
+      ordersRepo.findByOrderNumber.mockResolvedValue({ ...mockOrder, userId: 1 } as any)
+      const result = await service.findByOrderNumber('CI-ORD-0001', 1, false)
+      expect(result.id).toBe(1)
+    })
+
+    it('lève ORDER_NOT_FOUND si le numéro est inconnu', async () => {
+      ordersRepo.findByOrderNumber.mockResolvedValue(null)
+      await expect(service.findByOrderNumber('INCONNUE', 1, false)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'ORDER_NOT_FOUND' }),
+      })
+    })
+
+    it('lève FORBIDDEN si l\'utilisateur n\'est pas propriétaire', async () => {
+      ordersRepo.findByOrderNumber.mockResolvedValue({ ...mockOrder, userId: 2 } as any)
+      await expect(service.findByOrderNumber('CI-ORD-0001', 1, false)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'FORBIDDEN' }),
+      })
+    })
+
+    it('permet à un admin de voir n\'importe quelle commande par numéro', async () => {
+      ordersRepo.findByOrderNumber.mockResolvedValue({ ...mockOrder, userId: 2 } as any)
+      await expect(service.findByOrderNumber('CI-ORD-0001', 1, true)).resolves.toBeDefined()
+    })
+  })
+
+  describe('createOrder - releaseStockAndCancel avec variantId', () => {
+    it('libère le stock de la variante si Stripe échoue avec un item variantId', async () => {
+      variantsRepo.decrementStock.mockResolvedValue(1)
+      variantsRepo.findById.mockResolvedValue({ id: 10, productId: 1, price: 390, label: '70g' } as any)
+      stripeService.createPaymentIntent.mockRejectedValue(new Error('stripe down'))
+      const dtoWithVariant = { items: [{ productId: 1, variantId: 10, quantity: 1 }], shippingAddress: {} }
+      await expect(service.createOrder(dtoWithVariant as any, 1)).rejects.toThrow('stripe down')
+      expect(variantsRepo.incrementStock).toHaveBeenCalledWith(10, 1, mockTransaction)
+    })
+  })
+
+  describe('createOrder - variante', () => {
+    it('décrémente le stock de la variante si variantId fourni', async () => {
+      variantsRepo.decrementStock.mockResolvedValue(1)
+      variantsRepo.findById.mockResolvedValue({ id: 10, productId: 1, price: 390, label: '70g' } as any)
+      const dto = { items: [{ productId: 1, variantId: 10, quantity: 1 }], shippingAddress: {} }
+      const result = await service.createOrder(dto as any, 1)
+      expect(variantsRepo.decrementStock).toHaveBeenCalledWith(10, 1, 1, mockTransaction)
+      expect(result.orderId).toBe(1)
+    })
+
+    it('lève VARIANT_OUT_OF_STOCK si la variante est en rupture', async () => {
+      variantsRepo.decrementStock.mockResolvedValue(0)
+      variantsRepo.findByProductId.mockResolvedValue([])
+      const dto = { items: [{ productId: 1, variantId: 10, quantity: 1 }], shippingAddress: {} }
+      await expect(service.createOrder(dto as any, 1)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'VARIANT_OUT_OF_STOCK' }),
+      })
+    })
+
+    it('lève VARIANT_OUT_OF_STOCK si la variante est introuvable après décrémentation réussie', async () => {
+      variantsRepo.decrementStock.mockResolvedValue(1)
+      variantsRepo.findById.mockResolvedValue(null)
+      const dto = { items: [{ productId: 1, variantId: 10, quantity: 1 }], shippingAddress: {} }
+      await expect(service.createOrder(dto as any, 1)).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'VARIANT_OUT_OF_STOCK' }),
+      })
+    })
+  })
+
+  describe('toResponseDto - branches', () => {
+    it('utilise #id si orderNumber est absent', async () => {
+      ordersRepo.findByUserId.mockResolvedValue([{ ...mockOrder, orderNumber: undefined, items: undefined } as any])
+      const result = await service.findUserOrders(1)
+      expect(result[0].orderNumber).toBe('#1')
+    })
+
+    it('gère les items undefined dans toResponseDto', async () => {
+      ordersRepo.findByUserId.mockResolvedValue([{ ...mockOrder, items: null } as any])
+      const result = await service.findUserOrders(1)
+      expect(result[0].items).toEqual([])
+    })
+
+    it('couvre toutes les branches ?? des items dans le map callback', async () => {
+      const orderWithItems = {
+        ...mockOrder,
+        shippingAddress: { city: 'Paris' },
+        stripePaymentIntentId: 'pi_xxx',
+        items: [
+          { id: 1, productId: 1, productName: null, variantId: 5, quantity: 1, unitPrice: 100, format: '70g' },
+          { id: 2, productId: 2, productName: 'Carré', variantId: null, quantity: 2, unitPrice: 200, format: null },
+        ],
+      }
+      ordersRepo.findByUserId.mockResolvedValue([orderWithItems as any])
+      const result = await service.findUserOrders(1)
+      const items = result[0].items
+      expect(items[0].variantId).toBe(5)
+      expect(items[0].format).toBe('70g')
+      expect(items[0].productName).toBeUndefined()
+      expect(items[1].variantId).toBeUndefined()
+      expect(items[1].format).toBeUndefined()
+      expect(items[1].productName).toBe('Carré')
     })
   })
 })
