@@ -29,7 +29,7 @@ type ShippingPayload = {
 
 const router = useRouter();
 const cartStore = useCartStore();
-const { submitOrder } = useCheckout();
+const { submitOrder, stripeError } = useCheckout();
 
 const step = ref<"livraison" | "paiement">("livraison");
 const shipping = ref<ShippingPayload | null>(null);
@@ -180,6 +180,7 @@ async function handlePaymentSubmit() {
         <StripePaymentForm
           v-else
           :total="grandTotal"
+          :payment-error="stripeError"
           @pay="handlePaymentSubmit"
         />
       </div>

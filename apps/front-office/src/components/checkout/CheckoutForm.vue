@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useAuthStore } from "@carre-ivoire/stores";
-import { usePublicSettings } from "@carre-ivoire/composables";
+import { useApi, usePublicSettings } from "@carre-ivoire/composables";
 
 type ShippingPayload = {
   firstName: string;
@@ -22,7 +22,22 @@ const emit = defineEmits<{
 }>();
 
 const authStore = useAuthStore();
+const api = useApi();
 const { shippingFlatEuros } = usePublicSettings();
+
+onMounted(async () => {
+  try {
+    const res = await api.get<{ data: { phone?: string; addressStreet?: string; addressZip?: string; addressCity?: string; addressCountry?: string } }>('/users/me')
+    const u = res.data.data
+    if (u.phone) form.value.phone = u.phone
+    if (u.addressStreet) form.value.address = u.addressStreet
+    if (u.addressZip) form.value.postalCode = u.addressZip
+    if (u.addressCity) form.value.city = u.addressCity
+    if (u.addressCountry) form.value.country = u.addressCountry
+  } catch {
+    // silencieux — les champs restent vides si l'appel échoue
+  }
+})
 
 const deliveryOptions = computed(() => [
   {

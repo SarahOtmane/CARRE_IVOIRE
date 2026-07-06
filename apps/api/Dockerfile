@@ -32,13 +32,19 @@ RUN npm run build
 
 # ─── Stage 4: Development (hot reload nodemon) ───────────────────────
 FROM build-deps AS development
-WORKDIR /app/apps/api
-COPY apps/api ./
+WORKDIR /app
+RUN apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-freefont
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+COPY apps/api .
 EXPOSE 3000
 CMD ["npm", "run", "start:dev"]
 
 # ─── Stage 5: Production (image minimale) ────────────────────────────
 FROM node:20-alpine AS production
+RUN apk add --no-cache chromium nss freetype harfbuzz ca-certificates ttf-freefont
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 WORKDIR /app
 ENV NODE_ENV=production
 

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useCheckout } from "@carre-ivoire/composables";
 
-defineProps<{ total: number }>();
+const props = defineProps<{ total: number; paymentError?: string | null }>();
 const emit = defineEmits<{ (e: "pay"): void }>();
 
 const { processing, stripeError, mountCard } = useCheckout();
+
+const displayError = computed(() => props.paymentError || stripeError.value);
 const cardContainer = ref<HTMLElement | null>(null);
 
 onMounted(async () => {
@@ -43,13 +45,24 @@ onMounted(async () => {
         class="border-b py-[14px]"
         style="border-color: var(--cacao-a24); min-height: 44px"
       />
-      <p
-        v-if="stripeError"
-        class="mt-2 font-sans text-[12px]"
-        style="color: #9b1c1c"
+      <div
+        v-if="displayError"
+        class="mt-4 flex items-center gap-3 border p-4"
+        style="border-color: rgba(155,28,28,0.25); background: rgba(155,28,28,0.05)"
       >
-        {{ stripeError }}
-      </p>
+        <span
+          class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full"
+          style="background: #9b1c1c"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M6 3V7" stroke="white" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"/>
+            <circle cx="6" cy="9.5" r="0.75" fill="white"/>
+          </svg>
+        </span>
+        <p class="font-sans text-[13px] leading-[1.5]" style="color: #9b1c1c">
+          {{ displayError }}
+        </p>
+      </div>
     </div>
 
     <div class="flex flex-wrap items-center gap-4">
