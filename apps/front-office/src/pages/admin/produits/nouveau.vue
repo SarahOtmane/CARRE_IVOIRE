@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import {
   useAdminProducts,
@@ -20,16 +20,17 @@ interface VariantDraft {
   label: string;
   weightGrams: number;
   price: number;
+  taxRateId: number;
   stock: number;
 }
 
 const variantDrafts = ref<VariantDraft[]>([]);
-const newVariant = ref<VariantDraft>({ label: "", weightGrams: 0, price: 0, stock: 0 });
+const newVariant = ref<VariantDraft>({ label: "", weightGrams: 0, price: 0, taxRateId: 0, stock: 0 });
 
 function addVariantDraft() {
-  if (!newVariant.value.label.trim() || newVariant.value.price <= 0) return;
+  if (!newVariant.value.label.trim() || newVariant.value.price <= 0 || !newVariant.value.taxRateId) return;
   variantDrafts.value.push({ ...newVariant.value });
-  newVariant.value = { label: "", weightGrams: 0, price: 0, stock: 0 };
+  newVariant.value = { label: "", weightGrams: 0, price: 0, taxRateId: 0, stock: 0 };
 }
 
 function removeVariantDraft(index: number) {
@@ -42,7 +43,7 @@ const draft = ref({
   categoryId: 0,
   price: 0,
   stockStatus: 'in_stock' as 'in_stock' | 'out_of_stock',
-  taxRateId: null as number | null,
+  taxRateId: 0,
   shortDescription: "",
   description: "",
   isActive: true,
@@ -50,6 +51,11 @@ const draft = ref({
   allergens: "",
   weightGrams: 0,
   imageUrl: "",
+});
+
+const productPriceTtc = computed(() => {
+  const rate = taxRates.value.find((t) => t.id === draft.value.taxRateId)?.rate ?? 0;
+  return draft.value.price * (1 + rate / 100);
 });
 
 function autoSlug() {
@@ -71,14 +77,14 @@ async function onImageChange(e: Event) {
 }
 
 async function save() {
-  if (!draft.value.name.trim() || !draft.value.slug.trim() || !draft.value.categoryId) return;
+  if (!draft.value.name.trim() || !draft.value.slug.trim() || !draft.value.categoryId || !draft.value.taxRateId) return;
   const product = await create({
     name: draft.value.name,
     slug: draft.value.slug,
     categoryId: draft.value.categoryId,
     price: Math.round(draft.value.price * 100),
     stockStatus: draft.value.stockStatus,
-    taxRateId: draft.value.taxRateId ?? undefined,
+    taxRateId: draft.value.taxRateId,
     shortDescription: draft.value.shortDescription || undefined,
     description: draft.value.description || undefined,
     isActive: draft.value.isActive,
@@ -94,6 +100,7 @@ async function save() {
         label: variant.label,
         weightGrams: variant.weightGrams || undefined,
         price: Math.round(variant.price * 100),
+        taxRateId: variant.taxRateId,
         stock: variant.stock,
       });
     }
@@ -172,7 +179,7 @@ async function save() {
 
         <div class="grid gap-6 lg:grid-cols-3">
           <label class="grid gap-2">
-            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Prix (€)</span>
+            <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Prix HT (€)</span>
             <input
               v-model.number="draft.price"
               type="number"
@@ -210,13 +217,20 @@ async function save() {
           <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">TVA applicable</span>
           <select
             v-model.number="draft.taxRateId"
+            required
             class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
           >
-            <option :value="null">Aucune TVA</option>
+            <option :value="0" disabled>Choisir un taux…</option>
             <option v-for="tva in taxRates" :key="tva.id" :value="tva.id">
               {{ tva.label }} — {{ tva.rate }} %
             </option>
           </select>
+          <p v-if="!draft.taxRateId" class="font-body text-[11px] italic text-cacao/45">
+            Obligatoire — utilisé uniquement si le produit n'a aucune variante.
+          </p>
+          <p v-else-if="draft.price > 0" class="font-body text-[11px] text-cacao/55">
+            Soit {{ productPriceTtc.toFixed(2).replace(".", ",") }} € TTC
+          </p>
         </label>
 
         <label class="grid gap-2">
@@ -273,7 +287,8 @@ async function save() {
             >
               <span class="min-w-0 flex-1 truncate font-body text-sm text-cacao">{{ variant.label }}</span>
               <span class="shrink-0 font-body text-sm text-cacao/70">{{ variant.weightGrams || "—" }} g</span>
-              <span class="shrink-0 font-body text-sm text-cacao/70">{{ variant.price.toFixed(2).replace(".", ",") }} €</span>
+              <span class="shrink-0 font-body text-sm text-cacao/70">{{ variant.price.toFixed(2).replace(".", ",") }} € HT</span>
+              <span class="shrink-0 font-body text-sm text-cacao/70">TVA {{ taxRates.find((t) => t.id === variant.taxRateId)?.rate ?? "—" }} %</span>
               <span class="shrink-0 font-body text-sm text-cacao/70">Stock {{ variant.stock }}</span>
               <button
                 type="button"
@@ -305,7 +320,7 @@ async function save() {
               />
             </label>
             <label class="grid w-[90px] shrink-0 gap-1.5">
-              <span class="font-body text-[10px] uppercase tracking-[0.18em] text-cacao/45">Prix (€)</span>
+              <span class="font-body text-[10px] uppercase tracking-[0.18em] text-cacao/45">Prix HT (€)</span>
               <input
                 v-model.number="newVariant.price"
                 type="number"
@@ -313,6 +328,18 @@ async function save() {
                 step="0.01"
                 class="w-full border border-cacao bg-beige-doux/20 px-2 py-1.5 font-body text-sm text-cacao outline-none focus:border-cacao/60"
               />
+            </label>
+            <label class="grid w-[130px] shrink-0 gap-1.5">
+              <span class="font-body text-[10px] uppercase tracking-[0.18em] text-cacao/45">TVA</span>
+              <select
+                v-model.number="newVariant.taxRateId"
+                class="w-full border border-cacao bg-beige-doux/20 px-2 py-1.5 font-body text-sm text-cacao outline-none focus:border-cacao/60"
+              >
+                <option :value="0" disabled>Choisir…</option>
+                <option v-for="tva in taxRates" :key="tva.id" :value="tva.id">
+                  {{ tva.label }} — {{ tva.rate }} %
+                </option>
+              </select>
             </label>
             <label class="grid w-[90px] shrink-0 gap-1.5">
               <span class="font-body text-[10px] uppercase tracking-[0.18em] text-cacao/45">Stock</span>
@@ -375,7 +402,10 @@ async function save() {
         <div class="border border-cacao bg-beige-doux/50 p-5">
           <div class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/45">Aperçu prix</div>
           <div class="mt-3 font-display text-4xl text-dore">
-            {{ draft.price.toFixed(2).replace(".", ",") }} €
+            {{ productPriceTtc.toFixed(2).replace(".", ",") }} €
+          </div>
+          <div class="mt-1 font-body text-[11px] text-cacao/45">
+            {{ draft.price.toFixed(2).replace(".", ",") }} € HT · TTC ci-dessus
           </div>
           <div class="mt-2 font-body text-sm text-cacao/60">
             {{ draft.categoryId ? categories.find((c) => c.id === draft.categoryId)?.name ?? "—" : "—" }}
