@@ -2,33 +2,40 @@ import { Test } from '@nestjs/testing'
 import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { MailService } from './mail.service'
-import * as nodemailer from 'nodemailer'
+import { PdfService } from './pdf.service'
 
-jest.mock('nodemailer', () => ({
-  createTransport: jest.fn().mockReturnValue({
-    sendMail: jest.fn().mockResolvedValue({ messageId: 'msg-1' }),
-  }),
+const mockResendSend = jest.fn().mockResolvedValue({ data: { id: 'email-1' }, error: null })
+
+jest.mock('resend', () => ({
+  Resend: jest.fn().mockImplementation(() => ({
+    emails: {
+      send: mockResendSend,
+    },
+  })),
 }))
 
 describe('MailService', () => {
   let service: MailService
+  let pdfService: { generateFromHtml: jest.Mock }
 
   beforeEach(() => {
-    jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => {})
-    jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {})
+    jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => { })
+    jest.spyOn(Logger.prototype, 'log').mockImplementation(() => { })
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => { })
     jest.clearAllMocks()
+    pdfService = {
+      generateFromHtml: jest.fn().mockResolvedValue(Buffer.from('pdf')),
+    }
   })
 
-  function buildConfig(withHost: boolean) {
+  function buildConfig(withResendApiKey: boolean, withMailToOverride: boolean) {
     return {
       get: (key: string) => {
         const map: Record<string, any> = {
           MAIL_FROM: 'no-reply@test.com',
-          ...(withHost ? {
-            MAIL_HOST: 'smtp.test.com',
-            MAIL_PORT: 587,
-            MAIL_USER: 'user',
-            MAIL_PASS: 'pass',
+          RESEND_API_KEY: withResendApiKey ? 'resend-test-key' : undefined,
+          ...(withMailToOverride ? {
+            MAIL_TO_OVERRIDE: 'override@test.com',
           } : {}),
         }
         return map[key]
@@ -36,26 +43,29 @@ describe('MailService', () => {
     }
   }
 
-  async function createService(withHost: boolean): Promise<MailService> {
+  async function createService(withResendApiKey: boolean, withMailToOverride: boolean): Promise<MailService> {
     const module = await Test.createTestingModule({
       providers: [
         MailService,
-        { provide: ConfigService, useValue: buildConfig(withHost) },
+        { provide: ConfigService, useValue: buildConfig(withResendApiKey, withMailToOverride) },
+        { provide: PdfService, useValue: pdfService },
       ],
     }).compile()
     return module.get(MailService)
   }
 
-  describe('sans MAIL_HOST (mode console)', () => {
-    beforeEach(async () => { service = await createService(false) })
+  describe('sans RESEND_API_KEY (mode console)', () => {
+    beforeEach(async () => { service = await createService(false, false) })
 
     it('sendOrderConfirmation se résout sans appel réseau', async () => {
       await expect(
         service.sendOrderConfirmation({
-          to: 'a@b.com', firstName: 'J', orderNumber: 'CI-001', totalAmount: 390,
+          to: 'a@b.com', firstName: 'J', lastName: 'D', orderNumber: 'CI-001', totalAmount: 390,
           items: [{ productName: 'Carré', quantity: 1, unitPrice: 390 }],
         }),
       ).resolves.toBeUndefined()
+      expect(pdfService.generateFromHtml).toHaveBeenCalled()
+      expect(mockResendSend).not.toHaveBeenCalled()
     })
 
     it('sendPasswordReset se résout sans appel réseau', async () => {
@@ -65,36 +75,37 @@ describe('MailService', () => {
     })
   })
 
-  describe('avec MAIL_HOST (envoi via transporter)', () => {
-    let sendMailSpy: jest.Mock
-
+  describe('avec RESEND_API_KEY (envoi via Resend)', () => {
     beforeEach(async () => {
-      service = await createService(true)
-      const transport = (nodemailer.createTransport as jest.Mock).mock.results.at(-1)?.value
-      sendMailSpy = transport?.sendMail as jest.Mock
+      service = await createService(true, true)
     })
 
-    it('appelle sendMail pour sendOrderConfirmation', async () => {
+    it('appelle resend.emails.send pour sendOrderConfirmation', async () => {
       await service.sendOrderConfirmation({
-        to: 'a@b.com', firstName: 'J', orderNumber: 'CI-001', totalAmount: 390,
+        to: 'a@b.com', firstName: 'J', lastName: 'D', orderNumber: 'CI-001', totalAmount: 390,
         items: [{ productName: 'Carré', quantity: 1, unitPrice: 390 }],
       })
-      expect(sendMailSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ to: 'a@b.com', subject: expect.stringContaining('CI-001') }),
+      expect(mockResendSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: ['override@test.com'],
+          subject: expect.stringContaining('CI-001'),
+          from: 'no-reply@test.com',
+        }),
       )
     })
 
-    it('appelle sendMail avec bcc si fourni', async () => {
+    it("passe le bcc quand aucun override destinataire n'est défini", async () => {
+      service = await createService(true, false)
       await service.sendOrderConfirmation({
-        to: 'a@b.com', firstName: 'J', orderNumber: 'CI-002', totalAmount: 390,
+        to: 'a@b.com', firstName: 'J', lastName: 'D', orderNumber: 'CI-002', totalAmount: 390,
         items: [], bcc: 'bcc@test.com',
       })
-      expect(sendMailSpy).toHaveBeenCalledWith(expect.objectContaining({ bcc: 'bcc@test.com' }))
+      expect(mockResendSend).toHaveBeenCalledWith(expect.objectContaining({ bcc: ['bcc@test.com'] }))
     })
 
-    it('appelle sendMail pour sendPasswordReset', async () => {
+    it('appelle resend.emails.send pour sendPasswordReset', async () => {
       await service.sendPasswordReset({ to: 'a@b.com', firstName: 'J', resetUrl: 'https://x.com/r' })
-      expect(sendMailSpy).toHaveBeenCalledWith(expect.objectContaining({ to: 'a@b.com' }))
+      expect(mockResendSend).toHaveBeenCalledWith(expect.objectContaining({ to: ['override@test.com'] }))
     })
   })
 })
