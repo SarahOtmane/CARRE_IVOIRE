@@ -77,11 +77,11 @@ const isActive = computed(
 );
 
 const navItems = [
-  { id: "boutique", label: "boutique", path: "/boutique", hasMega: true },
-  { id: "histoire", label: "notre histoire", path: "/histoire" },
-  { id: "engagements", label: "nos engagements", path: "/engagements" },
-  { id: "evenements", label: "nos événements", path: "/evenements" },
-  { id: "contact", label: "nous contacter", path: "/contact" },
+  { id: "boutique", label: "Boutique", path: "/boutique", hasMega: true },
+  { id: "histoire", label: "Notre histoire", path: "/histoire" },
+  { id: "engagements", label: "Nos engagements", path: "/engagements" },
+  { id: "evenements", label: "Nos événements", path: "/evenements" },
+  { id: "contact", label: "Nous contacter", path: "/contact" },
 ];
 
 const boutiqueCats = megaCategories;
@@ -144,18 +144,18 @@ function toggleSearch() {
     @mouseleave="onHeaderLeave"
   >
     <!-- Barre principale -->
-    <div class="flex h-[72px] items-center justify-between px-5 lg:px-[104px]">
+    <div class="flex h-[80px] items-center justify-between px-5 lg:px-[104px]">
       <!-- Logo -->
-      <RouterLink to="/" class="flex items-center gap-3.5">
+      <RouterLink to="/" class="flex items-center gap-3.5 w-[90px] h-[60px]">
         <Logo :logo-url="publicSettings?.logoUrl" />
       </RouterLink>
 
       <!-- Navigation desktop -->
-      <nav class="hidden items-center gap-7 lg:flex">
+      <nav class="hidden items-center gap-7 lg:flex mt-[3px]">
         <a
           v-for="item in navItems"
           :key="item.id"
-          class="cursor-pointer border-b pb-0.5 font-sans text-[12px] tracking-[0.06em] text-cacao transition-[border-color] duration-[240ms]"
+          class="cursor-pointer border-b pb-0.5 font-sans text-[14px] tracking-[0.06em] text-cacao transition-[border-color] duration-[240ms]"
           :class="
             (route.path.startsWith(item.path) && item.path !== '/') ||
             (item.hasMega && boutiqueOpen)
