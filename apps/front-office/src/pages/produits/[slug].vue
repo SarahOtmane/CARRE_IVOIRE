@@ -71,20 +71,26 @@ function formatPrice(centimes: number) {
   return `${(centimes / 100).toFixed(2).replace('.', ',')} €`
 }
 
+// Prix HT — affiché partout sur la fiche produit. La TVA ne s'applique qu'au moment de l'ajout au panier.
 const activePrice = computed(() => selectedVariant.value?.price ?? product.value?.price ?? 0)
 
 const unitTotal = computed(() => activePrice.value * quantity.value)
 
 function addToCart() {
   if (!product.value) return
+  const taxRate = selectedVariant.value?.taxRate ?? product.value.taxRate
+  const priceTtc = taxRate ? Math.round(activePrice.value * (1 + taxRate.rate / 100)) : activePrice.value
   cartStore.addItem({
     productId: product.value.id,
     variantId: selectedVariant.value?.id,
     name: product.value.name,
     imageUrl: product.value.imageUrl ?? '',
-    price: activePrice.value / 100,
+    price: priceTtc / 100,
     quantity: quantity.value,
     format: selectedVariant.value?.label,
+    taxRateId: taxRate?.id,
+    taxRateLabel: taxRate?.label,
+    taxRatePercent: taxRate?.rate,
   })
   added.value = true
   setTimeout(() => { added.value = false }, 2000)

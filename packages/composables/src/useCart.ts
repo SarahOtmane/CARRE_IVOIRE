@@ -12,9 +12,12 @@ export function useCart() {
       productId: product.id,
       name: product.name,
       imageUrl: product.imageUrl ?? '',
-      price: product.price / 100,
+      price: (product.priceTtc ?? product.price) / 100,
       quantity,
       format,
+      taxRateId: product.taxRate?.id,
+      taxRateLabel: product.taxRate?.label,
+      taxRatePercent: product.taxRate?.rate,
     })
     success(`${product.name} ajouté au panier`)
   }

@@ -141,6 +141,17 @@ function goToCheckout() {
               >{{ cartStore.total.toFixed(2).replace(".", ",") }} €</span
             >
           </div>
+          <div
+            v-if="cartStore.totalVat > 0"
+            class="flex justify-between font-sans text-[13px]"
+          >
+            <span class="text-cacao-2">dont TVA</span>
+            <span
+              class="text-cacao-2"
+              style="font-variant-numeric: tabular-nums"
+              >{{ cartStore.totalVat.toFixed(2).replace(".", ",") }} €</span
+            >
+          </div>
           <div class="flex justify-between font-sans text-[13px]">
             <span class="text-cacao-2">Livraison</span>
             <span
