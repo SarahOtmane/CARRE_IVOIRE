@@ -28,6 +28,10 @@ export interface OrderItem {
   quantity: number
   unitPrice: number
   format?: string
+  taxRateLabel?: string
+  taxRatePercent?: number
+  unitPriceHt?: number
+  vatAmount?: number
 }
 
 export interface Order {
@@ -36,6 +40,8 @@ export interface Order {
   userId: number
   status: OrderStatus
   totalAmount: number
+  totalHt?: number
+  totalVat?: number
   stripePaymentIntentId?: string
   shippingAddress?: ShippingAddress
   items: OrderItem[]
@@ -53,6 +59,9 @@ export interface CartItem {
   price: number
   quantity: number
   format?: string
+  taxRateId?: number
+  taxRateLabel?: string
+  taxRatePercent?: number
 }
 
 export interface CreateOrderDto {

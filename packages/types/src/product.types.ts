@@ -14,6 +14,7 @@ export interface Product {
   shortDescription?: string
   description?: string
   price: number
+  priceTtc?: number
   discountPrice?: number
   stock: number
   stockStatus: StockStatus
@@ -43,6 +44,9 @@ export interface ProductVariant {
   label: string
   weightGrams?: number
   price: number
+  priceTtc?: number
+  taxRateId?: number
+  taxRate?: TaxRate
   stock: number
   stockStatus: StockStatus
   displayOrder: number
@@ -55,6 +59,7 @@ export interface CreateVariantDto {
   label: string
   weightGrams?: number
   price: number
+  taxRateId: number
   stock?: number
   stockStatus?: 'in_stock' | 'out_of_stock'
   displayOrder?: number
@@ -75,7 +80,7 @@ export interface CreateProductDto {
   categoryId: number
   stock?: number
   stockStatus?: 'in_stock' | 'out_of_stock'
-  taxRateId?: number | null
+  taxRateId: number
   isActive?: boolean
   isSeasonal?: boolean
   displayOrder?: number
