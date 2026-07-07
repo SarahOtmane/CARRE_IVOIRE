@@ -18,6 +18,7 @@ export const ErrorHttpStatus: Record<ErrorCode, number> = {
     [ErrorCodes.OUT_OF_STOCK]: 409,
     [ErrorCodes.VARIANT_OUT_OF_STOCK]: 409,
     [ErrorCodes.VARIANT_REQUIRED]: 400,
+    [ErrorCodes.TAX_RATE_MISSING]: 400,
     [ErrorCodes.ORDER_NOT_FOUND]: 404,
     [ErrorCodes.INVALID_ORDER_STATUS]: 400,
 

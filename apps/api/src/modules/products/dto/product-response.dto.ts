@@ -10,6 +10,7 @@ export interface ProductResponseDto {
   shortDescription?: string
   description?: string
   price: number
+  priceTtc?: number
   discountPrice?: number
   imageUrl?: string
   images?: string[]

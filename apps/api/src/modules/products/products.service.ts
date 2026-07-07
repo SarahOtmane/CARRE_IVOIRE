@@ -87,6 +87,7 @@ export class ProductsService {
       shortDescription: p.shortDescription ?? undefined,
       description: p.description ?? undefined,
       price: p.price,
+      priceTtc: tax ? Math.round(p.price * (1 + Number(tax.rate) / 100)) : undefined,
       discountPrice: p.discountPrice ?? undefined,
       imageUrl: p.imageUrl ?? undefined,
       images: p.images ?? undefined,

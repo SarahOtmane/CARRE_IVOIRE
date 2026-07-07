@@ -4,6 +4,7 @@ import { Sequelize } from 'sequelize-typescript'
 import { Op } from 'sequelize'
 import type { Transaction } from 'sequelize'
 import { ProductVariant } from './product-variant.model'
+import { TaxRate } from '@/modules/tax-rates/tax-rate.model'
 import type { CreateVariantDto } from './dto/create-variant.dto'
 import type { UpdateVariantDto } from './dto/update-variant.dto'
 
@@ -17,12 +18,13 @@ export class ProductVariantsRepository {
   async findByProductId(productId: number): Promise<ProductVariant[]> {
     return this.db.findAll({
       where: { productId, isActive: 1 },
+      include: [TaxRate],
       order: [['displayOrder', 'ASC']],
     })
   }
 
   async findById(id: number, t?: Transaction): Promise<ProductVariant | null> {
-    return this.db.findByPk(id, { transaction: t })
+    return this.db.findByPk(id, { include: [TaxRate], transaction: t })
   }
 
   async create(productId: number, dto: CreateVariantDto): Promise<ProductVariant> {
@@ -32,6 +34,7 @@ export class ProductVariantsRepository {
       label: dto.label,
       weightGrams: dto.weightGrams ?? null,
       price: dto.price,
+      taxRateId: dto.taxRateId,
       stock: dto.stock ?? 0,
       stockStatus: dto.stockStatus ?? 'in_stock',
       displayOrder: dto.displayOrder ?? 0,
@@ -44,6 +47,7 @@ export class ProductVariantsRepository {
     if (dto.label !== undefined) data.label = dto.label
     if (dto.weightGrams !== undefined) data.weightGrams = dto.weightGrams
     if (dto.price !== undefined) data.price = dto.price
+    if (dto.taxRateId !== undefined) data.taxRateId = dto.taxRateId
     if (dto.stock !== undefined) data.stock = dto.stock
     if (dto.stockStatus !== undefined) data.stockStatus = dto.stockStatus
     if (dto.displayOrder !== undefined) data.displayOrder = dto.displayOrder
@@ -51,7 +55,7 @@ export class ProductVariantsRepository {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Record<string,unknown> incompatible with Sequelize update attributes type
     await this.db.update(data as any, { where: { id } })
-    return this.db.findByPk(id)
+    return this.db.findByPk(id, { include: [TaxRate] })
   }
 
   async delete(id: number): Promise<void> {

@@ -28,6 +28,11 @@ export class UpdateVariantDto {
 
   @IsOptional()
   @IsInt()
+  @Min(1)
+  taxRateId?: number
+
+  @IsOptional()
+  @IsInt()
   @Min(0)
   stock?: number
 

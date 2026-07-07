@@ -40,7 +40,7 @@ export class ProductsRepository {
       include: [
         { model: Category, attributes: ['id', 'name', 'slug'] },
         { model: TaxRate, attributes: ['id', 'label', 'rate', 'is_default'] },
-        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']], include: [TaxRate] },
       ],
       limit,
       offset: (page - 1) * limit,
@@ -64,7 +64,7 @@ export class ProductsRepository {
       include: [
         Category,
         TaxRate,
-        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']], include: [TaxRate] },
       ],
     })
   }
@@ -74,7 +74,7 @@ export class ProductsRepository {
       include: [
         Category,
         TaxRate,
-        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']], include: [TaxRate] },
       ],
     })
   }
@@ -83,7 +83,7 @@ export class ProductsRepository {
     if (ids.length === 0) return []
     return this.db.findAll({
       where: { id: ids },
-      raw: true,
+      include: [TaxRate],
       transaction: t,
     })
   }
@@ -101,7 +101,7 @@ export class ProductsRepository {
       categoryId: dto.categoryId,
       stock: dto.stock ?? 0,
       stockStatus: dto.stockStatus ?? 'in_stock',
-      taxRateId: dto.taxRateId ?? null,
+      taxRateId: dto.taxRateId,
       isActive: dto.isActive !== false ? 1 : 0,
       isSeasonal: dto.isSeasonal ? 1 : 0,
       displayOrder: dto.displayOrder ?? 0,
@@ -131,7 +131,7 @@ export class ProductsRepository {
     if (dto.categoryId !== undefined) data.categoryId = dto.categoryId
     if (dto.stock !== undefined) data.stock = dto.stock
     if (dto.stockStatus !== undefined) data.stockStatus = dto.stockStatus
-    if (dto.taxRateId !== undefined) data.taxRateId = dto.taxRateId ?? null
+    if (dto.taxRateId !== undefined) data.taxRateId = dto.taxRateId
     if (dto.isActive !== undefined) data.isActive = dto.isActive ? 1 : 0
     if (dto.isSeasonal !== undefined) data.isSeasonal = dto.isSeasonal ? 1 : 0
     if (dto.displayOrder !== undefined) data.displayOrder = dto.displayOrder
