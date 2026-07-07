@@ -46,6 +46,7 @@ services:
       dockerfile: apps/front-office/Dockerfile
       target: development
     volumes:
+      - ./apps/front-office/index.html:/app/index.html
       - ./apps/front-office/src:/app/src
       - ./apps/front-office/public:/app/public
       - ./packages:/app/packages
