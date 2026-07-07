@@ -12,7 +12,8 @@ import { SettingsService } from '@/modules/settings/settings.service'
 const mockTransaction = { commit: jest.fn(), rollback: jest.fn() }
 const mockSequelize = { transaction: jest.fn((cb) => cb(mockTransaction)) }
 
-const mockProduct = { id: 1, name: 'Carré Noir', price: 390, stock: 100, isActive: 1 }
+const mockTaxRate = { id: 1, label: 'TVA standard', rate: 20, isDefault: true }
+const mockProduct = { id: 1, name: 'Carré Noir', price: 390, stock: 100, isActive: 1, taxRate: mockTaxRate }
 const mockOrder = { id: 1, userId: 1, totalAmount: 390, status: 'payment_pending', items: [] }
 const mockUser = { id: 1, email: 'test@example.com', first_name: 'Jean' }
 
@@ -102,7 +103,7 @@ describe('OrdersService', () => {
     it('crée la commande si le stock est suffisant', async () => {
       const result = await service.createOrder(dto as any, 1)
       expect(result.orderId).toBe(1)
-      expect(result.totalAmount).toBe(390 * 2)
+      expect(result.totalAmount).toBe(468 * 2) // 390 HT * 1.2 (TVA 20%) = 468 TTC
       expect(result.clientSecret).toBe('cs_test')
       expect(productsRepo.decrementStock).toHaveBeenCalledWith(1, 2, mockTransaction)
     })
@@ -123,7 +124,7 @@ describe('OrdersService', () => {
     it('calcule le prix depuis la BDD et non depuis le client', async () => {
       const dtoWithFakePrice = { items: [{ productId: 1, quantity: 1, unitPrice: 1 }], shippingAddress: {} }
       const result = await service.createOrder(dtoWithFakePrice as any, 1)
-      expect(result.totalAmount).toBe(390) // prix BDD, pas 1
+      expect(result.totalAmount).toBe(468) // prix BDD (390 HT * 1.2 TVA), pas 1
     })
 
     it('lève VARIANT_REQUIRED si le produit a des variantes actives et aucun variantId fourni', async () => {
@@ -290,7 +291,7 @@ describe('OrdersService', () => {
   describe('createOrder - releaseStockAndCancel avec variantId', () => {
     it('libère le stock de la variante si Stripe échoue avec un item variantId', async () => {
       variantsRepo.decrementStock.mockResolvedValue(1)
-      variantsRepo.findById.mockResolvedValue({ id: 10, productId: 1, price: 390, label: '70g' } as any)
+      variantsRepo.findById.mockResolvedValue({ id: 10, productId: 1, price: 390, label: '70g', taxRate: mockTaxRate } as any)
       stripeService.createPaymentIntent.mockRejectedValue(new Error('stripe down'))
       const dtoWithVariant = { items: [{ productId: 1, variantId: 10, quantity: 1 }], shippingAddress: {} }
       await expect(service.createOrder(dtoWithVariant as any, 1)).rejects.toThrow('stripe down')
@@ -301,7 +302,7 @@ describe('OrdersService', () => {
   describe('createOrder - variante', () => {
     it('décrémente le stock de la variante si variantId fourni', async () => {
       variantsRepo.decrementStock.mockResolvedValue(1)
-      variantsRepo.findById.mockResolvedValue({ id: 10, productId: 1, price: 390, label: '70g' } as any)
+      variantsRepo.findById.mockResolvedValue({ id: 10, productId: 1, price: 390, label: '70g', taxRate: mockTaxRate } as any)
       const dto = { items: [{ productId: 1, variantId: 10, quantity: 1 }], shippingAddress: {} }
       const result = await service.createOrder(dto as any, 1)
       expect(variantsRepo.decrementStock).toHaveBeenCalledWith(10, 1, 1, mockTransaction)

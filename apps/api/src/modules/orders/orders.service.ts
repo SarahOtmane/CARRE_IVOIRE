@@ -83,19 +83,27 @@ export class OrdersService {
         t,
       )
 
-      for (const item of dto.items) {
-        if (!products.find((p) => p.id === item.productId)) {
+      // Résout prix HT + taux de TVA depuis la BDD, calcule le prix TTC réellement facturé
+      // (le prix stocké sur Product/ProductVariant est HT — la TVA s'ajoute, elle ne s'en déduit pas).
+      const resolvedItems = dto.items.map((item) => {
+        const product = products.find((p) => p.id === item.productId)
+        if (!product) {
           throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, `Produit ${item.productId} introuvable`)
         }
-      }
-
-      const itemsTotal = dto.items.reduce((acc, item) => {
         const variant = item.variantId ? variantsById.get(item.variantId) : undefined
-        if (variant) return acc + variant.price * item.quantity
-        const product = products.find((p) => p.id === item.productId)
-        if (!product) return acc
-        return acc + product.price * item.quantity
-      }, 0)
+        const taxRate = variant ? variant.taxRate : product.taxRate
+        if (!taxRate) {
+          throwApiError(
+            ErrorCodes.TAX_RATE_MISSING,
+            `Aucun taux de TVA associé au produit ${item.productId}${item.variantId ? ` (variante ${item.variantId})` : ''}`,
+          )
+        }
+        const unitPriceHt = variant ? variant.price : product.price
+        const unitPriceTtc = Math.round(unitPriceHt * (1 + Number(taxRate.rate) / 100))
+        return { item, product, variant, taxRate, unitPriceTtc }
+      })
+
+      const itemsTotal = resolvedItems.reduce((acc, r) => acc + r.unitPriceTtc * r.item.quantity, 0)
 
       // Frais calculés serveur — le client ne peut pas imposer un montant
       const shippingAmount = dto.deliveryType === 'pickup'
@@ -109,22 +117,17 @@ export class OrdersService {
       )
 
       await this.ordersRepository.createItems(
-        dto.items.map((item) => {
-          const product = products.find((p) => p.id === item.productId)
-          if (!product) {
-            throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, `Produit ${item.productId} introuvable`)
-          }
-          const variant = item.variantId ? variantsById.get(item.variantId) : undefined
-          return {
-            orderId: order.id,
-            productId: item.productId,
-            variantId: item.variantId ?? null,
-            quantity: item.quantity,
-            unitPrice: variant ? variant.price : product.price,
-            format: variant ? variant.label : item.format ?? null,
-            productName: product.name,
-          }
-        }),
+        resolvedItems.map((r) => ({
+          orderId: order.id,
+          productId: r.item.productId,
+          variantId: r.item.variantId ?? null,
+          quantity: r.item.quantity,
+          unitPrice: r.unitPriceTtc,
+          format: r.variant ? r.variant.label : r.item.format ?? null,
+          productName: r.product.name,
+          taxRateLabel: r.taxRate.label,
+          taxRatePercent: Number(r.taxRate.rate),
+        })),
         t,
       )
 
@@ -156,6 +159,8 @@ export class OrdersService {
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             format: item.format ?? undefined,
+            taxRateLabel: item.taxRateLabel ?? undefined,
+            taxRatePercent: item.taxRatePercent ?? undefined,
           })),
         }).catch(() => { /* ne jamais bloquer sur un échec email */ })
       }
@@ -249,6 +254,8 @@ export class OrdersService {
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           format: item.format ?? undefined,
+          taxRateLabel: item.taxRateLabel ?? undefined,
+          taxRatePercent: item.taxRatePercent ?? undefined,
         })),
       }).catch(() => { /* ne jamais bloquer sur un échec email */ })
     }
@@ -273,16 +280,17 @@ export class OrdersService {
     })
   }
 
+  private computeHtBreakdown(unitPriceTtc: number, ratePercent: number | null): { unitPriceHt?: number; vatAmount?: number } {
+    if (ratePercent === null || ratePercent === undefined) return {}
+    const unitPriceHt = Math.round(unitPriceTtc / (1 + ratePercent / 100))
+    return { unitPriceHt, vatAmount: unitPriceTtc - unitPriceHt }
+  }
+
   private toResponseDto(order: Order): OrderResponseDto {
-    return {
-      id: order.id,
-      orderNumber: order.orderNumber ?? `#${order.id}`,
-      userId: order.userId,
-      status: order.status,
-      totalAmount: order.totalAmount,
-      shippingAddress: order.shippingAddress ?? undefined,
-      stripePaymentIntentId: order.stripePaymentIntentId ?? undefined,
-      items: ((order.items ?? []) as OrderItem[]).map((item) => ({
+    const items = ((order.items ?? []) as OrderItem[]).map((item) => {
+      const ratePercent = item.taxRatePercent !== null && item.taxRatePercent !== undefined ? Number(item.taxRatePercent) : null
+      const { unitPriceHt, vatAmount } = this.computeHtBreakdown(item.unitPrice, ratePercent)
+      return {
         id: item.id,
         productId: item.productId,
         productName: (item as any).productName ?? undefined,
@@ -290,7 +298,27 @@ export class OrdersService {
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         format: item.format ?? undefined,
-      })),
+        taxRateLabel: item.taxRateLabel ?? undefined,
+        taxRatePercent: ratePercent ?? undefined,
+        unitPriceHt,
+        vatAmount,
+      }
+    })
+
+    const totalVat = items.reduce((acc, i) => acc + (i.vatAmount ?? 0) * i.quantity, 0)
+    const totalHt = order.totalAmount - totalVat
+
+    return {
+      id: order.id,
+      orderNumber: order.orderNumber ?? `#${order.id}`,
+      userId: order.userId,
+      status: order.status,
+      totalAmount: order.totalAmount,
+      totalHt,
+      totalVat,
+      shippingAddress: order.shippingAddress ?? undefined,
+      stripePaymentIntentId: order.stripePaymentIntentId ?? undefined,
+      items,
       createdAt: order.created_at?.toISOString(),
       updatedAt: order.updated_at?.toISOString(),
     }

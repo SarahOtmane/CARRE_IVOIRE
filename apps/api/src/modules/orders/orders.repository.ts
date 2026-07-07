@@ -19,6 +19,8 @@ interface CreateOrderItemData {
   unitPrice: number
   format: string | null
   productName: string
+  taxRateLabel: string | null
+  taxRatePercent: number | null
 }
 
 @Injectable()

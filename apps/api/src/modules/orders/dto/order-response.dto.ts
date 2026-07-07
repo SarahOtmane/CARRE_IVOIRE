@@ -8,6 +8,10 @@ export interface OrderItemResponseDto {
   quantity: number
   unitPrice: number
   format?: string
+  taxRateLabel?: string
+  taxRatePercent?: number
+  unitPriceHt?: number
+  vatAmount?: number
 }
 
 export interface OrderResponseDto {
@@ -16,6 +20,8 @@ export interface OrderResponseDto {
   userId: number
   status: string
   totalAmount: number
+  totalHt?: number
+  totalVat?: number
   shippingAddress?: ShippingAddress
   stripePaymentIntentId?: string
   items: OrderItemResponseDto[]
