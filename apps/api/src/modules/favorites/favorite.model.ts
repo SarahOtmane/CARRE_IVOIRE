@@ -17,6 +17,7 @@ import { Product } from '@/modules/products/product.model'
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: false,
+  indexes: [{ unique: true, fields: ['user_id', 'product_id'] }],
 })
 export class Favorite extends Model<Favorite> {
   @PrimaryKey

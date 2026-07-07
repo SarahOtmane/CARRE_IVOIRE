@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common'
+import { LoginAttemptsService } from './login-attempts.service'
+import { RefreshTokensRepository } from './refresh-tokens.repository'
 import { JwtService } from '@nestjs/jwt'
 import * as bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
@@ -23,12 +25,15 @@ export class AuthService {
     private readonly usersRepository: UsersRepository,
     private readonly jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly loginAttempts: LoginAttemptsService,
+    private readonly refreshTokensRepository: RefreshTokensRepository,
   ) { }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto & TokenPair> {
     const exists = await this.usersRepository.emailExists(dto.email)
     if (exists) {
-      throwApiError(ErrorCodes.EMAIL_ALREADY_EXISTS, 'Un compte existe déjà avec cette adresse email')
+      // Réponse générique — ne pas révéler si l'email est déjà enregistré (anti-énumération)
+      throwApiError(ErrorCodes.EMAIL_ALREADY_EXISTS, 'Vérifiez vos informations et réessayez.')
     }
 
     const passwordHash = await bcrypt.hash(dto.password, 12)
@@ -42,40 +47,74 @@ export class AuthService {
     })
 
     const tokens = this.generateTokens(user)
+    await this.storeRefreshToken(user.id, tokens.refreshToken)
     return { ...tokens, user: this.toAuthUserDto(user) }
   }
 
   async login(dto: LoginDto): Promise<AuthResponseDto & TokenPair> {
+    // Vérifier le blocage par email avant toute requête DB
+    await this.loginAttempts.check(dto.email)
+
     // Même message d'erreur pour email inconnu ou mot de passe incorrect (anti-énumération)
     const INVALID_CREDENTIALS = () => throwApiError(ErrorCodes.INVALID_CREDENTIALS, 'Identifiants invalides')
 
     const user = await this.usersRepository.findByEmail(dto.email)
-    if (!user || !user.is_active) INVALID_CREDENTIALS()
+    if (!user || !user.is_active) {
+      await this.loginAttempts.recordFailure(dto.email)
+      INVALID_CREDENTIALS()
+    }
 
     const passwordValid = await bcrypt.compare(dto.password, user!.password_hash)
-    if (!passwordValid) INVALID_CREDENTIALS()
+    if (!passwordValid) {
+      await this.loginAttempts.recordFailure(dto.email)
+      INVALID_CREDENTIALS()
+    }
 
+    await this.loginAttempts.clearAttempts(dto.email)
     const tokens = this.generateTokens(user!)
+    await this.storeRefreshToken(user!.id, tokens.refreshToken)
     return { ...tokens, user: this.toAuthUserDto(user!) }
   }
 
-  async refresh(refreshToken: string | undefined): Promise<{ accessToken: string }> {
+  async refresh(refreshToken: string | undefined): Promise<{ accessToken: string; refreshToken: string }> {
     if (!refreshToken) {
       throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token manquant')
     }
+
+    // 1. Vérifier la signature JWT
+    let payload: JwtPayload
     try {
-      const payload = this.jwtService.verify<JwtPayload>(refreshToken, {
+      payload = this.jwtService.verify<JwtPayload>(refreshToken!, {
         secret: process.env.REFRESH_TOKEN_SECRET,
       })
-      const user = await this.usersRepository.findById(payload.sub)
-      if (!user || !user.is_active) {
-        throwApiError(ErrorCodes.UNAUTHORIZED, 'Token invalide')
-      }
-      const accessToken = this.signAccessToken(user)
-      return { accessToken }
     } catch {
       throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token invalide ou expiré')
     }
+
+    // 2. Vérifier que le token est connu et non révoqué en base
+    const stored = await this.refreshTokensRepository.findValid(refreshToken!)
+    if (!stored) {
+      // Token inconnu ou déjà révoqué → révoquer tous les tokens de l'utilisateur (détection de replay)
+      await this.refreshTokensRepository.revokeAllForUser(payload!.sub)
+      throwApiError(ErrorCodes.UNAUTHORIZED, 'Refresh token révoqué')
+    }
+
+    const user = await this.usersRepository.findById(payload!.sub)
+    if (!user || !user.is_active) {
+      throwApiError(ErrorCodes.UNAUTHORIZED, 'Utilisateur introuvable')
+    }
+
+    // 3. Rotation : révoquer l'ancien, émettre un nouveau
+    await this.refreshTokensRepository.revoke(refreshToken!)
+    const newTokens = this.generateTokens(user!)
+    await this.storeRefreshToken(user!.id, newTokens.refreshToken)
+
+    return { accessToken: newTokens.accessToken, refreshToken: newTokens.refreshToken }
+  }
+
+  async revokeRefreshToken(refreshToken: string | undefined): Promise<void> {
+    if (!refreshToken) return
+    await this.refreshTokensRepository.revoke(refreshToken)
   }
 
   async forgotPassword(email: string): Promise<void> {
@@ -108,13 +147,18 @@ export class AuthService {
     await this.usersRepository.clearResetToken(user!.id, newHash)
   }
 
+  private async storeRefreshToken(userId: number, token: string): Promise<void> {
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 jours
+    await this.refreshTokensRepository.store(userId, token, expiresAt)
+  }
+
   private generateTokens(user: User): TokenPair {
     const accessToken = this.signAccessToken(user)
     const refreshToken = this.jwtService.sign(
-      { sub: user.id, email: user.email, role: user.role } satisfies JwtPayload,
+      { sub: user.id, email: user.email, role: user.role } as JwtPayload,
       {
-        secret: process.env.REFRESH_TOKEN_SECRET,
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRATION ?? '7d',
+        secret: process.env.REFRESH_TOKEN_SECRET ?? '',
+        expiresIn: (process.env.REFRESH_TOKEN_EXPIRATION ?? '7d') as any,
       },
     )
     return { accessToken, refreshToken }
@@ -122,10 +166,10 @@ export class AuthService {
 
   private signAccessToken(user: User): string {
     return this.jwtService.sign(
-      { sub: user.id, email: user.email, role: user.role } satisfies JwtPayload,
+      { sub: user.id, email: user.email, role: user.role } as JwtPayload,
       {
-        secret: process.env.JWT_SECRET,
-        expiresIn: process.env.JWT_EXPIRATION ?? '24h',
+        secret: process.env.JWT_SECRET ?? '',
+        expiresIn: (process.env.JWT_EXPIRATION ?? '24h') as any,
       },
     )
   }

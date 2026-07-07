@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import type { ProductResponse } from '@carre-ivoire/types'
 import { useApi } from './useApi'
 
@@ -42,6 +42,10 @@ export function useProductSearch() {
     results.value = []
     isSearching.value = false
   }
+
+  onUnmounted(() => {
+    if (timer) clearTimeout(timer)
+  })
 
   return { results, isSearching, search, clear }
 }

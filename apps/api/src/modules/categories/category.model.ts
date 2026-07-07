@@ -27,7 +27,7 @@ export class Category extends Model<Category> {
   @Column(DataType.STRING(100))
   declare name: string
 
-  @Unique
+  @Unique('slug')
   @AllowNull(false)
   @Column(DataType.STRING(100))
   declare slug: string

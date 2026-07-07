@@ -28,7 +28,7 @@ export class FavoritesService {
     if (existing) throwApiError(ErrorCodes.FAVORITE_ALREADY_EXISTS, 'Déjà dans vos favoris')
 
     const favorite = await this.favoritesRepository.create(userId, productId)
-    return { id: favorite.id, productId, addedAt: favorite.created_at }
+    return { id: favorite.id, product, addedAt: favorite.created_at }
   }
 
   async remove(userId: number, productId: number) {

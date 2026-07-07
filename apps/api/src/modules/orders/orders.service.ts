@@ -1,17 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import { InjectConnection, InjectModel } from '@nestjs/sequelize'
+import { InjectConnection } from '@nestjs/sequelize'
 import { Sequelize } from 'sequelize-typescript'
-import { Op } from 'sequelize'
 import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
-import { Product } from '@/modules/products/product.model'
-import { ProductVariant } from '@/modules/products/product-variant.model'
+import type { ProductVariant } from '@/modules/products/product-variant.model'
 import { ProductsRepository } from '@/modules/products/products.repository'
 import { ProductVariantsRepository } from '@/modules/products/product-variants.repository'
 import { OrdersRepository } from './orders.repository'
 import { StripeService } from './stripe.service'
 import { MailService } from '@/modules/mail/mail.service'
 import { UsersRepository } from '@/modules/users/users.repository'
+import { SettingsService } from '@/modules/settings/settings.service'
 import type { Order } from './order.model'
 import type { OrderItem } from './order-item.model'
 import type { CreateOrderDto } from './dto/create-order.dto'
@@ -22,14 +21,13 @@ import type { OrderResponseDto, OrderCreatedResponseDto } from './dto/order-resp
 export class OrdersService {
   constructor(
     @InjectConnection() private readonly sequelize: Sequelize,
-    @InjectModel(Product) private readonly productModel: typeof Product,
-    @InjectModel(ProductVariant) private readonly variantModel: typeof ProductVariant,
     private readonly productsRepository: ProductsRepository,
     private readonly productVariantsRepository: ProductVariantsRepository,
     private readonly ordersRepository: OrdersRepository,
     private readonly stripeService: StripeService,
     private readonly mailService: MailService,
     private readonly usersRepository: UsersRepository,
+    private readonly settingsService: SettingsService,
   ) { }
 
   async createOrder(dto: CreateOrderDto, userId: number): Promise<OrderCreatedResponseDto> {
@@ -37,33 +35,27 @@ export class OrdersService {
       throwApiError(ErrorCodes.CART_EMPTY, 'Le panier est vide')
     }
 
-    return this.sequelize.transaction(async (t) => {
-      // 1. Décrémenter le stock atomiquement — rowsAffected === 0 → rollback
-      //    Stock par variante si l'item en cible une, sinon stock du produit (inchangé)
+    // Récupérer les settings avant la transaction pour calculer les frais de livraison côté serveur
+    const settings = await this.settingsService.getAll()
+
+    // 1. Réservation atomique du stock + création de la commande (statut payment_pending),
+    //    dans une transaction courte qui ne contient aucun appel réseau externe.
+    const { order, totalAmount } = await this.sequelize.transaction(async (t) => {
       const variantsById = new Map<number, ProductVariant>()
+
       for (const item of dto.items) {
-        const safeQuantity = Math.floor(Math.abs(Number(item.quantity)))
-
         if (item.variantId) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
-          const [rowsAffected] = await this.variantModel.update(
-            { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
-            {
-              where: {
-                id: item.variantId,
-                productId: item.productId,
-                stock: { [Op.gte]: item.quantity },
-                isActive: 1,
-              },
-              transaction: t,
-            },
+          const rowsAffected = await this.productVariantsRepository.decrementStock(
+            item.variantId,
+            item.productId,
+            item.quantity,
+            t,
           )
-
           if (rowsAffected === 0) {
             throwApiError(ErrorCodes.VARIANT_OUT_OF_STOCK, `Stock insuffisant pour la variante ${item.variantId}`)
           }
 
-          const variant = await this.variantModel.findByPk(item.variantId, { transaction: t })
+          const variant = await this.productVariantsRepository.findById(item.variantId, t)
           if (!variant) {
             throwApiError(ErrorCodes.VARIANT_OUT_OF_STOCK, `Variante ${item.variantId} introuvable`)
           }
@@ -71,81 +63,134 @@ export class OrdersService {
           continue
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
-        const [rowsAffected] = await this.productModel.update(
-          { stock: Sequelize.literal(`stock - ${safeQuantity}`) } as any,
-          {
-            where: {
-              id: item.productId,
-              stock: { [Op.gte]: item.quantity },
-              isActive: 1,
-            },
-            transaction: t,
-          },
-        )
+        const activeVariants = await this.productVariantsRepository.findByProductId(item.productId)
+        if (activeVariants.length > 0) {
+          throwApiError(
+            ErrorCodes.VARIANT_REQUIRED,
+            `Le produit ${item.productId} nécessite de préciser une variante (variantId)`,
+          )
+        }
 
+        const rowsAffected = await this.productsRepository.decrementStock(item.productId, item.quantity, t)
         if (rowsAffected === 0) {
           throwApiError(ErrorCodes.OUT_OF_STOCK, `Stock insuffisant pour le produit ${item.productId}`)
         }
       }
 
-      // 2. Relire les prix depuis la BDD — jamais depuis le client
+      // Relire les prix depuis la BDD — jamais depuis le client
       const products = await this.productsRepository.findAllByIds(
         dto.items.map((i) => i.productId),
         t,
       )
 
-      for (const item of dto.items) {
-        if (!products.find((p) => p.id === item.productId)) {
+      // Résout prix HT + taux de TVA depuis la BDD, calcule le prix TTC réellement facturé
+      // (le prix stocké sur Product/ProductVariant est HT — la TVA s'ajoute, elle ne s'en déduit pas).
+      const resolvedItems = dto.items.map((item) => {
+        const product = products.find((p) => p.id === item.productId)
+        if (!product) {
           throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, `Produit ${item.productId} introuvable`)
         }
-      }
-
-      const totalAmount = dto.items.reduce((acc, item) => {
         const variant = item.variantId ? variantsById.get(item.variantId) : undefined
-        if (variant) return acc + variant.price * item.quantity
-        const product = products.find((p) => p.id === item.productId)
-        if (!product) return acc
-        return acc + product.price * item.quantity
-      }, 0)
+        const taxRate = variant ? variant.taxRate : product.taxRate
+        if (!taxRate) {
+          throwApiError(
+            ErrorCodes.TAX_RATE_MISSING,
+            `Aucun taux de TVA associé au produit ${item.productId}${item.variantId ? ` (variante ${item.variantId})` : ''}`,
+          )
+        }
+        const unitPriceHt = variant ? variant.price : product.price
+        const unitPriceTtc = Math.round(unitPriceHt * (1 + Number(taxRate.rate) / 100))
+        return { item, product, variant, taxRate, unitPriceTtc }
+      })
 
-      // 3. Créer la commande
+      const itemsTotal = resolvedItems.reduce((acc, r) => acc + r.unitPriceTtc * r.item.quantity, 0)
+
+      // Frais calculés serveur — le client ne peut pas imposer un montant
+      const shippingAmount = dto.deliveryType === 'pickup'
+        ? 0
+        : (itemsTotal >= settings.shippingFreeFrom ? 0 : settings.shippingFlat)
+      const totalAmount = itemsTotal + shippingAmount
+
       const order = await this.ordersRepository.create(
         { userId, totalAmount, shippingAddress: dto.shippingAddress },
         t,
       )
 
-      // 4. Créer les order_items (snapshot du prix et du nom)
       await this.ordersRepository.createItems(
-        dto.items.map((item) => {
-          const product = products.find((p) => p.id === item.productId)
-          if (!product) {
-            throwApiError(ErrorCodes.PRODUCT_NOT_FOUND, `Produit ${item.productId} introuvable`)
-          }
-          const variant = item.variantId ? variantsById.get(item.variantId) : undefined
-          return {
-            orderId: order.id,
-            productId: item.productId,
-            variantId: item.variantId ?? null,
-            quantity: item.quantity,
-            unitPrice: variant ? variant.price : product.price,
-            format: variant ? variant.label : item.format ?? null,
-            productName: product.name,
-          }
-        }),
+        resolvedItems.map((r) => ({
+          orderId: order.id,
+          productId: r.item.productId,
+          variantId: r.item.variantId ?? null,
+          quantity: r.item.quantity,
+          unitPrice: r.unitPriceTtc,
+          format: r.variant ? r.variant.label : r.item.format ?? null,
+          productName: r.product.name,
+          taxRateLabel: r.taxRate.label,
+          taxRatePercent: Number(r.taxRate.rate),
+        })),
         t,
       )
 
-      // 5. PaymentIntent Stripe — si Stripe échoue, la transaction rollback
+      return { order, totalAmount }
+    })
+
+    // 2. PaymentIntent Stripe — hors transaction DB. En cas d'échec, on compense
+    //    en libérant le stock réservé plutôt que de tenir les verrous DB pendant l'appel réseau.
+    try {
       const paymentIntent = await this.stripeService.createPaymentIntent(totalAmount, order.id)
-      await this.ordersRepository.update(order.id, { stripePaymentIntentId: paymentIntent.id }, t)
+      await this.ordersRepository.update(order.id, { stripePaymentIntentId: paymentIntent.id })
+
+      // Envoi email + facture dès la création de la commande (pour test — à déplacer dans confirmByPaymentIntent une fois le webhook opérationnel)
+      const user = await this.usersRepository.findById(order.userId)
+      const bccEmail = await this.settingsService.getAll().then((s) => s.bccEmail || undefined).catch(() => undefined)
+      if (user) {
+        const fullOrder = await this.ordersRepository.findById(order.id)
+        this.mailService.sendOrderConfirmation({
+          to: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          orderNumber: order.orderNumber ?? `#${order.id}`,
+          totalAmount,
+          orderDate: order.created_at,
+          shippingAddress: fullOrder?.shippingAddress as any,
+          bcc: bccEmail,
+          items: ((fullOrder?.items ?? []) as OrderItem[]).map((item) => ({
+            productName: (item as any).productName ?? `Produit ${item.productId}`,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            format: item.format ?? undefined,
+            taxRateLabel: item.taxRateLabel ?? undefined,
+            taxRatePercent: item.taxRatePercent ?? undefined,
+          })),
+        }).catch(() => { /* ne jamais bloquer sur un échec email */ })
+      }
 
       return {
         orderId: order.id,
+        orderNumber: order.orderNumber,
         status: 'payment_pending',
         clientSecret: paymentIntent.client_secret,
         totalAmount,
       }
+    } catch (error) {
+      await this.releaseStockAndCancel(order.id, dto.items)
+      throw error
+    }
+  }
+
+  private async releaseStockAndCancel(
+    orderId: number,
+    items: CreateOrderDto['items'],
+  ): Promise<void> {
+    await this.sequelize.transaction(async (t) => {
+      for (const item of items) {
+        if (item.variantId) {
+          await this.productVariantsRepository.incrementStock(item.variantId, item.quantity, t)
+        } else {
+          await this.productsRepository.incrementStock(item.productId, item.quantity, t)
+        }
+      }
+      await this.ordersRepository.update(orderId, { status: 'cancelled' }, t)
     })
   }
 
@@ -156,6 +201,15 @@ export class OrdersService {
 
   async findById(id: number, userId: number, isAdmin: boolean): Promise<OrderResponseDto> {
     const order = await this.ordersRepository.findById(id)
+    if (!order) throwApiError(ErrorCodes.ORDER_NOT_FOUND, 'Commande introuvable')
+    if (!isAdmin && order.userId !== userId) {
+      throwApiError(ErrorCodes.FORBIDDEN, 'Accès refusé')
+    }
+    return this.toResponseDto(order)
+  }
+
+  async findByOrderNumber(orderNumber: string, userId: number, isAdmin: boolean): Promise<OrderResponseDto> {
+    const order = await this.ordersRepository.findByOrderNumber(orderNumber)
     if (!order) throwApiError(ErrorCodes.ORDER_NOT_FOUND, 'Commande introuvable')
     if (!isAdmin && order.userId !== userId) {
       throwApiError(ErrorCodes.FORBIDDEN, 'Accès refusé')
@@ -185,15 +239,23 @@ export class OrdersService {
     const fullOrder = await this.ordersRepository.findById(order.id)
     const user = await this.usersRepository.findById(order.userId)
     if (fullOrder && user) {
+      const bccEmail = await this.settingsService.getAll().then((s) => s.bccEmail || undefined).catch(() => undefined)
       this.mailService.sendOrderConfirmation({
         to: user.email,
         firstName: user.first_name,
-        orderNumber: (fullOrder as any).orderNumber ?? `#${fullOrder.id}`,
+        lastName: user.last_name,
+        orderNumber: fullOrder.orderNumber ?? `#${fullOrder.id}`,
         totalAmount: fullOrder.totalAmount,
+        orderDate: fullOrder.created_at,
+        shippingAddress: fullOrder.shippingAddress as any,
+        bcc: bccEmail,
         items: ((fullOrder.items ?? []) as OrderItem[]).map((item) => ({
           productName: (item as any).productName ?? `Produit ${item.productId}`,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
+          format: item.format ?? undefined,
+          taxRateLabel: item.taxRateLabel ?? undefined,
+          taxRatePercent: item.taxRatePercent ?? undefined,
         })),
       }).catch(() => { /* ne jamais bloquer sur un échec email */ })
     }
@@ -218,22 +280,45 @@ export class OrdersService {
     })
   }
 
+  private computeHtBreakdown(unitPriceTtc: number, ratePercent: number | null): { unitPriceHt?: number; vatAmount?: number } {
+    if (ratePercent === null || ratePercent === undefined) return {}
+    const unitPriceHt = Math.round(unitPriceTtc / (1 + ratePercent / 100))
+    return { unitPriceHt, vatAmount: unitPriceTtc - unitPriceHt }
+  }
+
   private toResponseDto(order: Order): OrderResponseDto {
-    return {
-      id: order.id,
-      userId: order.userId,
-      status: order.status,
-      totalAmount: order.totalAmount,
-      shippingAddress: order.shippingAddress ?? undefined,
-      stripePaymentIntentId: order.stripePaymentIntentId ?? undefined,
-      items: ((order.items ?? []) as OrderItem[]).map((item) => ({
+    const items = ((order.items ?? []) as OrderItem[]).map((item) => {
+      const ratePercent = item.taxRatePercent !== null && item.taxRatePercent !== undefined ? Number(item.taxRatePercent) : null
+      const { unitPriceHt, vatAmount } = this.computeHtBreakdown(item.unitPrice, ratePercent)
+      return {
         id: item.id,
         productId: item.productId,
+        productName: (item as any).productName ?? undefined,
         variantId: item.variantId ?? undefined,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         format: item.format ?? undefined,
-      })),
+        taxRateLabel: item.taxRateLabel ?? undefined,
+        taxRatePercent: ratePercent ?? undefined,
+        unitPriceHt,
+        vatAmount,
+      }
+    })
+
+    const totalVat = items.reduce((acc, i) => acc + (i.vatAmount ?? 0) * i.quantity, 0)
+    const totalHt = order.totalAmount - totalVat
+
+    return {
+      id: order.id,
+      orderNumber: order.orderNumber ?? `#${order.id}`,
+      userId: order.userId,
+      status: order.status,
+      totalAmount: order.totalAmount,
+      totalHt,
+      totalVat,
+      shippingAddress: order.shippingAddress ?? undefined,
+      stripePaymentIntentId: order.stripePaymentIntentId ?? undefined,
+      items,
       createdAt: order.created_at?.toISOString(),
       updatedAt: order.updated_at?.toISOString(),
     }

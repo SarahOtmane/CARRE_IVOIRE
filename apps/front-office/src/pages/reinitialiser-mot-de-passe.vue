@@ -25,6 +25,14 @@ onMounted(() => {
 
 async function submit() {
   error.value = ''
+  if (!newPassword.value.trim()) {
+    error.value = 'Veuillez remplir ce champs'
+    return
+  }
+  if (!confirm.value.trim()) {
+    error.value = 'Veuillez remplir ce champs'
+    return
+  }
   if (newPassword.value !== confirm.value) {
     error.value = 'Les mots de passe ne correspondent pas.'
     return
@@ -55,44 +63,41 @@ async function submit() {
     <div style="width: 100%; max-width: 440px">
       <span class="ci-eyebrow">Votre compte</span>
       <h1
-        class="mt-4 font-serif font-medium text-brun-cacao"
+        class="mt-4 font-serif font-medium text-cacao"
         style="font-size: clamp(32px, 5vw, 52px); line-height: 1; letter-spacing: -0.01em"
       >
         Nouveau<br />
-        <em class="text-brun-cacao-2">mot de passe.</em>
+        <em class="text-cacao-2">mot de passe.</em>
       </h1>
 
       <div v-if="success" class="mt-10">
-        <p class="font-sans text-[15px] leading-relaxed text-brun-cacao-2">
+        <p class="font-sans text-[15px] leading-relaxed text-cacao-2">
           Votre mot de passe a été mis à jour. Vous allez être redirigé vers la page de connexion.
         </p>
       </div>
 
-      <form v-else class="mt-10 space-y-6" @submit.prevent="submit">
+      <form v-else class="mt-10 space-y-6" novalidate @submit.prevent="submit">
         <label class="block space-y-2">
-          <span class="font-sans text-[10px] uppercase tracking-[0.18em] text-brun-cacao-2">
+          <span class="font-sans text-[10px] uppercase tracking-[0.18em] text-cacao-2">
             Nouveau mot de passe
           </span>
           <input
             v-model="newPassword"
             type="password"
-            required
             autocomplete="new-password"
-            minlength="8"
-            class="w-full border border-brun-cacao/25 bg-papier px-4 py-3 font-sans text-[15px] text-brun-cacao outline-none transition-colors focus:border-brun-cacao/60"
+            class="w-full border border-cacao/25 bg-papier px-4 py-3 font-sans text-[15px] text-cacao outline-none transition-colors focus:border-cacao/60"
           />
         </label>
 
         <label class="block space-y-2">
-          <span class="font-sans text-[10px] uppercase tracking-[0.18em] text-brun-cacao-2">
+          <span class="font-sans text-[10px] uppercase tracking-[0.18em] text-cacao-2">
             Confirmer le mot de passe
           </span>
           <input
             v-model="confirm"
             type="password"
-            required
             autocomplete="new-password"
-            class="w-full border border-brun-cacao/25 bg-papier px-4 py-3 font-sans text-[15px] text-brun-cacao outline-none transition-colors focus:border-brun-cacao/60"
+            class="w-full border border-cacao/25 bg-papier px-4 py-3 font-sans text-[15px] text-cacao outline-none transition-colors focus:border-cacao/60"
           />
         </label>
 
@@ -101,7 +106,7 @@ async function submit() {
         <button
           type="submit"
           :disabled="loading"
-          class="w-full border border-brun-cacao bg-brun-cacao py-4 font-sans text-[12px] uppercase tracking-[0.12em] text-ivoire transition-opacity disabled:opacity-50"
+          class="w-full border border-cacao bg-cacao py-4 font-sans text-[12px] uppercase tracking-[0.12em] text-ivoire transition-opacity disabled:opacity-50"
         >
           {{ loading ? 'Enregistrement…' : 'Enregistrer' }}
         </button>

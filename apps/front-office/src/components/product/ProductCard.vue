@@ -2,25 +2,51 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ProductResponse } from '@carre-ivoire/types'
+import { useAuth, useFavorites } from '@carre-ivoire/composables'
 
 const props = defineProps<{ product: ProductResponse }>()
 const router = useRouter()
+const { isAuthenticated } = useAuth()
+const { isFavorite, add, remove } = useFavorites()
 
 const hovered = ref(false)
+const togglingFavorite = ref(false)
+
+const isFav = computed(() => isFavorite(props.product.id))
+
+async function toggleFavorite(event: MouseEvent) {
+  event.stopPropagation()
+  if (!isAuthenticated.value) {
+    router.push({ path: '/connexion', query: { redirect: router.currentRoute.value.fullPath } })
+    return
+  }
+  if (togglingFavorite.value) return
+  togglingFavorite.value = true
+  try {
+    if (isFav.value) {
+      await remove(props.product.id)
+    } else {
+      await add(props.product.id)
+    }
+  } finally {
+    togglingFavorite.value = false
+  }
+}
 
 function formatPrice(centimes: number) {
   return `${(centimes / 100).toFixed(2).replace('.', ',')} €`
 }
 
 const displayPrice = computed(() => {
-  if (props.product.variants.length === 0) return formatPrice(props.product.price)
-  const cheapest = Math.min(...props.product.variants.map((v) => v.price))
+  const variants = props.product.variants ?? []
+  if (variants.length === 0) return formatPrice(props.product.price)
+  const cheapest = Math.min(...variants.map((v) => v.price))
   return `À partir de ${formatPrice(cheapest)}`
 })
 
 const badgeVariants: Record<string, string> = {
-  'NOUVEAU':         'bg-papier text-brun-cacao border border-[var(--cacao-a24)]',
-  'Édition limitée': 'bg-brun-cacao text-ivoire',
+  'NOUVEAU':         'bg-papier text-cacao border border-[var(--cacao-a24)]',
+  'Édition limitée': 'bg-cacao text-ivoire',
   'Signature':       'text-dore border border-dore',
 }
 </script>
@@ -38,9 +64,27 @@ const badgeVariants: Record<string, string> = {
       <div
         v-if="product.badge"
         class="absolute left-3 top-3 z-10 font-sans text-[9px] uppercase tracking-[0.22em]"
-        :class="badgeVariants[product.badge] ?? 'bg-papier text-brun-cacao border border-[var(--cacao-a24)]'"
+        :class="badgeVariants[product.badge] ?? 'bg-papier text-cacao border border-[var(--cacao-a24)]'"
         style="padding: 5px 9px"
       >{{ product.badge }}</div>
+
+      <!-- Favori -->
+      <button
+        type="button"
+        class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center bg-papier transition-opacity duration-180 disabled:cursor-not-allowed disabled:opacity-60"
+        :aria-label="isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+        :aria-pressed="isFav"
+        :disabled="togglingFavorite"
+        @click="toggleFavorite"
+      >
+        <svg width="30" height="30" viewBox="0 0 24 24" stroke-width="1.25" stroke-linecap="square" stroke-linejoin="miter" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M12 20s-7-4.5-7-10a4 4 0 017-2.5A4 4 0 0119 10c0 5.5-7 10-7 10z"
+            :fill="isFav ? 'var(--dore)' : 'none'"
+            :stroke="isFav ? 'var(--dore)' : 'var(--brun-cacao)'"
+          />
+        </svg>
+      </button>
 
       <!-- Image -->
       <img
@@ -56,7 +100,7 @@ const badgeVariants: Record<string, string> = {
 
       <!-- Overlay CTA sur hover -->
       <div
-        class="absolute inset-x-0 bottom-0 bg-brun-cacao py-3.5 text-center font-sans text-[11px] uppercase tracking-[0.18em] text-ivoire transition-transform duration-400"
+        class="absolute inset-x-0 bottom-0 bg-cacao py-3.5 text-center font-sans text-[11px] uppercase tracking-[0.18em] text-ivoire transition-transform duration-400"
         :style="{ transform: hovered ? 'translateY(0)' : 'translateY(100%)' }"
       >
         Voir le produit
@@ -66,7 +110,7 @@ const badgeVariants: Record<string, string> = {
     <!-- Infos produit -->
     <div class="pt-5">
       <span v-if="product.shortDescription" class="ci-eyebrow">{{ product.shortDescription }}</span>
-      <div class="mt-1.5 font-serif text-[22px] leading-[1.15] tracking-[-0.005em] text-brun-cacao">
+      <div class="mt-1.5 font-serif text-[22px] leading-[1.15] tracking-[-0.005em] text-cacao">
         {{ product.name }}
       </div>
       <div class="mt-2 font-sans text-[13px] text-dore" style="letter-spacing: 0.02em; font-variant-numeric: tabular-nums">

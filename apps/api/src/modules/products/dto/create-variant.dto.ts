@@ -24,6 +24,10 @@ export class CreateVariantDto {
   @Min(0)
   price: number
 
+  @IsInt()
+  @Min(1)
+  taxRateId: number
+
   @IsOptional()
   @IsInt()
   @Min(0)

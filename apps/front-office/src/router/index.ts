@@ -52,6 +52,21 @@ const routes: RouteRecordRaw[] = [
         name: 'panier',
         component: () => import('@/pages/panier.vue'),
       },
+      {
+        path: 'mentions-legales',
+        name: 'mentions-legales',
+        component: () => import('@/pages/mentions-legales.vue'),
+      },
+      {
+        path: 'cgv',
+        name: 'cgv',
+        component: () => import('@/pages/cgv.vue'),
+      },
+      {
+        path: 'politique-de-confidentialite',
+        name: 'politique-de-confidentialite',
+        component: () => import('@/pages/politique-de-confidentialite.vue'),
+      },
     ],
   },
   {
@@ -62,6 +77,17 @@ const routes: RouteRecordRaw[] = [
         path: '',
         name: 'connexion',
         component: () => import('@/pages/connexion.vue'),
+      },
+    ],
+  },
+  {
+    path: '/inscription',
+    component: () => import('@/layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'inscription',
+        component: () => import('@/pages/inscription.vue'),
       },
     ],
   },

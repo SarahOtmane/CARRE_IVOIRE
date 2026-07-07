@@ -63,8 +63,8 @@ export class UpdateProductDto {
 
   @IsOptional()
   @IsInt()
-  @Min(0)
-  taxRateId?: number | null
+  @Min(1)
+  taxRateId?: number
 
   @IsOptional()
   @IsBoolean()

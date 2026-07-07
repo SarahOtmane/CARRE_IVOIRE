@@ -1,11 +1,7 @@
+import type { TaxRate, CategorySummary } from '@carre-ivoire/types'
 import type { VariantResponseDto } from './variant-response.dto'
 
-export interface TaxRateDto {
-  id: number
-  label: string
-  rate: number
-  isDefault: boolean
-}
+export type TaxRateDto = TaxRate
 
 export interface ProductResponseDto {
   id: number
@@ -14,11 +10,12 @@ export interface ProductResponseDto {
   shortDescription?: string
   description?: string
   price: number
+  priceTtc?: number
   discountPrice?: number
   imageUrl?: string
   images?: string[]
   categoryId: number
-  category?: { id: number; name: string; slug: string }
+  category?: CategorySummary
   stock: number
   stockStatus: string
   taxRateId?: number

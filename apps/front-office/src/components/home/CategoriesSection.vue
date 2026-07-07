@@ -34,6 +34,7 @@ const categories = computed(() =>
       bg: meta?.bg ?? FALLBACK_COLORS[i % FALLBACK_COLORS.length],
       fg: meta?.fg ?? 'var(--brun-cacao)',
       featured: meta?.featured ?? false,
+      imageUrl: cat.imageUrl ?? null,
     }
   }),
 )
@@ -47,18 +48,18 @@ const categories = computed(() =>
       <div class="max-w-[620px]">
         <span class="ci-eyebrow">01 — La boutique</span>
         <h2
-          class="mt-4 font-serif font-medium text-brun-cacao"
+          class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4.5vw, 64px); line-height: 1; letter-spacing: -0.01em"
         >
           Neuf familles,<br/>
-          <em class="text-brun-cacao-2">une même obsession.</em>
+          <em class="text-cacao-2">une même obsession.</em>
         </h2>
       </div>
       <div class="flex flex-col items-end gap-3">
-        <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-brun-cacao-3">— I / IV</span>
+        <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-cacao-3">— I / IV</span>
         <RouterLink
           to="/boutique"
-          class="border-b border-brun-cacao pb-0.5 font-sans text-[13px] text-brun-cacao"
+          class="border-b border-cacao pb-0.5 font-sans text-[13px] text-cacao"
         >
           Voir la boutique →
         </RouterLink>
@@ -90,8 +91,22 @@ const categories = computed(() =>
         @mouseleave="hoveredSlug = null"
         @click="router.push('/boutique/' + cat.slug)"
       >
+        <!-- Image de fond -->
+        <img
+          v-if="cat.imageUrl"
+          :src="cat.imageUrl"
+          :alt="cat.label"
+          class="absolute inset-0 h-full w-full object-cover"
+        />
+        <!-- Overlay couleur pour lisibilité du texte -->
+        <div
+          v-if="cat.imageUrl"
+          class="absolute inset-0"
+          :style="{ background: cat.bg, opacity: 0.55 }"
+        />
+
         <!-- Numéro + badge Signature + glyph -->
-        <div class="flex items-start justify-between gap-4">
+        <div class="relative flex items-start justify-between gap-4">
           <div>
             <div class="font-sans text-[10px] tracking-[0.22em]" style="opacity: 0.6">{{ cat.num }}</div>
             <div
@@ -108,13 +123,12 @@ const categories = computed(() =>
         </div>
 
         <!-- Titre + tagline + flèche -->
-        <div>
+        <div class="relative">
           <h3
-            class="font-serif font-medium leading-none transition-all duration-200"
+            class="font-serif font-medium leading-none"
             :style="{
               fontSize: i === 0 ? 'clamp(36px, 5vw, 72px)' : 'clamp(22px, 2.2vw, 32px)',
               letterSpacing: '-0.01em',
-              fontStyle: hoveredSlug === cat.slug ? 'italic' : 'normal',
               color: cat.fg,
             }"
           >{{ cat.label }}</h3>

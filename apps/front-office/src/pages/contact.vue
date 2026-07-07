@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useAuthStore } from "@carre-ivoire/stores";
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: 'Nous contacter — Carré Ivoire',
+  meta: [{ name: 'description', content: 'Une question sur votre commande, un projet de collaboration ou simplement l\'envie d\'échanger — contactez l\'atelier Carré Ivoire.' }],
+})
 
 type ContactForm = {
   subject: string;
@@ -7,24 +14,42 @@ type ContactForm = {
   message: string;
 };
 
+const authStore = useAuthStore();
+
 const form = ref<ContactForm>({
   subject: "",
-  address: "",
+  address: authStore.user?.email ?? "",
   message: "",
 });
 
 const sent = ref(false);
+const errors = ref<Record<string, string>>({});
+
+function validate(): boolean {
+  errors.value = {};
+  if (!form.value.subject.trim())
+    errors.value.subject = "Veuillez remplir ce champs";
+  if (!form.value.address.trim())
+    errors.value.address = "Veuillez remplir ce champs";
+  else if (!/^[^@]+@[^@]+\.[^@]+$/.test(form.value.address.trim()))
+    errors.value.address = "Le format de votre email n'est pas bon";
+  if (!form.value.message.trim())
+    errors.value.message = "Veuillez remplir ce champs";
+  return Object.keys(errors.value).length === 0;
+}
 
 function resetForm() {
   form.value = {
     subject: "",
-    address: "",
+    address: authStore.user?.email ?? "",
     message: "",
   };
+  errors.value = {};
   sent.value = false;
 }
 
 function handleSubmit() {
+  if (!validate()) return;
   const body = `Adresse de réponse : ${form.value.address}\n\n${form.value.message}`;
   const href = `mailto:contact@carre-ivoire.fr?subject=${encodeURIComponent(form.value.subject)}&body=${encodeURIComponent(body)}`;
   globalThis.location.href = href;
@@ -43,7 +68,7 @@ function handleSubmit() {
     >
       <span class="ci-eyebrow">Maison — Nous écrire</span>
       <h1
-        class="mt-6 font-serif text-brun-cacao"
+        class="mt-6 font-serif text-cacao"
         style="
           font-size: clamp(44px, 7vw, 104px);
           line-height: 0.95;
@@ -52,13 +77,13 @@ function handleSubmit() {
         "
       >
         Une question,<br /><span
-          class="text-brun-cacao-2"
+          class="text-cacao-2"
           style="font-style: italic"
           >un mot, une commande.</span
         >
       </h1>
       <p
-        class="mt-8 max-w-[560px] font-sans text-[16px] leading-[1.7] text-brun-cacao-2"
+        class="mt-8 max-w-[560px] font-sans text-[16px] leading-[1.7] text-cacao-2"
       >
         Notre atelier répond du mardi au samedi, sous 48 heures ouvrées. Pour
         les commandes professionnelles, mariages et événements, merci de
@@ -79,16 +104,16 @@ function handleSubmit() {
         <div class="mt-8 flex flex-col gap-10">
           <div>
             <div
-              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Atelier &amp; boutique
             </div>
-            <div class="font-serif text-[22px] leading-[1.3] text-brun-cacao">
+            <div class="font-serif text-[22px] leading-[1.3] text-cacao">
               4, rue du Nil<br />
               <span class="italic">75002 Paris</span>
             </div>
             <div
-              class="mt-3 font-sans text-[13px] leading-[1.6] text-brun-cacao-2"
+              class="mt-3 font-sans text-[13px] leading-[1.6] text-cacao-2"
             >
               Mardi — samedi<br />
               10 h 30 — 19 h 30
@@ -97,20 +122,20 @@ function handleSubmit() {
 
           <div>
             <div
-              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Par courriel
             </div>
             <a
               href="mailto:contact@carre-ivoire.fr"
-              class="inline-block border-b border-brun-cacao pb-[2px] font-serif text-[22px] italic text-brun-cacao"
+              class="inline-block border-b border-cacao pb-[2px] font-serif text-[22px] italic text-cacao"
             >
               contact@carre-ivoire.fr
             </a>
             <div class="mt-4">
               <a
                 href="mailto:contact@carre-ivoire.fr"
-                class="inline-flex items-center gap-2 border-b pb-1 font-sans text-[12px] tracking-[0.06em] text-brun-cacao"
+                class="inline-flex items-center gap-2 border-b pb-1 font-sans text-[12px] tracking-[0.06em] text-cacao"
                 style="border-color: var(--cacao-a24)"
               >
                 <svg
@@ -134,12 +159,12 @@ function handleSubmit() {
 
           <div>
             <div
-              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Par téléphone
             </div>
             <div
-              class="font-serif text-[22px] text-brun-cacao"
+              class="font-serif text-[22px] text-cacao"
               style="font-variant-numeric: tabular-nums"
             >
               +33 1 42 33 84 12
@@ -148,13 +173,13 @@ function handleSubmit() {
 
           <div>
             <div
-              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
               Presse &amp; professionnels
             </div>
             <a
               href="mailto:presse@carre-ivoire.fr"
-              class="inline-block border-b pb-[2px] font-serif text-[18px] italic text-brun-cacao"
+              class="inline-block border-b pb-[2px] font-serif text-[18px] italic text-cacao"
               style="border-color: var(--cacao-a24)"
             >
               presse@carre-ivoire.fr
@@ -167,19 +192,19 @@ function handleSubmit() {
         <div class="mb-12 flex items-end justify-between">
           <span class="ci-eyebrow">II — Formulaire</span>
           <span
-            class="font-sans text-[10px] tracking-[0.22em] text-brun-cacao-2"
+            class="font-sans text-[10px] tracking-[0.22em] text-cacao-2"
             >— II / II</span
           >
         </div>
 
         <div
           v-if="sent"
-          class="border-t border-brun-cacao bg-beige-doux"
+          class="border-t border-cacao bg-beige-doux"
           style="padding: clamp(32px, 5vw, 64px)"
         >
           <span class="ci-eyebrow-accent">Message préparé</span>
           <h2
-            class="mt-4 font-serif text-brun-cacao"
+            class="mt-4 font-serif text-cacao"
             style="
               font-size: clamp(28px, 3.4vw, 40px);
               font-weight: 500;
@@ -189,13 +214,13 @@ function handleSubmit() {
             Votre messagerie <span class="italic">vient de s'ouvrir.</span>
           </h2>
           <p
-            class="mb-6 mt-4 max-w-[460px] font-sans text-[15px] leading-[1.7] text-brun-cacao-2"
+            class="mb-6 mt-4 max-w-[460px] font-sans text-[15px] leading-[1.7] text-cacao-2"
           >
             Nous vous répondons sous 48 heures ouvrées depuis l'adresse
             contact@carre-ivoire.fr.
           </p>
           <button
-            class="border-b border-brun-cacao pb-[2px] font-sans text-[13px] text-brun-cacao"
+            class="border-b border-cacao pb-[2px] font-sans text-[13px] text-cacao"
             @click="resetForm"
           >
             Écrire un autre message →
@@ -206,70 +231,71 @@ function handleSubmit() {
           v-else
           class="flex flex-col gap-10"
           @submit.prevent="handleSubmit"
+          novalidate
         >
           <div>
             <label
               for="contact-subject"
-              class="mb-[10px] block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="mb-[10px] block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
               >Sujet</label
             >
             <input
               id="contact-subject"
               v-model="form.subject"
-              required
               type="text"
               placeholder="Une commande, une question, un projet…"
-              class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] tracking-[0.01em] text-brun-cacao outline-none focus:border-brun-cacao"
-              style="border-color: var(--cacao-a24)"
+              class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] tracking-[0.01em] text-cacao outline-none focus:border-cacao"
+              :style="{ borderColor: errors.subject ? '#9B1C1C' : 'var(--cacao-a24)' }"
             />
+            <p v-if="errors.subject" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.subject }}</p>
           </div>
 
           <div>
             <label
               for="contact-address"
-              class="mb-[10px] block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="mb-[10px] block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
               >Adresse où vous contacter</label
             >
             <input
               id="contact-address"
               v-model="form.address"
-              required
               type="email"
               placeholder="vous@maison.fr"
-              class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] tracking-[0.01em] text-brun-cacao outline-none focus:border-brun-cacao"
-              style="border-color: var(--cacao-a24)"
+              class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] tracking-[0.01em] text-cacao outline-none focus:border-cacao"
+              :style="{ borderColor: errors.address ? '#9B1C1C' : 'var(--cacao-a24)' }"
             />
+            <p v-if="errors.address" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.address }}</p>
           </div>
 
           <div>
             <label
               for="contact-message"
-              class="mb-[10px] block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+              class="mb-[10px] block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
               >Message</label
             >
             <textarea
               id="contact-message"
               v-model="form.message"
-              required
               rows="6"
               placeholder="Dites-nous tout — sans formules inutiles."
-              class="min-h-[160px] w-full resize-y border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] leading-[1.6] tracking-[0.01em] text-brun-cacao outline-none focus:border-brun-cacao"
-              style="border-color: var(--cacao-a24)"
+              class="min-h-[160px] w-full resize-y border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] leading-[1.6] tracking-[0.01em] text-cacao outline-none focus:border-cacao"
+              :style="{ borderColor: errors.message ? '#9B1C1C' : 'var(--cacao-a24)' }"
             />
+            <p v-if="errors.message" class="mt-1 font-sans text-[11px]" style="color: #9B1C1C">{{ errors.message }}</p>
           </div>
 
           <div class="flex flex-wrap items-center gap-6 pt-2">
             <button
               type="submit"
-              class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
+              class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
             >
               Envoyer
             </button>
             <span
-              class="max-w-[320px] font-sans text-[11px] leading-[1.6] tracking-[0.04em] text-brun-cacao-2"
+              class="max-w-[320px] font-sans text-[11px] leading-[1.6] tracking-[0.04em] text-cacao-2"
             >
               En envoyant, vous adressez un message à
-              <span class="text-brun-cacao">contact@carre-ivoire.fr</span>.
+              <span class="text-cacao">contact@carre-ivoire.fr</span>.
             </span>
           </div>
         </form>
@@ -284,7 +310,7 @@ function handleSubmit() {
     >
       <div class="mb-8 flex items-end justify-between">
         <span class="ci-eyebrow">III — Nous trouver</span>
-        <span class="font-sans text-[11px] tracking-[0.22em] text-brun-cacao-2"
+        <span class="font-sans text-[11px] tracking-[0.22em] text-cacao-2"
           >Paris II<sup>e</sup></span
         >
       </div>
@@ -363,21 +389,21 @@ function handleSubmit() {
         </svg>
 
         <div
-          class="absolute bottom-6 right-6 max-w-[240px] border-l-2 border-brun-cacao bg-ivoire px-5 py-4"
+          class="absolute bottom-6 right-6 max-w-[240px] border-l-2 border-cacao bg-ivoire px-5 py-4"
         >
           <div
-            class="mb-1.5 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+            class="mb-1.5 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
           >
             Adresse
           </div>
-          <div class="font-serif text-[16px] leading-[1.3] text-brun-cacao">
+          <div class="font-serif text-[16px] leading-[1.3] text-cacao">
             4 rue du Nil<br /><span class="italic">75002 Paris</span>
           </div>
           <a
             href="https://maps.google.com/?q=4+rue+du+Nil+75002+Paris"
             target="_blank"
             rel="noopener"
-            class="mt-3 inline-block border-b pb-[2px] font-sans text-[11px] tracking-[0.06em] text-brun-cacao"
+            class="mt-3 inline-block border-b pb-[2px] font-sans text-[11px] tracking-[0.06em] text-cacao"
             style="border-color: var(--cacao-a24)"
           >
             Itinéraire →

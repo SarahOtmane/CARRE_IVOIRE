@@ -1,4 +1,4 @@
-import type { CategoryResponse } from './category.types'
+import type { CategorySummary } from './category.types'
 import type { TaxRate } from './tax-rate.types'
 
 export enum StockStatus {
@@ -14,6 +14,7 @@ export interface Product {
   shortDescription?: string
   description?: string
   price: number
+  priceTtc?: number
   discountPrice?: number
   stock: number
   stockStatus: StockStatus
@@ -22,7 +23,7 @@ export interface Product {
   imageUrl?: string
   images?: string[]
   categoryId: number
-  category?: CategoryResponse
+  category?: CategorySummary
   isActive: boolean
   isSeasonal: boolean
   displayOrder: number
@@ -43,6 +44,9 @@ export interface ProductVariant {
   label: string
   weightGrams?: number
   price: number
+  priceTtc?: number
+  taxRateId?: number
+  taxRate?: TaxRate
   stock: number
   stockStatus: StockStatus
   displayOrder: number
@@ -55,6 +59,7 @@ export interface CreateVariantDto {
   label: string
   weightGrams?: number
   price: number
+  taxRateId: number
   stock?: number
   stockStatus?: 'in_stock' | 'out_of_stock'
   displayOrder?: number
@@ -75,7 +80,7 @@ export interface CreateProductDto {
   categoryId: number
   stock?: number
   stockStatus?: 'in_stock' | 'out_of_stock'
-  taxRateId?: number | null
+  taxRateId: number
   isActive?: boolean
   isSeasonal?: boolean
   displayOrder?: number
@@ -85,29 +90,3 @@ export interface CreateProductDto {
 }
 
 export type UpdateProductDto = Partial<CreateProductDto>
-
-/**
- * Format option for product detail sheet
- * Represents different available formats (size/variant) of a product
- */
-export interface FormatOption {
-  id: string
-  label: string
-  detail: string
-  extraPrice: number
-}
-
-/**
- * Product detail sheet — metadata for rendering product detail page
- * Contains narrative content, composition, tasting notes, and format variants
- */
-export interface ProductSheet {
-  eyebrow: string
-  intro: string
-  storyTitle: string
-  story: string
-  composition: string[]
-  tasting: string
-  conservation: string
-  formats: FormatOption[]
-}

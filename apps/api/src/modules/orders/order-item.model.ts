@@ -45,7 +45,7 @@ export class OrderItem extends Model<OrderItem> {
   declare variant: ProductVariant | null
 
   @AllowNull(false)
-  @Column(DataType.INTEGER)
+  @Column(DataType.INTEGER.UNSIGNED)
   declare quantity: number
 
   @AllowNull(false)
@@ -59,4 +59,12 @@ export class OrderItem extends Model<OrderItem> {
   @AllowNull(false)
   @Column({ type: DataType.STRING(255), field: 'product_name' })
   declare productName: string
+
+  @AllowNull(true)
+  @Column({ type: DataType.STRING(100), field: 'tax_rate_label' })
+  declare taxRateLabel: string | null
+
+  @AllowNull(true)
+  @Column({ type: DataType.DECIMAL(5, 2), field: 'tax_rate_percent' })
+  declare taxRatePercent: number | null
 }

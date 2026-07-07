@@ -9,6 +9,13 @@ export const useCartStore = defineStore(
 
     const count = computed(() => items.value.reduce((acc, i) => acc + i.quantity, 0))
     const total = computed(() => items.value.reduce((acc, i) => acc + i.price * i.quantity, 0))
+    const totalVat = computed(() =>
+      items.value.reduce((acc, i) => {
+        if (i.taxRatePercent === undefined) return acc
+        const priceHt = i.price / (1 + i.taxRatePercent / 100)
+        return acc + (i.price - priceHt) * i.quantity
+      }, 0),
+    )
     const isEmpty = computed(() => items.value.length === 0)
 
     function addItem(item: CartItem) {
@@ -37,7 +44,7 @@ export const useCartStore = defineStore(
       items.value = []
     }
 
-    return { items, count, total, isEmpty, addItem, updateQuantity, removeItem, clearCart }
+    return { items, count, total, totalVat, isEmpty, addItem, updateQuantity, removeItem, clearCart }
   },
   { persist: true },
 )

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { useAuthStore } from "@/stores/auth.store";
+import { computed, onMounted, ref } from "vue";
+import { useAuthStore } from "@carre-ivoire/stores";
+import { useApi, usePublicSettings } from "@carre-ivoire/composables";
 
 type ShippingPayload = {
   firstName: string;
@@ -21,19 +22,35 @@ const emit = defineEmits<{
 }>();
 
 const authStore = useAuthStore();
+const api = useApi();
+const { shippingFlatEuros } = usePublicSettings();
 
-const deliveryOptions = [
+onMounted(async () => {
+  try {
+    const res = await api.get<{ data: { phone?: string; addressStreet?: string; addressZip?: string; addressCity?: string; addressCountry?: string } }>('/users/me')
+    const u = res.data.data
+    if (u.phone) form.value.phone = u.phone
+    if (u.addressStreet) form.value.address = u.addressStreet
+    if (u.addressZip) form.value.postalCode = u.addressZip
+    if (u.addressCity) form.value.city = u.addressCity
+    if (u.addressCountry) form.value.country = u.addressCountry
+  } catch {
+    // silencieux — les champs restent vides si l'appel échoue
+  }
+})
+
+const deliveryOptions = computed(() => [
   {
     id: "courier",
     name: "Coursier Paris",
     detail: "24h — Paris intra-muros",
-    price: 8,
+    price: shippingFlatEuros(),
   },
   {
     id: "chrono",
     name: "ChronoFresh",
     detail: "24–48h — France métropolitaine",
-    price: 14,
+    price: shippingFlatEuros() + 6,
   },
   {
     id: "pickup",
@@ -41,27 +58,51 @@ const deliveryOptions = [
     detail: "4 rue du Nil, Paris 2",
     price: 0,
   },
-] as const;
+]);
 
 const form = ref({
   firstName: authStore.user?.firstName ?? "",
   lastName: authStore.user?.lastName ?? "",
   email: authStore.user?.email ?? "",
   phone: "",
-  address: "4 rue du Nil",
-  postalCode: "75002",
-  city: "Paris",
+  address: "",
+  postalCode: "",
+  city: "",
   country: "France",
   deliveryId: "courier",
 });
 
+const errors = ref<Record<string, string>>({});
+
 const selectedDelivery = computed(
   () =>
-    deliveryOptions.find((option) => option.id === form.value.deliveryId) ??
-    deliveryOptions[0],
+    deliveryOptions.value.find((option) => option.id === form.value.deliveryId) ??
+    deliveryOptions.value[0],
 );
 
+function validate(): boolean {
+  errors.value = {};
+
+  if (!form.value.firstName.trim())
+    errors.value.firstName = "Prénom requis";
+  if (!form.value.lastName.trim())
+    errors.value.lastName = "Nom requis";
+  if (!form.value.email.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(form.value.email))
+    errors.value.email = "Email invalide";
+  if (!form.value.address.trim())
+    errors.value.address = "Adresse requise";
+  if (!form.value.postalCode.trim() || !/^\d{4,10}$/.test(form.value.postalCode.trim()))
+    errors.value.postalCode = "Code postal invalide";
+  if (!form.value.city.trim())
+    errors.value.city = "Ville requise";
+  if (form.value.phone.trim() && !/^\+?[\d\s.\-()]{7,20}$/.test(form.value.phone.trim()))
+    errors.value.phone = "Numéro de téléphone invalide";
+
+  return Object.keys(errors.value).length === 0;
+}
+
 function submit() {
+  if (!validate()) return;
   emit("submit", {
     ...form.value,
     deliveryLabel: selectedDelivery.value.name,
@@ -71,12 +112,12 @@ function submit() {
 </script>
 
 <template>
-  <form class="space-y-10" @submit.prevent="submit">
+  <form class="space-y-10" novalidate @submit.prevent="submit">
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
       <div>
         <label
           for="checkout-first-name"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           Prénom
         </label>
@@ -85,14 +126,17 @@ function submit() {
           v-model="form.firstName"
           type="text"
           autocomplete="given-name"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
+          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-cacao outline-none"
+          :style="{ borderColor: errors.firstName ? '#9B1C1C' : 'var(--cacao-a24)' }"
         />
+        <p v-if="errors.firstName" class="mt-1 font-sans text-[11px] text-red-800">
+          {{ errors.firstName }}
+        </p>
       </div>
       <div>
         <label
           for="checkout-last-name"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           Nom
         </label>
@@ -101,14 +145,17 @@ function submit() {
           v-model="form.lastName"
           type="text"
           autocomplete="family-name"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
+          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-cacao outline-none"
+          :style="{ borderColor: errors.lastName ? '#9B1C1C' : 'var(--cacao-a24)' }"
         />
+        <p v-if="errors.lastName" class="mt-1 font-sans text-[11px] text-red-800">
+          {{ errors.lastName }}
+        </p>
       </div>
       <div>
         <label
           for="checkout-email"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           Email
         </label>
@@ -117,30 +164,36 @@ function submit() {
           v-model="form.email"
           type="email"
           autocomplete="email"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
+          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-cacao outline-none"
+          :style="{ borderColor: errors.email ? '#9B1C1C' : 'var(--cacao-a24)' }"
         />
+        <p v-if="errors.email" class="mt-1 font-sans text-[11px] text-red-800">
+          {{ errors.email }}
+        </p>
       </div>
       <div>
         <label
           for="checkout-phone"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
-          Téléphone
+          Téléphone <span class="text-cacao-3">(facultatif)</span>
         </label>
         <input
           id="checkout-phone"
           v-model="form.phone"
           type="tel"
           autocomplete="tel"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
+          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-cacao outline-none"
+          :style="{ borderColor: errors.phone ? '#9B1C1C' : 'var(--cacao-a24)' }"
         />
+        <p v-if="errors.phone" class="mt-1 font-sans text-[11px] text-red-800">
+          {{ errors.phone }}
+        </p>
       </div>
       <div class="sm:col-span-2">
         <label
           for="checkout-address"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           Adresse
         </label>
@@ -149,14 +202,17 @@ function submit() {
           v-model="form.address"
           type="text"
           autocomplete="address-line1"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
+          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-cacao outline-none"
+          :style="{ borderColor: errors.address ? '#9B1C1C' : 'var(--cacao-a24)' }"
         />
+        <p v-if="errors.address" class="mt-1 font-sans text-[11px] text-red-800">
+          {{ errors.address }}
+        </p>
       </div>
       <div>
         <label
           for="checkout-postal-code"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           Code postal
         </label>
@@ -165,14 +221,17 @@ function submit() {
           v-model="form.postalCode"
           type="text"
           autocomplete="postal-code"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
+          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-cacao outline-none"
+          :style="{ borderColor: errors.postalCode ? '#9B1C1C' : 'var(--cacao-a24)' }"
         />
+        <p v-if="errors.postalCode" class="mt-1 font-sans text-[11px] text-red-800">
+          {{ errors.postalCode }}
+        </p>
       </div>
       <div>
         <label
           for="checkout-city"
-          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-2"
+          class="mb-1.5 block font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
         >
           Ville
         </label>
@@ -181,15 +240,18 @@ function submit() {
           v-model="form.city"
           type="text"
           autocomplete="address-level2"
-          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-brun-cacao outline-none"
-          style="border-color: var(--cacao-a24)"
+          class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] text-cacao outline-none"
+          :style="{ borderColor: errors.city ? '#9B1C1C' : 'var(--cacao-a24)' }"
         />
+        <p v-if="errors.city" class="mt-1 font-sans text-[11px] text-red-800">
+          {{ errors.city }}
+        </p>
       </div>
     </div>
 
     <div>
       <div
-        class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+        class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
       >
         Mode de livraison
       </div>
@@ -215,21 +277,20 @@ function submit() {
           class="sr-only"
         />
         <span
-          class="flex h-4 w-4 items-center justify-center border border-brun-cacao"
+          class="flex h-4 w-4 items-center justify-center border border-cacao"
         >
           <span
             v-if="form.deliveryId === option.id"
-            class="h-2 w-2 bg-brun-cacao"
+            class="h-2 w-2 bg-cacao"
           />
         </span>
         <span class="flex-1">
-          <span
-            class="block font-serif text-[18px] font-medium text-brun-cacao"
-            >{{ option.name }}</span
-          >
-          <span class="mt-1 block font-sans text-[12px] text-brun-cacao-2">{{
-            option.detail
-          }}</span>
+          <span class="block font-serif text-[18px] font-medium text-cacao">
+            {{ option.name }}
+          </span>
+          <span class="mt-1 block font-sans text-[12px] text-cacao-2">
+            {{ option.detail }}
+          </span>
         </span>
         <span
           class="font-sans text-[13px] text-dore"
@@ -247,12 +308,12 @@ function submit() {
     <div class="flex flex-wrap items-center gap-4">
       <button
         type="submit"
-        class="border border-brun-cacao bg-brun-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
+        class="border border-cacao bg-cacao px-7 py-4 font-sans text-[13px] tracking-[0.08em] text-ivoire transition-all duration-180 active:translate-y-px"
       >
         Continuer vers le paiement
       </button>
       <p
-        class="max-w-[360px] font-sans text-[11px] leading-[1.6] tracking-[0.04em] text-brun-cacao-2"
+        class="max-w-[360px] font-sans text-[11px] leading-[1.6] tracking-[0.04em] text-cacao-2"
       >
         Vos informations servent uniquement à préparer la livraison et le reçu.
       </p>

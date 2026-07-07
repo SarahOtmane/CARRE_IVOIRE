@@ -19,6 +19,6 @@ export const stripeConfig = (): StripeConfig => {
     return {
         secretKey,
         webhookSecret,
-        apiVersion: '2023-10-16',
+        apiVersion: '2024-04-10',
     }
 }

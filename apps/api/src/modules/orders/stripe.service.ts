@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { ErrorCodes } from '@/common/constants'
 import throwApiError from '@/common/errors/throw-api-error'
 import { ConfigService } from '@nestjs/config'
@@ -12,11 +12,11 @@ export class StripeService {
   constructor(private readonly configService: ConfigService) {
     const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY')
     if (!secretKey) {
-      throw new Error('STRIPE_SECRET_KEY environment variable is not set')
+      throw new InternalServerErrorException('STRIPE_SECRET_KEY environment variable is not set')
     }
 
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2023-10-16',
+      apiVersion: '2025-02-24.acacia',
     })
 
     this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET') ?? ''

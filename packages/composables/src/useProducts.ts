@@ -4,7 +4,9 @@ import { useApi } from './useApi'
 import { useLoading } from './useLoading'
 
 interface ProductQuery {
+  search?: string
   categoryId?: number
+  sort?: 'price_asc' | 'price_desc' | 'newest' | 'display_order'
   page?: number
   limit?: number
 }
@@ -25,6 +27,8 @@ export function useProducts(initialQuery: ProductQuery = {}) {
     withLoading(async () => {
       const params = new URLSearchParams()
       if (query.categoryId) params.set('categoryId', String(query.categoryId))
+      if (query.search) params.set('search', query.search)
+      if (query.sort) params.set('sort', query.sort)
       if (query.page) params.set('page', String(query.page))
       if (query.limit) params.set('limit', String(query.limit))
 

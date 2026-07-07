@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -8,6 +9,7 @@ import {
   ValidateNested,
   ArrayMinSize,
 } from 'class-validator'
+
 import { Type } from 'class-transformer'
 
 class OrderItemDto {
@@ -63,4 +65,8 @@ export class CreateOrderDto {
   @ValidateNested()
   @Type(() => ShippingAddressDto)
   shippingAddress: ShippingAddressDto
+
+  @IsOptional()
+  @IsIn(['pickup', 'delivery'])
+  deliveryType?: 'pickup' | 'delivery'
 }

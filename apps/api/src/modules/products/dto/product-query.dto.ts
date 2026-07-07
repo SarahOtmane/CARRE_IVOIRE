@@ -1,4 +1,4 @@
-import { IsOptional, IsInt, Min, Max, IsBoolean, IsString, MaxLength } from 'class-validator'
+import { IsOptional, IsInt, Min, Max, IsBoolean, IsString, MaxLength, IsIn } from 'class-validator'
 import { Type, Transform } from 'class-transformer'
 
 export class ProductQueryDto {
@@ -35,4 +35,9 @@ export class ProductQueryDto {
   @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
   isSeasonal?: boolean
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['price_asc', 'price_desc', 'newest', 'display_order'])
+  sort?: 'price_asc' | 'price_desc' | 'newest' | 'display_order'
 }

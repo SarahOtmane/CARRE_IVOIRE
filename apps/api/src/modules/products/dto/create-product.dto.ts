@@ -57,10 +57,9 @@ export class CreateProductDto {
   @IsIn(['in_stock', 'out_of_stock'])
   stockStatus?: 'in_stock' | 'out_of_stock'
 
-  @IsOptional()
   @IsInt()
   @Min(1)
-  taxRateId?: number
+  taxRateId: number
 
   @IsOptional()
   @IsBoolean()

@@ -15,6 +15,7 @@ import {
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  indexes: [{ name: 'idx_users_reset_token', fields: ['reset_token'] }],
 })
 export class User extends Model<User> {
   @PrimaryKey
@@ -22,7 +23,7 @@ export class User extends Model<User> {
   @Column(DataType.INTEGER.UNSIGNED)
   declare id: number
 
-  @Unique
+  @Unique('email')
   @AllowNull(false)
   @Column(DataType.STRING(255))
   declare email: string
@@ -66,7 +67,7 @@ export class User extends Model<User> {
   declare role: 'client' | 'admin'
 
   // Format: CI-YYYYMMDD-XXXX — généré à la création, jamais modifiable
-  @Unique
+  @Unique('customer_number')
   @AllowNull(false)
   @Column(DataType.STRING(20))
   declare customer_number: string

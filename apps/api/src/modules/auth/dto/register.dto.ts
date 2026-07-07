@@ -1,7 +1,7 @@
 import {
   IsEmail,
   IsString,
-  MinLength,
+  Matches,
   MaxLength,
   IsOptional,
 } from 'class-validator'
@@ -11,8 +11,10 @@ export class RegisterDto {
   email: string
 
   @IsString()
-  @MinLength(8)
   @MaxLength(100)
+  @Matches(/^(?=.*[A-Z])(?=.*[0-9]).{8,}$/, {
+    message: 'Le mot de passe doit contenir au moins 8 caractères, une majuscule et un chiffre.',
+  })
   password: string
 
   @IsString()

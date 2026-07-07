@@ -65,7 +65,7 @@ describe('FavoritesService', () => {
       favoritesRepo.findOne.mockResolvedValue(null)
       favoritesRepo.create.mockResolvedValue(mockFavorite as any)
       const result = await service.add(1, 1)
-      expect(result).toEqual({ id: 1, productId: 1, addedAt: mockFavorite.created_at })
+      expect(result).toEqual({ id: 1, product: { id: 1 }, addedAt: mockFavorite.created_at })
     })
   })
 

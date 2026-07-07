@@ -1,5 +1,3 @@
-import type { Product } from './product.types'
-
 export enum OrderStatus {
   PENDING = 'pending',
   PAYMENT_PENDING = 'payment_pending',
@@ -21,22 +19,29 @@ export interface ShippingAddress {
   country: string
 }
 
+// Reflète OrderItemResponseDto côté API — pas de orderId/product imbriqué (jamais renvoyés)
 export interface OrderItem {
   id: number
-  orderId: number
   productId: number
+  productName?: string
   variantId?: number
-  product?: Product
   quantity: number
   unitPrice: number
   format?: string
+  taxRateLabel?: string
+  taxRatePercent?: number
+  unitPriceHt?: number
+  vatAmount?: number
 }
 
 export interface Order {
   id: number
+  orderNumber: string
   userId: number
   status: OrderStatus
   totalAmount: number
+  totalHt?: number
+  totalVat?: number
   stripePaymentIntentId?: string
   shippingAddress?: ShippingAddress
   items: OrderItem[]
@@ -54,6 +59,9 @@ export interface CartItem {
   price: number
   quantity: number
   format?: string
+  taxRateId?: number
+  taxRateLabel?: string
+  taxRatePercent?: number
 }
 
 export interface CreateOrderDto {
@@ -64,4 +72,5 @@ export interface CreateOrderDto {
     format?: string
   }>
   shippingAddress: ShippingAddress
+  deliveryType?: 'pickup' | 'delivery'
 }

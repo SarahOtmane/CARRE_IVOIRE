@@ -40,16 +40,19 @@ export class ProductsRepository {
       include: [
         { model: Category, attributes: ['id', 'name', 'slug'] },
         { model: TaxRate, attributes: ['id', 'label', 'rate', 'is_default'] },
-        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']], include: [TaxRate] },
       ],
       limit,
       offset: (page - 1) * limit,
       order: search
         ? [[Sequelize.literal('relevance'), 'DESC']]
-        : [
-            ['displayOrder', 'ASC'],
-            ['created_at', 'DESC'],
-          ],
+        : query.sort === 'price_asc'
+          ? [['price', 'ASC'], ['displayOrder', 'ASC']]
+          : query.sort === 'price_desc'
+            ? [['price', 'DESC'], ['displayOrder', 'ASC']]
+            : query.sort === 'newest'
+              ? [['created_at', 'DESC']]
+              : [['displayOrder', 'ASC'], ['created_at', 'DESC']],
       replacements: search ? { search } : undefined,
       distinct: true,
     })
@@ -61,7 +64,7 @@ export class ProductsRepository {
       include: [
         Category,
         TaxRate,
-        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']], include: [TaxRate] },
       ],
     })
   }
@@ -71,7 +74,7 @@ export class ProductsRepository {
       include: [
         Category,
         TaxRate,
-        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']] },
+        { model: ProductVariant, where: { isActive: 1 }, required: false, separate: true, order: [['displayOrder', 'ASC']], include: [TaxRate] },
       ],
     })
   }
@@ -80,7 +83,7 @@ export class ProductsRepository {
     if (ids.length === 0) return []
     return this.db.findAll({
       where: { id: ids },
-      raw: true,
+      include: [TaxRate],
       transaction: t,
     })
   }
@@ -98,7 +101,7 @@ export class ProductsRepository {
       categoryId: dto.categoryId,
       stock: dto.stock ?? 0,
       stockStatus: dto.stockStatus ?? 'in_stock',
-      taxRateId: dto.taxRateId ?? null,
+      taxRateId: dto.taxRateId,
       isActive: dto.isActive !== false ? 1 : 0,
       isSeasonal: dto.isSeasonal ? 1 : 0,
       displayOrder: dto.displayOrder ?? 0,
@@ -128,7 +131,7 @@ export class ProductsRepository {
     if (dto.categoryId !== undefined) data.categoryId = dto.categoryId
     if (dto.stock !== undefined) data.stock = dto.stock
     if (dto.stockStatus !== undefined) data.stockStatus = dto.stockStatus
-    if (dto.taxRateId !== undefined) data.taxRateId = dto.taxRateId ?? null
+    if (dto.taxRateId !== undefined) data.taxRateId = dto.taxRateId
     if (dto.isActive !== undefined) data.isActive = dto.isActive ? 1 : 0
     if (dto.isSeasonal !== undefined) data.isSeasonal = dto.isSeasonal ? 1 : 0
     if (dto.displayOrder !== undefined) data.displayOrder = dto.displayOrder
@@ -144,11 +147,35 @@ export class ProductsRepository {
   }
 
   async incrementStock(productId: number, quantity: number, t?: Transaction): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal Literal type incompatible with model field type
+    const safeQty = Math.floor(Math.abs(quantity))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal incompatible with model field type
     await this.db.update(
-      { stock: Sequelize.literal(`stock + ${Math.floor(Math.abs(quantity))}`) } as any,
+      {
+        stock: Sequelize.literal(`stock + ${safeQty}`),
+        stockStatus: Sequelize.literal(`CASE WHEN stock + ${safeQty} <= 0 THEN 'out_of_stock' WHEN stock + ${safeQty} <= 5 THEN 'low_stock' ELSE 'in_stock' END`),
+      } as any,
       { where: { id: productId }, transaction: t },
     )
+  }
+
+  async decrementStock(productId: number, quantity: number, t?: Transaction): Promise<number> {
+    const safeQuantity = Math.floor(Math.abs(quantity))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Sequelize.literal incompatible with model field type
+    const [rowsAffected] = await this.db.update(
+      {
+        stock: Sequelize.literal(`stock - ${safeQuantity}`),
+        stockStatus: Sequelize.literal(`CASE WHEN stock - ${safeQuantity} <= 0 THEN 'out_of_stock' WHEN stock - ${safeQuantity} <= 5 THEN 'low_stock' ELSE 'in_stock' END`),
+      } as any,
+      {
+        where: {
+          id: productId,
+          stock: { [Op.gte]: quantity },
+          isActive: 1,
+        },
+        transaction: t,
+      },
+    )
+    return rowsAffected
   }
 
   async delete(id: number): Promise<void> {

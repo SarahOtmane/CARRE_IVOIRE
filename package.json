@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "packageManager": "npm@10.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -15,5 +18,8 @@
     "dev:api": "npm --prefix apps/api run start:dev",
     "dev:front": "npm --prefix apps/front-office run dev"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "overrides": {
+    "rxjs": "^7.8.2"
+  }
 }

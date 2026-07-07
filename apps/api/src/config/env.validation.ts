@@ -11,12 +11,16 @@ export const envValidationSchema = Joi.object({
   DB_PASSWORD: Joi.string().required(),
 
   JWT_SECRET: Joi.string().min(16).required(),
-  JWT_EXPIRATION: Joi.string().default('24h'),
+  JWT_EXPIRATION: Joi.string().default('1h'),
   REFRESH_TOKEN_SECRET: Joi.string().min(16).required(),
   REFRESH_TOKEN_EXPIRATION: Joi.string().default('7d'),
 
   STRIPE_SECRET_KEY: Joi.string().pattern(/^sk_/).required(),
-  STRIPE_WEBHOOK_SECRET: Joi.string().optional().allow(''),
+  STRIPE_WEBHOOK_SECRET: Joi.string().when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().required(),
+    otherwise: Joi.string().optional().allow(''),
+  }),
 
   MAIL_HOST: Joi.string().optional().allow(''),
   MAIL_PORT: Joi.number().optional(),
@@ -24,7 +28,13 @@ export const envValidationSchema = Joi.object({
   MAIL_PASS: Joi.string().optional().allow(''),
   MAIL_FROM: Joi.string().optional().allow(''),
 
+  APP_URL: Joi.string().optional().allow(''),
   FRONTEND_URL: Joi.string().optional().allow(''),
+  CORS_ORIGIN: Joi.string().when('NODE_ENV', {
+    is: 'production',
+    then: Joi.string().required(),
+    otherwise: Joi.string().optional().allow(''),
+  }),
   ADMIN_EMAIL: Joi.string().email().optional(),
   ADMIN_PASSWORD: Joi.string().optional().allow(''),
 })

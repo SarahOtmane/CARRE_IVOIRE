@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --workspaces --if-present
+
+      - name: Type check
+        run: npm run type-check --workspaces --if-present
+
+      - name: Unit tests — API
+        run: npm run test --workspace=apps/api
+
+      - name: Unit tests — stores
+        run: npm run test --workspace=packages/stores
+
+      - name: Unit tests — composables
+        run: npm run test --workspace=packages/composables
+
+      - name: Unit tests — front-office
+        run: npm run test --workspace=apps/front-office
+
+      - name: Build — API
+        run: npm run build --workspace=apps/api
+
+      - name: Build — front-office
+        run: npm run build --workspace=apps/front-office

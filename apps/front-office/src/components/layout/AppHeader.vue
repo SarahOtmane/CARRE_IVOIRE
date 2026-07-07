@@ -1,18 +1,31 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { useCartStore } from "@/stores/cart.store";
-import { useProductSearch } from "@carre-ivoire/composables";
+import { useCartStore } from "@carre-ivoire/stores";
+import {
+  useProductSearch,
+  useCategories,
+  usePublicSettings,
+} from "@carre-ivoire/composables";
+import { Logo } from "@carre-ivoire/ui";
 
 const router = useRouter();
 const route = useRoute();
 const cartStore = useCartStore();
-const { results: searchResults, isSearching, search: runSearch } = useProductSearch();
+const {
+  results: searchResults,
+  isSearching,
+  search: runSearch,
+} = useProductSearch();
+const { categories: megaCategories } = useCategories();
+const { settings: publicSettings } = usePublicSettings();
 
+const alwaysActive = true; // mettre false pour réactiver le comportement au scroll uniquement
 const scrolled = ref(false);
 const hovered = ref(false);
 const boutiqueOpen = ref(false);
 const searchOpen = ref(false);
+const mobileMenuOpen = ref(false);
 const query = ref("");
 const inputRef = ref<HTMLInputElement | null>(null);
 
@@ -39,33 +52,39 @@ onUnmounted(() => {
 watch(searchOpen, (val) => {
   if (val) {
     boutiqueOpen.value = false;
+    mobileMenuOpen.value = false;
     nextTick(() => inputRef.value?.focus());
   }
 });
 
+function toggleMobileMenu() {
+  mobileMenuOpen.value = !mobileMenuOpen.value;
+  if (mobileMenuOpen.value) searchOpen.value = false;
+}
+
+function navigateMobile(path: string) {
+  mobileMenuOpen.value = false;
+  router.push(path);
+}
+
 const isActive = computed(
-  () => scrolled.value || hovered.value || searchOpen.value,
+  () =>
+    alwaysActive ||
+    scrolled.value ||
+    hovered.value ||
+    searchOpen.value ||
+    mobileMenuOpen.value,
 );
 
 const navItems = [
-  { id: "boutique", label: "boutique", path: "/boutique", hasMega: true },
-  { id: "histoire", label: "notre histoire", path: "/histoire" },
-  { id: "engagements", label: "nos engagements", path: "/engagements" },
-  { id: "evenements", label: "nos événements", path: "/evenements" },
-  { id: "contact", label: "nous contacter", path: "/contact" },
+  { id: "boutique", label: "Boutique", path: "/boutique", hasMega: true },
+  { id: "histoire", label: "Notre histoire", path: "/histoire" },
+  { id: "engagements", label: "Nos engagements", path: "/engagements" },
+  { id: "evenements", label: "Nos événements", path: "/evenements" },
+  { id: "contact", label: "Nous contacter", path: "/contact" },
 ];
 
-const boutiqueCats = [
-  { label: "Carrés Signature", slug: "carres-signature" },
-  { label: "Mini Carrés", slug: "mini-carres" },
-  { label: "Tablettes", slug: "tablettes" },
-  { label: "Gourmandises", slug: "gourmandises" },
-  { label: "Sablés", slug: "sables" },
-  { label: "Mendiants", slug: "mendiants" },
-  { label: "Oursons", slug: "oursons" },
-  { label: "Chocobombs", slug: "chocobombs" },
-  { label: "Pâtes à tartiner", slug: "pates-a-tartiner" },
-];
+const boutiqueCats = megaCategories;
 
 const suggestions = [
   "Carrés Signature",
@@ -125,31 +144,22 @@ function toggleSearch() {
     @mouseleave="onHeaderLeave"
   >
     <!-- Barre principale -->
-    <div class="flex h-[72px] items-center justify-between px-5 lg:px-[104px]">
+    <div class="flex h-[80px] items-center justify-between px-5 lg:px-[104px]">
       <!-- Logo -->
-      <RouterLink to="/" class="flex items-center gap-3.5">
-        <div
-          class="flex h-8 w-8 shrink-0 items-center justify-center border border-brun-cacao font-serif text-[15px] font-medium text-brun-cacao"
-        >
-          CI
-        </div>
-        <span
-          class="hidden font-serif text-[13px] font-medium tracking-[0.22em] text-brun-cacao lg:block"
-        >
-          CARRÉ IVOIRE
-        </span>
+      <RouterLink to="/" class="flex items-center gap-3.5 w-[90px] h-[60px]">
+        <Logo :logo-url="publicSettings?.logoUrl" />
       </RouterLink>
 
       <!-- Navigation desktop -->
-      <nav class="hidden items-center gap-7 lg:flex">
+      <nav class="hidden items-center gap-7 lg:flex mt-[3px]">
         <a
           v-for="item in navItems"
           :key="item.id"
-          class="cursor-pointer border-b pb-0.5 font-sans text-[12px] tracking-[0.06em] text-brun-cacao transition-[border-color] duration-[240ms]"
+          class="cursor-pointer border-b pb-0.5 font-sans text-[14px] tracking-[0.06em] text-cacao transition-[border-color] duration-[240ms]"
           :class="
             (route.path.startsWith(item.path) && item.path !== '/') ||
             (item.hasMega && boutiqueOpen)
-              ? 'border-brun-cacao'
+              ? 'border-cacao'
               : 'border-transparent'
           "
           @mouseenter="onNavEnter(item)"
@@ -159,7 +169,7 @@ function toggleSearch() {
       </nav>
 
       <!-- Icônes -->
-      <div class="flex items-center gap-5 text-brun-cacao">
+      <div class="flex items-center gap-5 text-cacao">
         <!-- Recherche — toggle -->
         <button
           class="flex cursor-pointer items-center transition-opacity duration-180 hover:opacity-60"
@@ -241,14 +251,21 @@ function toggleSearch() {
           </svg>
           <span
             v-if="cartStore.count > 0"
-            class="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-brun-cacao font-sans text-[10px] text-ivoire"
+            class="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-cacao font-sans text-[10px] text-ivoire"
             >{{ cartStore.count }}</span
           >
         </RouterLink>
 
         <!-- Burger mobile -->
-        <button class="flex items-center lg:hidden" aria-label="Menu">
+        <button
+          class="flex items-center lg:hidden"
+          :aria-label="mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'"
+          :aria-expanded="mobileMenuOpen"
+          aria-controls="mobile-nav-panel"
+          @click="toggleMobileMenu"
+        >
           <svg
+            v-if="!mobileMenuOpen"
             width="18"
             height="18"
             fill="none"
@@ -261,8 +278,45 @@ function toggleSearch() {
             <line x1="1" y1="9" x2="17" y2="9" />
             <line x1="1" y1="14" x2="17" y2="14" />
           </svg>
+          <svg
+            v-else
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.25"
+            stroke-linecap="square"
+            stroke-linejoin="miter"
+            viewBox="0 0 18 18"
+          >
+            <line x1="3" y1="3" x2="15" y2="15" />
+            <line x1="15" y1="3" x2="3" y2="15" />
+          </svg>
         </button>
       </div>
+    </div>
+
+    <!-- Panneau de navigation mobile -->
+    <div
+      id="mobile-nav-panel"
+      class="overflow-hidden transition-[max-height,opacity] duration-400 ease-ui lg:hidden"
+      :class="mobileMenuOpen ? 'opacity-100' : 'opacity-0'"
+      :style="{ maxHeight: mobileMenuOpen ? '80vh' : '0' }"
+    >
+      <nav
+        class="flex flex-col gap-1 px-5 py-6"
+        style="border-top: 1px solid var(--cacao-a12)"
+      >
+        <button
+          v-for="item in navItems"
+          :key="item.id"
+          type="button"
+          class="cursor-pointer py-3 text-left font-sans text-[14px] tracking-[0.06em] text-cacao transition-opacity duration-180 hover:opacity-60"
+          @click="navigateMobile(item.path)"
+        >
+          {{ item.label }}
+        </button>
+      </nav>
     </div>
 
     <!-- Mega menu boutique -->
@@ -279,16 +333,16 @@ function toggleSearch() {
         <!-- Liste des catégories -->
         <div class="grid grid-cols-3 gap-x-8 gap-y-3.5">
           <div
-            class="col-span-3 mb-2 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+            class="col-span-3 mb-2 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
           >
             Catégories
           </div>
           <a
             v-for="cat in boutiqueCats"
             :key="cat.slug"
-            class="group cursor-pointer font-serif text-xl text-brun-cacao transition-all duration-200 hover:italic"
+            class="cursor-pointer font-serif text-xl text-cacao transition-opacity duration-180 hover:opacity-60"
             @click="navigate('/boutique/' + cat.slug)"
-            >{{ cat.label }}</a
+            >{{ cat.name }}</a
           >
         </div>
 
@@ -301,10 +355,10 @@ function toggleSearch() {
           >
             <span class="ci-label">À la une</span>
             <div>
-              <div class="font-serif text-[22px] leading-[1.1] text-brun-cacao">
+              <div class="font-serif text-[22px] leading-[1.1] text-cacao">
                 Coffret<br /><em>Signature</em>
               </div>
-              <div class="mt-1.5 font-sans text-[11px] text-brun-cacao-3">
+              <div class="mt-1.5 font-sans text-[11px] text-cacao-3">
                 16 carrés — 42 €
               </div>
             </div>
@@ -316,10 +370,10 @@ function toggleSearch() {
           >
             <span class="ci-label">Saison</span>
             <div>
-              <div class="font-serif text-[22px] leading-[1.1] text-brun-cacao">
+              <div class="font-serif text-[22px] leading-[1.1] text-cacao">
                 Chocobombs<br /><em>printemps</em>
               </div>
-              <div class="mt-1.5 font-sans text-[11px] text-brun-cacao-3">
+              <div class="mt-1.5 font-sans text-[11px] text-cacao-3">
                 Édition limitée
               </div>
             </div>
@@ -362,7 +416,7 @@ function toggleSearch() {
             stroke-linecap="square"
             stroke-linejoin="miter"
             viewBox="0 0 18 18"
-            class="shrink-0 text-brun-cacao-3"
+            class="shrink-0 text-cacao-3"
           >
             <circle cx="7.5" cy="7.5" r="5" />
             <line x1="11.2" y1="11.2" x2="16.5" y2="16.5" />
@@ -374,7 +428,7 @@ function toggleSearch() {
             v-model="query"
             type="search"
             placeholder="Chercher un carré, une origine, une famille…"
-            class="flex-1 bg-transparent font-serif text-brun-cacao outline-none placeholder:text-brun-cacao-3"
+            class="flex-1 bg-transparent font-serif text-cacao outline-none placeholder:text-cacao-3"
             style="
               font-size: clamp(20px, 3vw, 36px);
               letter-spacing: -0.005em;
@@ -385,7 +439,7 @@ function toggleSearch() {
           <!-- Effacer -->
           <button
             v-if="hasQuery"
-            class="shrink-0 cursor-pointer font-sans text-[11px] uppercase tracking-[0.14em] text-brun-cacao-3 transition-opacity duration-180 hover:opacity-60"
+            class="shrink-0 cursor-pointer font-sans text-[11px] uppercase tracking-[0.14em] text-cacao-3 transition-opacity duration-180 hover:opacity-60"
             @click="query = ''"
           >
             Effacer
@@ -393,7 +447,7 @@ function toggleSearch() {
 
           <!-- Hint ESC -->
           <span
-            class="hidden shrink-0 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3 lg:inline"
+            class="hidden shrink-0 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3 lg:inline"
           >
             ESC pour fermer
           </span>
@@ -407,7 +461,7 @@ function toggleSearch() {
           <!-- Suggestions -->
           <div>
             <div
-              class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+              class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
             >
               Suggestions
             </div>
@@ -415,7 +469,7 @@ function toggleSearch() {
               <button
                 v-for="s in suggestions"
                 :key="s"
-                class="cursor-pointer text-left font-serif text-[18px] italic text-brun-cacao transition-opacity duration-180 hover:opacity-60"
+                class="cursor-pointer text-left font-serif text-[18px] italic text-cacao transition-opacity duration-180 hover:opacity-60"
                 @click="query = s"
               >
                 {{ s }}
@@ -426,7 +480,7 @@ function toggleSearch() {
           <!-- Familles -->
           <div>
             <div
-              class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+              class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
             >
               Familles
             </div>
@@ -434,7 +488,7 @@ function toggleSearch() {
               <a
                 v-for="f in familles"
                 :key="f"
-                class="cursor-pointer font-serif text-[18px] text-brun-cacao transition-opacity duration-180 hover:opacity-60"
+                class="cursor-pointer font-serif text-[18px] text-cacao transition-opacity duration-180 hover:opacity-60"
                 @click="navigateAndClose('/boutique')"
                 >{{ f }}</a
               >
@@ -444,26 +498,30 @@ function toggleSearch() {
           <!-- Populaires -->
           <div>
             <div
-              class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+              class="mb-4 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
             >
               Populaires
             </div>
             <a
-              class="cursor-pointer font-serif text-[18px] text-brun-cacao transition-opacity duration-180 hover:opacity-60"
+              class="cursor-pointer font-serif text-[18px] text-cacao transition-opacity duration-180 hover:opacity-60"
               @click="navigateAndClose('/boutique')"
-            >Découvrir la collection</a>
+              >Découvrir la collection</a
+            >
           </div>
         </div>
 
         <!-- ── Recherche en cours ───────────────────────────────────── -->
-        <div v-else-if="isSearching && searchResults.length === 0" class="mt-12 pb-8">
+        <div
+          v-else-if="isSearching && searchResults.length === 0"
+          class="mt-12 pb-8"
+        >
           <span class="ci-eyebrow">Recherche</span>
         </div>
 
         <!-- ── Résultats ─────────────────────────────────────────────── -->
         <div v-else-if="searchResults.length > 0" class="mt-8">
           <div
-            class="mb-5 font-sans text-[10px] uppercase tracking-[0.22em] text-brun-cacao-3"
+            class="mb-5 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-3"
           >
             {{ searchResults.length }} résultat{{
               searchResults.length > 1 ? "s" : ""
@@ -486,12 +544,12 @@ function toggleSearch() {
               </div>
               <div class="min-w-0 flex-1">
                 <div
-                  class="font-sans text-[10px] uppercase tracking-[0.18em] text-brun-cacao-3"
+                  class="font-sans text-[10px] uppercase tracking-[0.18em] text-cacao-3"
                 >
                   {{ p.category?.name }}
                 </div>
                 <div
-                  class="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap font-serif text-[18px] text-brun-cacao"
+                  class="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap font-serif text-[18px] text-cacao"
                 >
                   {{ p.name }}
                 </div>
@@ -510,19 +568,19 @@ function toggleSearch() {
         <div v-else class="mt-12 pb-8">
           <span class="ci-eyebrow">Aucun résultat</span>
           <h3
-            class="mt-3 font-serif font-medium text-brun-cacao"
+            class="mt-3 font-serif font-medium text-cacao"
             style="font-size: clamp(22px, 3vw, 32px); line-height: 1.1"
           >
             Rien pour <em>« {{ query.trim() }} »</em>.
           </h3>
           <p
-            class="mt-3 font-sans text-[14px] leading-relaxed text-brun-cacao-2"
+            class="mt-3 font-sans text-[14px] leading-relaxed text-cacao-2"
             style="max-width: 420px"
           >
             Essayez une origine (Madagascar, Pérou), une famille (tablette,
             mendiant) ou
             <a
-              class="cursor-pointer border-b border-brun-cacao-2 pb-px"
+              class="cursor-pointer border-b border-cacao-2 pb-px"
               @click="navigateAndClose('/contact')"
               >contactez-nous</a
             >, nous trouverons.

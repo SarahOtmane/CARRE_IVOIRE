@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { ScheduleModule } from '@nestjs/schedule'
 import { SequelizeModule } from '@nestjs/sequelize'
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
@@ -15,6 +16,9 @@ import { UploadsModule } from './modules/uploads/uploads.module'
 import { FavoritesModule } from './modules/favorites/favorites.module'
 import { MailModule } from './modules/mail/mail.module'
 import { SitemapModule } from './modules/sitemap/sitemap.module'
+import { NewsletterModule } from './modules/newsletter/newsletter.module'
+import { SettingsModule } from './modules/settings/settings.module'
+import { HistoireModule } from './modules/histoire/histoire.module'
 import { envValidationSchema } from './config/env.validation'
 
 @Module({
@@ -25,6 +29,7 @@ import { envValidationSchema } from './config/env.validation'
       validationSchema: envValidationSchema,
       validationOptions: { abortEarly: false },
     }),
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 100,
@@ -43,6 +48,9 @@ import { envValidationSchema } from './config/env.validation'
     OrdersModule,
     FavoritesModule,
     SitemapModule,
+    NewsletterModule,
+    SettingsModule,
+    HistoireModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

@@ -21,6 +21,11 @@ import { ProductVariant } from './product-variant.model'
   timestamps: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at',
+  indexes: [
+    { type: 'FULLTEXT', fields: ['name', 'short_description', 'description'] },
+    { name: 'idx_products_category_active_order', fields: ['category_id', 'is_active', 'display_order'] },
+    { name: 'idx_products_active_order', fields: ['is_active', 'display_order'] },
+  ],
 })
 export class Product extends Model<Product> {
   @PrimaryKey
@@ -32,7 +37,7 @@ export class Product extends Model<Product> {
   @Column(DataType.STRING(255))
   declare name: string
 
-  @Unique
+  @Unique('slug')
   @AllowNull(false)
   @Column(DataType.STRING(255))
   declare slug: string

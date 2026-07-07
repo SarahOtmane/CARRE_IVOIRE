@@ -6,6 +6,7 @@ import { WinstonModule } from 'nest-winston'
 import * as winston from 'winston'
 import { join } from 'path'
 import cookieParser from 'cookie-parser'
+import helmet from 'helmet'
 import { AppModule } from './app.module'
 import { HttpExceptionFilter } from './common/filters/http-exception.filter'
 import { TransformInterceptor } from './common/interceptors/transform.interceptor'
@@ -29,6 +30,16 @@ function buildLogger() {
   })
 }
 
+function buildCorsOrigins(): string[] {
+  if (process.env.CORS_ORIGIN) {
+    return process.env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
+  }
+  if (process.env.NODE_ENV !== 'production') {
+    return [process.env.FRONTEND_URL ?? 'http://localhost:5173']
+  }
+  return []
+}
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
@@ -40,13 +51,11 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1', { exclude: ['api/health'] })
 
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL ?? 'http://localhost:5173',
-      'http://localhost:5174',
-    ],
+    origin: buildCorsOrigins(),
     credentials: true,
   })
 
+  app.use(helmet())
   app.use(cookieParser())
 
   app.useGlobalPipes(

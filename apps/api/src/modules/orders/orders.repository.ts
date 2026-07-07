@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/sequelize'
+import { randomUUID } from 'crypto'
 import type { Transaction } from 'sequelize'
 import { Order } from './order.model'
 import { OrderItem } from './order-item.model'
@@ -18,6 +19,8 @@ interface CreateOrderItemData {
   unitPrice: number
   format: string | null
   productName: string
+  taxRateLabel: string | null
+  taxRatePercent: number | null
 }
 
 @Injectable()
@@ -38,11 +41,7 @@ export class OrdersRepository {
         status: 'payment_pending',
         totalAmount: data.totalAmount,
         shippingAddress: data.shippingAddress,
-        orderNumber: `TEMP-${Date.now()}`,
-        addressStreet: address.line1 ?? '',
-        addressCity: address.city ?? '',
-        addressZip: address.postalCode ?? '',
-        addressCountry: address.country ?? 'France',
+        orderNumber: `TEMP-${randomUUID()}`,
       } as any,
       { transaction: t },
     )
@@ -74,6 +73,10 @@ export class OrdersRepository {
     })
   }
 
+  async findByOrderNumber(orderNumber: string): Promise<Order | null> {
+    return this.orderDb.findOne({ where: { orderNumber }, include: [OrderItem] })
+  }
+
   async findByPaymentIntentId(paymentIntentId: string): Promise<Order | null> {
     return this.orderDb.findOne({ where: { stripePaymentIntentId: paymentIntentId } })
   }
@@ -82,8 +85,10 @@ export class OrdersRepository {
     const where: Record<string, unknown> = {}
     if (query.status) where.status = query.status
 
-    const limit = Math.min(query.limit ?? 20, 100)
-    const page = query.page ?? 1
+    // NestJS convertit un query param numérique absent en NaN (Number(undefined)), pas en
+    // undefined — `?? valeur` ne rattrape pas NaN, d'où la vérification explicite ci-dessous.
+    const limit = Math.min(Number.isFinite(query.limit) ? (query.limit as number) : 20, 100)
+    const page = Number.isFinite(query.page) ? (query.page as number) : 1
 
     return this.orderDb.findAndCountAll({
       where,

@@ -4,6 +4,7 @@ networks:
 
 volumes:
   mysql_data:
+  uploads_data:
   node_modules_api:
   node_modules_front:
 
@@ -48,6 +49,8 @@ services:
       target: ${DOCKER_TARGET:-production}
     env_file:
       - .env
+    volumes:
+      - uploads_data:/app/uploads
     networks:
       - carre_ivoire_network
     depends_on:

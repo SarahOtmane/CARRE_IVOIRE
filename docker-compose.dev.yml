@@ -26,11 +26,11 @@ services:
       dockerfile: apps/api/Dockerfile
       target: development
     volumes:
-      - ./apps/api/src:/app/src
-      - ./apps/api/package.json:/app/package.json
+      - ./apps/api/src:/app/apps/api/src
+      - ./apps/api/package.json:/app/apps/api/package.json
       - ./packages:/app/packages
-      - node_modules_api:/app/node_modules
-      - ./apps/api/uploads:/app/uploads
+      - node_modules_api:/app/apps/api/node_modules
+      - ./apps/api/uploads:/app/apps/api/uploads
     environment:
       NODE_ENV: development
     ports:
@@ -46,6 +46,7 @@ services:
       dockerfile: apps/front-office/Dockerfile
       target: development
     volumes:
+      - ./apps/front-office/index.html:/app/index.html
       - ./apps/front-office/src:/app/src
       - ./apps/front-office/public:/app/public
       - ./packages:/app/packages

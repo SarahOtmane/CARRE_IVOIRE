@@ -1,19 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import type { AuthUser } from '@carre-ivoire/types'
 
-export interface User {
-  id: number
-  email: string
-  firstName: string
-  lastName: string
-  role: 'client' | 'admin'
-}
+export type User = AuthUser
 
 export const useAuthStore = defineStore(
   'auth',
   () => {
     const token = ref<string | null>(null)
     const user = ref<User | null>(null)
+    const initialized = ref(false)
 
     const isAuthenticated = computed(() => !!token.value && !!user.value)
     const isAdmin = computed(() => user.value?.role === 'admin')
@@ -31,7 +27,15 @@ export const useAuthStore = defineStore(
       user.value = null
     }
 
-    return { token, user, isAuthenticated, isAdmin, fullName, setAuth, logout }
+    function setInitialized() {
+      initialized.value = true
+    }
+
+    return { token, user, initialized, isAuthenticated, isAdmin, fullName, setAuth, logout, setInitialized }
   },
-  { persist: true },
+  {
+    persist: {
+      paths: ['user', 'token'],
+    },
+  },
 )

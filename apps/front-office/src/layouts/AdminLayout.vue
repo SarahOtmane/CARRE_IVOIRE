@@ -5,11 +5,11 @@ import AdminHeader from '@/components/layout/AdminHeader.vue'
 </script>
 
 <template>
-  <div class="flex h-screen overflow-hidden bg-beige font-body text-cocoa">
+  <div class="flex h-screen overflow-hidden bg-beige-doux font-body text-cacao">
     <AdminSidebar />
     <div class="flex flex-1 flex-col overflow-hidden">
       <AdminHeader />
-      <main class="flex-1 overflow-y-auto p-6">
+      <main class="flex-1 overflow-y-auto overscroll-contain p-6">
         <RouterView />
       </main>
     </div>

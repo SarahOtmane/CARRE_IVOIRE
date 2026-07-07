@@ -19,12 +19,6 @@ export function useAdminProducts() {
       total.value = res.data.data.total
     })
 
-  const fetchOne = (id: number) =>
-    withLoading(async () => {
-      const res = await api.get(`/products/by-id/${id}`)
-      current.value = res.data.data
-    })
-
   const create = (dto: CreateProductDto) =>
     withLoading(async () => {
       const res = await api.post('/products', dto)
@@ -49,5 +43,5 @@ export function useAdminProducts() {
       success('Produit supprimé')
     })
 
-  return { products, total, current, isLoading, fetchAll, fetchOne, create, update, remove }
+  return { products, total, current, isLoading, fetchAll, create, update, remove }
 }
