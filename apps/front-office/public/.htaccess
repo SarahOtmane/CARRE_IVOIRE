@@ -1,0 +1,13 @@
+# SPA fallback — toutes les routes inconnues → index.html (Vue Router history mode)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Ne pas réécrire les fichiers et dossiers existants (assets, index.html...)
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Tout le reste → index.html
+  RewriteRule ^ index.html [L]
+</IfModule>
