@@ -125,7 +125,8 @@ async function changeStatus(event: Event) {
                   {{ item.productName ?? `Produit #${item.productId}` }}
                 </div>
                 <div class="font-body text-[11px] text-cacao/55">
-                  × {{ item.quantity }}{{ item.format ? ` · ${item.format}` : "" }}
+                  × {{ item.quantity }}{{ item.format ? ` · ${item.format}` : ""
+                  }}{{ item.taxRatePercent !== undefined ? ` · TVA ${item.taxRatePercent}%` : "" }}
                 </div>
               </div>
               <div class="font-body text-sm tabular-nums text-dore">
@@ -135,6 +136,14 @@ async function changeStatus(event: Event) {
           </div>
 
           <div class="mt-6 space-y-2 font-body text-sm text-cacao">
+            <div v-if="current.totalHt !== undefined" class="flex justify-between">
+              <span class="text-cacao/60">Total HT</span>
+              <span>{{ formatPrice(current.totalHt) }}</span>
+            </div>
+            <div v-if="current.totalVat !== undefined && current.totalVat > 0" class="flex justify-between">
+              <span class="text-cacao/60">dont TVA</span>
+              <span>{{ formatPrice(current.totalVat) }}</span>
+            </div>
             <div class="flex justify-between border-t border-cacao pt-3 font-display text-2xl">
               <span>Total</span>
               <span class="text-dore">{{ formatPrice(current.totalAmount) }}</span>

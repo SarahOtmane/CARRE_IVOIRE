@@ -18,6 +18,7 @@ const api = useApi();
 type Snapshot = {
   orderNumber?: string;
   total?: number;
+  totalVat?: number;
   shipping?: {
     firstName?: string;
     lastName?: string;
@@ -27,7 +28,7 @@ type Snapshot = {
     city?: string;
     deliveryLabel?: string;
   };
-  items?: Array<{ name: string; quantity: number }>;
+  items?: Array<{ name: string; quantity: number; price?: number; taxRatePercent?: number }>;
 };
 
 const checkoutSnapshot = ref<Snapshot | null>(null);
@@ -48,6 +49,7 @@ onMounted(async () => {
       checkoutSnapshot.value = {
         orderNumber: o.orderNumber,
         total: o.totalAmount / 100,
+        totalVat: typeof o.totalVat === 'number' ? o.totalVat / 100 : undefined,
         shipping: o.shippingAddress ? {
           firstName: o.shippingAddress.firstName,
           lastName: o.shippingAddress.lastName,
@@ -76,6 +78,16 @@ const itemCount = computed(
       0,
     ) ?? 0,
 );
+const totalVat = computed(() => {
+  if (checkoutSnapshot.value?.totalVat !== undefined) return checkoutSnapshot.value.totalVat;
+  return (
+    checkoutSnapshot.value?.items?.reduce((acc, item) => {
+      if (item.taxRatePercent === undefined || item.price === undefined) return acc;
+      const priceHt = item.price / (1 + item.taxRatePercent / 100);
+      return acc + (item.price - priceHt) * item.quantity;
+    }, 0) ?? 0
+  );
+});
 
 function formatPrice(value: number) {
   return `${value.toFixed(2).replace(".", ",")} €`;
@@ -243,6 +255,15 @@ function formatPrice(value: number) {
             </p>
           </div>
 
+          <div
+            v-if="totalVat > 0"
+            class="flex justify-between font-sans text-[13px] text-cacao-2"
+          >
+            <span>dont TVA</span>
+            <span style="font-variant-numeric: tabular-nums">{{
+              formatPrice(totalVat)
+            }}</span>
+          </div>
           <div
             class="flex justify-between pt-1 font-serif text-[22px] font-medium text-cacao"
           >

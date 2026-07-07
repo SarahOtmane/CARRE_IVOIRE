@@ -97,7 +97,8 @@ const shippingLine = computed(() => {
               {{ item.productName ?? `Produit #${item.productId}` }}
             </div>
             <div class="mt-1 font-sans text-[11px] uppercase tracking-[0.18em] text-cacao-2">
-              <template v-if="item.format">Format {{ item.format }} · </template>Qté {{ item.quantity }}
+              <template v-if="item.format">Format {{ item.format }} · </template>Qté {{ item.quantity
+              }}<template v-if="item.taxRatePercent !== undefined"> · TVA {{ item.taxRatePercent }}%</template>
             </div>
           </div>
           <div class="font-sans text-[13px] text-dore" style="font-variant-numeric: tabular-nums">
@@ -117,6 +118,18 @@ const shippingLine = computed(() => {
           <span class="text-cacao-2">Sous-total</span>
           <span class="text-cacao" style="font-variant-numeric: tabular-nums">
             {{ formatPrice(order.items.reduce((a, i) => a + i.unitPrice * i.quantity, 0)) }}
+          </span>
+        </div>
+        <div v-if="order.totalHt !== undefined" class="flex justify-between py-2 font-sans text-[13px]">
+          <span class="text-cacao-2">Total HT</span>
+          <span class="text-cacao-2" style="font-variant-numeric: tabular-nums">
+            {{ formatPrice(order.totalHt) }}
+          </span>
+        </div>
+        <div v-if="order.totalVat !== undefined && order.totalVat > 0" class="flex justify-between py-2 font-sans text-[13px]">
+          <span class="text-cacao-2">dont TVA</span>
+          <span class="text-cacao-2" style="font-variant-numeric: tabular-nums">
+            {{ formatPrice(order.totalVat) }}
           </span>
         </div>
         <div
