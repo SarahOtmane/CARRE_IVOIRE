@@ -3,8 +3,8 @@
     class="flex shrink-0 items-center justify-center overflow-hidden text-cacao"
     :class="
       size === 'lg'
-        ? 'h-16 w-24 font-display text-2xl'
-        : 'h-12 w-20 font-serif text-lg font-medium'
+        ? 'h-25 w-40 font-display text-2xl'
+        : 'h-20 w-30 font-serif text-lg font-medium'
     "
   >
     <img
