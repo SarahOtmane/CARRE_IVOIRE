@@ -12,7 +12,7 @@ export interface OrderConfirmationParams {
   totalAmount: number
   orderDate?: Date
   shippingAddress?: { line1?: string; postalCode?: string; city?: string; country?: string } | null
-  items: { productName: string; quantity: number; unitPrice: number; format?: string }[]
+  items: { productName: string; quantity: number; unitPrice: number; format?: string; taxRateLabel?: string; taxRatePercent?: number }[]
   bcc?: string
 }
 
@@ -61,7 +61,7 @@ export class MailService {
     const itemsHtml = params.items.map((item) => `
       <tr>
         <td style="padding:10px 0;font-family:Arial,sans-serif;font-size:14px;color:#3A1F14;border-bottom:1px solid rgba(58,31,20,0.08)">
-          ${item.productName}${item.format ? ` <span style="color:rgba(58,31,20,0.5);font-size:12px">(${item.format})</span>` : ''}
+          ${item.productName}${item.format ? ` <span style="color:rgba(58,31,20,0.5);font-size:12px">(${item.format})</span>` : ''}${item.taxRatePercent !== undefined ? ` <span style="color:rgba(58,31,20,0.4);font-size:11px">· TVA ${item.taxRatePercent}%</span>` : ''}
         </td>
         <td style="padding:10px 0;font-family:Arial,sans-serif;font-size:14px;color:rgba(58,31,20,0.6);text-align:center;border-bottom:1px solid rgba(58,31,20,0.08)">${item.quantity}</td>
         <td style="padding:10px 0;font-family:Arial,sans-serif;font-size:14px;color:#B08A4F;text-align:right;border-bottom:1px solid rgba(58,31,20,0.08);font-weight:500">${fmt(item.unitPrice * item.quantity)}</td>
