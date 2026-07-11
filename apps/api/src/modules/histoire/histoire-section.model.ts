@@ -50,8 +50,6 @@ export class HistoireSection extends Model<HistoireSection> {
  
   @AfterFind
   static formatParagraphs(section: HistoireSection) {
-    if(section.paragraphs != undefined) {
-     section.paragraphs = section.paragraphs.join().split(',') 
-     }
+    if(section.paragraphs !== undefined) section.paragraphs = section.paragraphs.join().split(',')
   }
 }
