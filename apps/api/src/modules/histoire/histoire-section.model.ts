@@ -8,6 +8,7 @@ import {
   Unique,
   Default,
   AllowNull,
+  AfterFind,
 } from 'sequelize-typescript'
 
 @Table({
@@ -46,4 +47,11 @@ export class HistoireSection extends Model<HistoireSection> {
 
   declare created_at: Date
   declare updated_at: Date
+ 
+  @AfterFind
+  static formatParagraphs(section: HistoireSection) {
+    if(section.paragraphs != undefined) {
+     section.paragraphs = section.paragraphs.join().split(',') 
+     }
+  }
 }

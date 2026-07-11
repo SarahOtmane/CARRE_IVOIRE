@@ -146,7 +146,7 @@ function toggleSearch() {
     <!-- Barre principale -->
     <div class="flex h-[80px] items-center justify-between px-5 lg:px-[104px]">
       <!-- Logo -->
-      <RouterLink to="/" class="flex items-center gap-3.5 w-[90px] h-[60px]">
+      <RouterLink to="/" class="flex items-center gap-3.5 w-[120px] h-[80px]">
         <Logo :logo-url="publicSettings?.logoUrl" />
       </RouterLink>
 
