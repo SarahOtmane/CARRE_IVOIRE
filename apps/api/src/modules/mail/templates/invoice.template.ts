@@ -100,7 +100,7 @@ export function buildInvoiceHtml(params: InvoiceParams): string {
         <p style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(58,31,20,0.4);margin-bottom:12px">Émetteur</p>
         <p style="font-family:Georgia,serif;font-size:16px;margin-bottom:6px">Carré Ivoire</p>
         <p style="font-size:12px;line-height:1.7;color:rgba(58,31,20,0.6)">
-          4 rue du Nil<br>75002 Paris<br>contact@carre-ivoire.fr
+          29 rue de Vauparfonds<br>28600 LUISANT<br>contact@carre-ivoire.fr
         </p>
       </div>
       <div style="text-align:right">
@@ -141,7 +141,7 @@ export function buildInvoiceHtml(params: InvoiceParams): string {
     <!-- Pied de page -->
     <div style="border-top:1px solid rgba(58,31,20,0.12);padding-top:24px;display:flex;justify-content:space-between;align-items:center">
       <p style="font-size:11px;color:rgba(58,31,20,0.4)">Paiement effectué par carte bancaire via Stripe</p>
-      <p style="font-size:11px;color:rgba(58,31,20,0.4)">Carré Ivoire — Paris, France</p>
+      <p style="font-size:11px;color:rgba(58,31,20,0.4)">Carré Ivoire — LUISANT, France</p>
     </div>
 
   </div>

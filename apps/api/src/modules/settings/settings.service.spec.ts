@@ -10,7 +10,7 @@ describe('SettingsService', () => {
     shipping_flat: '800',
     shipping_free_from: '7000',
     bcc_email: 'bcc@test.com',
-    address: '4 rue du Nil',
+    address: '29 rue de Vauparfonds',
     logo_url: 'https://example.com/logo.webp',
   }
 
@@ -38,7 +38,7 @@ describe('SettingsService', () => {
       expect(result.shippingFlat).toBe(800)
       expect(result.shippingFreeFrom).toBe(7000)
       expect(result.bccEmail).toBe('bcc@test.com')
-      expect(result.address).toBe('4 rue du Nil')
+      expect(result.address).toBe('29 rue de Vauparfonds')
       expect(result.logoUrl).toBe('https://example.com/logo.webp')
     })
 
@@ -59,9 +59,9 @@ describe('SettingsService', () => {
     })
 
     it('inclut shippingFreeFrom et address dans les entrées', async () => {
-      await service.update({ shippingFreeFrom: 5000, address: '4 rue du Nil' })
+      await service.update({ shippingFreeFrom: 5000, address: '29 rue de Vauparfonds' })
       expect(repo.setMany).toHaveBeenCalledWith(
-        expect.objectContaining({ shipping_free_from: '5000', address: '4 rue du Nil' }),
+        expect.objectContaining({ shipping_free_from: '5000', address: '29 rue de Vauparfonds' }),
       )
     })
 

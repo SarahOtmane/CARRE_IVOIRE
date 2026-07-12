@@ -29,7 +29,7 @@ const shippingAddress = {
   lastName: 'Dupont',
   line1: '1 rue du Cacao',
   postalCode: '75001',
-  city: 'Paris',
+  city: 'LUISANT',
   country: 'France',
 } as any
 

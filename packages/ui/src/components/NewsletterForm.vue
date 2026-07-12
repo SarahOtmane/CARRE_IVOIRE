@@ -13,7 +13,7 @@ const props = withDefaults(
     theme: 'dark',
     label: 'Newsletter',
     description: 'Une fois par mois. Rien de plus.',
-    placeholder: 'vous@maison.fr',
+    placeholder: 'vous@domaine.fr',
   },
 )
 

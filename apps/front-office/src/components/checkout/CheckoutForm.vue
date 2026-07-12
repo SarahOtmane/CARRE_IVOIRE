@@ -42,8 +42,8 @@ onMounted(async () => {
 const deliveryOptions = computed(() => [
   {
     id: "courier",
-    name: "Coursier Paris",
-    detail: "24h — Paris intra-muros",
+    name: "Coursier LUISANT",
+    detail: "24h — LUISANT intra-muros",
     price: shippingFlatEuros(),
   },
   {
@@ -55,7 +55,7 @@ const deliveryOptions = computed(() => [
   {
     id: "pickup",
     name: "Retrait boutique",
-    detail: "4 rue du Nil, Paris 2",
+    detail: "29 rue de Vauparfonds, LUISANT 2",
     price: 0,
   },
 ]);

@@ -10,7 +10,7 @@ const settings = ref({
   shippingFlat: 8,
   shippingFreeFrom: 70,
   bccEmail: "",
-  address: "4 rue du Nil, 75002 Paris",
+  address: "29 rue de Vauparfonds, 28600 LUISANT",
   logoUrl: "",
 });
 

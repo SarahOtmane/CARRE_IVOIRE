@@ -11,8 +11,8 @@ const sections = [
     num: '01',
     titre: 'Éditeur du site',
     contenu: [
-      'Le site carreivoire.fr est édité par la société Carré Ivoire, SAS au capital de 10 000 €, immatriculée au Registre du Commerce et des Sociétés de Paris sous le numéro 123 456 789.',
-      'Siège social : 4 rue du Nil, 75002 Paris, France.',
+      'Le site carreivoire.fr est édité par la société Carré Ivoire, SAS au capital de 10 000 €, immatriculée au Registre du Commerce et des Sociétés de LUISANT sous le numéro 123 456 789.',
+      'Siège social : 29 rue de Vauparfonds, 28600 LUISANT, France.',
       'Directeur de la publication : le représentant légal de la société.',
       'Contact : contact@carreivoire.fr',
     ],

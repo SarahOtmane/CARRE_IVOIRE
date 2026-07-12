@@ -11,7 +11,7 @@ const sections = [
     num: '01',
     titre: 'Objet et champ d\'application',
     contenu: [
-      'Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre la société Carré Ivoire, SAS au capital de 10 000 €, immatriculée au RCS de Paris sous le numéro 123 456 789, dont le siège social est situé 4 rue du Nil, 75002 Paris (ci-après « Carré Ivoire »), et toute personne physique ou morale (ci-après « le Client ») souhaitant effectuer un achat via le site carreivoire.fr.',
+      'Les présentes Conditions Générales de Vente (CGV) régissent les relations contractuelles entre la société Carré Ivoire, SAS au capital de 10 000 €, immatriculée au RCS de LUISANT sous le numéro 123 456 789, dont le siège social est situé 29 rue de Vauparfonds, 28600 LUISANT (ci-après « Carré Ivoire »), et toute personne physique ou morale (ci-après « le Client ») souhaitant effectuer un achat via le site carreivoire.fr.',
       'Toute commande passée sur le site implique l\'acceptation sans réserve des présentes CGV. Carré Ivoire se réserve le droit de les modifier à tout moment.',
     ],
   },

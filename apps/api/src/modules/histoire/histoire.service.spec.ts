@@ -8,7 +8,7 @@ const mockSection = {
   displayOrder: 0,
   image: 'https://example.com/img.webp',
   imageAlt: 'Cabosses de cacao',
-  paragraphs: ['Un premier paragraphe.'],
+  paragraphs: JSON.stringify(['Un premier paragraphe.']),
 }
 
 describe('HistoireService', () => {

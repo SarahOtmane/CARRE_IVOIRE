@@ -11,7 +11,7 @@ const sections = [
     num: '01',
     titre: 'Responsable du traitement',
     contenu: [
-      'Carré Ivoire, SAS au capital de 10 000 €, immatriculée au RCS de Paris sous le numéro 123 456 789, dont le siège social est situé 4 rue du Nil, 75002 Paris, est responsable du traitement de vos données personnelles.',
+      'Carré Ivoire, SAS au capital de 10 000 €, immatriculée au RCS de LUISANT sous le numéro 123 456 789, dont le siège social est situé 29 rue de Vauparfonds, 28600 LUISANT, est responsable du traitement de vos données personnelles.',
       'Contact délégué à la protection des données : dpo@carreivoire.fr',
     ],
   },
@@ -58,7 +58,7 @@ const sections = [
     titre: 'Vos droits',
     contenu: [
       'Conformément au Règlement Général sur la Protection des Données (RGPD) et à la loi Informatique et Libertés, vous disposez des droits suivants : accès, rectification, effacement, limitation du traitement, portabilité et opposition.',
-      'Pour exercer ces droits, adressez votre demande à dpo@carreivoire.fr ou par courrier à : Carré Ivoire — DPO, 4 rue du Nil, 75002 Paris. Nous vous répondrons dans un délai d\'un mois.',
+      'Pour exercer ces droits, adressez votre demande à dpo@carreivoire.fr ou par courrier à : Carré Ivoire — DPO, 29 rue de Vauparfonds, 28600 LUISANT. Nous vous répondrons dans un délai d\'un mois.',
       'Vous disposez également du droit de déposer une réclamation auprès de la CNIL (www.cnil.fr) si vous estimez que le traitement de vos données personnelles ne respecte pas la réglementation en vigueur.',
     ],
   },

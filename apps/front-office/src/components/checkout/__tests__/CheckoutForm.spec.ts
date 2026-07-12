@@ -30,9 +30,9 @@ function mountForm() {
 }
 
 async function fillValidForm(wrapper: ReturnType<typeof mountForm>) {
-  await wrapper.find('#checkout-address').setValue('4 rue du Nil')
-  await wrapper.find('#checkout-postal-code').setValue('75002')
-  await wrapper.find('#checkout-city').setValue('Paris')
+  await wrapper.find('#checkout-address').setValue('29 rue de Vauparfonds')
+  await wrapper.find('#checkout-postal-code').setValue('28600')
+  await wrapper.find('#checkout-city').setValue('LUISANT')
 }
 
 describe('CheckoutForm', () => {
@@ -70,9 +70,9 @@ describe('CheckoutForm', () => {
 
   it('affiche une erreur si le code postal est invalide', async () => {
     const wrapper = mountForm()
-    await wrapper.find('#checkout-address').setValue('4 rue du Nil')
+    await wrapper.find('#checkout-address').setValue('29 rue de Vauparfonds')
     await wrapper.find('#checkout-postal-code').setValue('abc')
-    await wrapper.find('#checkout-city').setValue('Paris')
+    await wrapper.find('#checkout-city').setValue('LUISANT')
     await wrapper.find('form').trigger('submit')
     expect(wrapper.text()).toContain('Code postal invalide')
   })
@@ -86,7 +86,7 @@ describe('CheckoutForm', () => {
     expect(emitted).toBeDefined()
     const payload = (emitted![0] as [Record<string, unknown>])[0]
     expect(payload.firstName).toBe('Sara')
-    expect(payload.city).toBe('Paris')
+    expect(payload.city).toBe('LUISANT')
     expect(payload.deliveryId).toBe('courier')
     expect(typeof payload.deliveryPrice).toBe('number')
   })

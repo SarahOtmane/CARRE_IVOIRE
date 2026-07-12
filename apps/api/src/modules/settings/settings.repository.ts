@@ -6,7 +6,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   shipping_flat: '800',        // en centimes
   shipping_free_from: '7000',  // en centimes
   bcc_email: '',
-  address: '4 rue du Nil, 75002 Paris',
+  address: '29 rue de Vauparfonds, 28600 LUISANT',
   logo_url: '',
 }
 

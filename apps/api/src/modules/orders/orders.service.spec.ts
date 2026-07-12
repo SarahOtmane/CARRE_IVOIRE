@@ -98,7 +98,7 @@ describe('OrdersService', () => {
   })
 
   describe('createOrder', () => {
-    const dto = { items: [{ productId: 1, quantity: 2 }], shippingAddress: { city: 'Paris' } }
+    const dto = { items: [{ productId: 1, quantity: 2 }], shippingAddress: { city: 'LUISANT' } }
 
     it('crée la commande si le stock est suffisant', async () => {
       const result = await service.createOrder(dto as any, 1)
@@ -344,7 +344,7 @@ describe('OrdersService', () => {
     it('couvre toutes les branches ?? des items dans le map callback', async () => {
       const orderWithItems = {
         ...mockOrder,
-        shippingAddress: { city: 'Paris' },
+        shippingAddress: { city: 'LUISANT' },
         stripePaymentIntentId: 'pi_xxx',
         items: [
           { id: 1, productId: 1, productName: null, variantId: 5, quantity: 1, unitPrice: 100, format: '70g' },

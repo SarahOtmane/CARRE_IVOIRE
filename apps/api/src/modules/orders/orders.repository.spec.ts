@@ -142,7 +142,7 @@ describe('OrdersRepository', () => {
 
   describe('create', () => {
     it('crée une commande et met à jour le numéro CI-ORD-...', async () => {
-      await repo.create({ userId: 1, totalAmount: 390, shippingAddress: { city: 'Paris' } } as any, mockTransaction)
+      await repo.create({ userId: 1, totalAmount: 390, shippingAddress: { city: 'LUISANT' } } as any, mockTransaction)
       expect(orderModel.create).toHaveBeenCalledWith(
         expect.objectContaining({ userId: 1, totalAmount: 390, status: 'payment_pending' }),
         { transaction: mockTransaction },

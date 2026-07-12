@@ -48,11 +48,11 @@ const engagements = [
   },
   {
     num: '04',
-    titre: 'Paris, rue du Nil',
+    titre: 'LUISANT, rue du Nil',
     accroche: 'Tout est fabriqué ici. À la main.',
-    corps: 'Notre atelier est au 4 rue du Nil, dans le 2ᵉ arrondissement. Torréfaction, broyage, conchage, tempérage, moulage : chaque étape se déroule dans cet espace de 80 m². Nous ne sous-traitons pas la production. Nous ne faisons pas co-packer. Ce que vous recevez a été fait par les mains de ceux qui ont conçu la recette.',
+    corps: 'Notre atelier est au 29 rue de Vauparfonds, dans le 2ᵉ arrondissement. Torréfaction, broyage, conchage, tempérage, moulage : chaque étape se déroule dans cet espace de 80 m². Nous ne sous-traitons pas la production. Nous ne faisons pas co-packer. Ce que vous recevez a été fait par les mains de ceux qui ont conçu la recette.',
     details: [
-      'Atelier de 80 m², Paris 2ᵉ — ouvert sur rendez-vous',
+      'Atelier de 80 m², LUISANT 2ᵉ — ouvert sur rendez-vous',
       'Effectif permanent : 4 personnes',
       'Production limitée — jamais au-delà de ce que nos mains peuvent faire',
     ],
@@ -62,9 +62,9 @@ const engagements = [
 
 const chiffres = [
   { valeur: '12', unite: 'origines', detail: 'sourcées directement auprès des producteurs' },
-  { valeur: '2', unite: 'ingrédients', detail: 'fèves de cacao et sucre de canne — rien d\'autre' },
+  { valeur: '2', unite: 'ingrédients', detail: 'fèves de cacao et sucre — rien d\'autre' },
   { valeur: '72h', unite: 'minimum', detail: 'de conchage pour chaque lot de couverture' },
-  { valeur: '80', unite: 'm² d\'atelier', detail: 'rue du Nil, Paris 2ᵉ — toute la fabrication ici' },
+  { valeur: '25', unite: 'm² d\'atelier', detail: 'rue de Vauparfonds, LUISANT — toute la fabrication ici' },
 ]
 </script>
 

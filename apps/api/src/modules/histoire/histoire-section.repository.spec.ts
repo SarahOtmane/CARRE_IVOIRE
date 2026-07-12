@@ -17,7 +17,7 @@ describe('HistoireSectionRepository', () => {
     displayOrder: 0,
     image: 'https://example.com/img.webp',
     imageAlt: 'Cabosses de cacao',
-    paragraphs: ['Un premier paragraphe.'],
+    paragraphs: "['Un premier paragraphe.']",
   }
 
   beforeEach(async () => {
@@ -77,6 +77,6 @@ describe('HistoireSectionRepository', () => {
     const call = model.update.mock.calls[0][0]
     expect(call.image).toBe('https://example.com/new.webp')
     expect(call.imageAlt).toBe('Alt')
-    expect(call.paragraphs).toEqual(['A', 'B'])
+    expect(call.paragraphs).toEqual(JSON.stringify(['A', 'B']))
   })
 })

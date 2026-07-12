@@ -12,7 +12,7 @@ const router = useRouter()
       <div class="overflow-hidden" style="aspect-ratio: 4/5">
         <img
           src="/assets/maison-atelier.jpg"
-          alt="L'atelier Carré Ivoire, rue du Nil"
+          alt="L'atelier Carré Ivoire, rue de Vauparfonds"
           class="h-full w-full object-cover"
         />
       </div>
@@ -25,8 +25,8 @@ const router = useRouter()
           class="mb-8 mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
         >
-          Rue du Nil,<br/>
-          <em class="text-cacao-2">depuis 2019.</em>
+          Rue de Vauparfonds,<br/>
+          <em class="text-cacao-2">depuis 2025.</em>
         </h2>
 
         <p class="mb-5 max-w-[480px] font-sans leading-relaxed text-cacao-2" style="font-size: 18px; line-height: 1.7">

@@ -110,7 +110,7 @@ function handleSubmit() {
             </div>
             <div class="font-serif text-[22px] leading-[1.3] text-cacao">
               4, rue du Nil<br />
-              <span class="italic">75002 Paris</span>
+              <span class="italic">28600 LUISANT</span>
             </div>
             <div
               class="mt-3 font-sans text-[13px] leading-[1.6] text-cacao-2"
@@ -260,7 +260,7 @@ function handleSubmit() {
               id="contact-address"
               v-model="form.address"
               type="email"
-              placeholder="vous@maison.fr"
+              placeholder="vous@domaine.fr"
               class="w-full border-0 border-b bg-transparent px-0 pb-[14px] pt-[10px] font-sans text-[15px] tracking-[0.01em] text-cacao outline-none focus:border-cacao"
               :style="{ borderColor: errors.address ? '#9B1C1C' : 'var(--cacao-a24)' }"
             />
@@ -311,7 +311,7 @@ function handleSubmit() {
       <div class="mb-8 flex items-end justify-between">
         <span class="ci-eyebrow">III — Nous trouver</span>
         <span class="font-sans text-[11px] tracking-[0.22em] text-cacao-2"
-          >Paris II<sup>e</sup></span
+          >LUISANT II<sup>e</sup></span
         >
       </div>
 
@@ -397,10 +397,10 @@ function handleSubmit() {
             Adresse
           </div>
           <div class="font-serif text-[16px] leading-[1.3] text-cacao">
-            4 rue du Nil<br /><span class="italic">75002 Paris</span>
+            29 rue de Vauparfonds<br /><span class="italic">28600 LUISANT</span>
           </div>
           <a
-            href="https://maps.google.com/?q=4+rue+du+Nil+75002+Paris"
+            href="https://maps.google.com/?q=4+rue+du+Nil+28600+LUISANT"
             target="_blank"
             rel="noopener"
             class="mt-3 inline-block border-b pb-[2px] font-sans text-[11px] tracking-[0.06em] text-cacao"

@@ -223,8 +223,8 @@ function formatPrice(value: number) {
             >
               {{ checkoutSnapshot?.shipping?.address ?? "Adresse enregistrée"
               }}<br />
-              {{ checkoutSnapshot?.shipping?.postalCode ?? "75002" }}
-              {{ checkoutSnapshot?.shipping?.city ?? "Paris" }}
+              {{ checkoutSnapshot?.shipping?.postalCode ?? "28600" }}
+              {{ checkoutSnapshot?.shipping?.city ?? "LUISANT" }}
             </p>
           </div>
 

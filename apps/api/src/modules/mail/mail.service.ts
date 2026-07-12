@@ -127,7 +127,7 @@ export class MailService {
 
     <!-- Pied de page -->
     <div style="border-top:1px solid rgba(58,31,20,0.12);padding:24px 40px;text-align:center">
-      <p style="font-size:11px;color:rgba(58,31,20,0.4);margin:0">Carré Ivoire — 4 rue du Nil, 75002 Paris</p>
+      <p style="font-size:11px;color:rgba(58,31,20,0.4);margin:0">Carré Ivoire — 29 rue de Vauparfonds, 28600 LUISANT</p>
     </div>
 
   </div>

@@ -83,12 +83,12 @@ describe('UsersService', () => {
       repo.update.mockResolvedValue(mockUser as any)
       await service.update(1, {
         firstName: 'A', lastName: 'B', phone: '0600',
-        addressStreet: '1 rue', addressCity: 'Paris',
+        addressStreet: '1 rue', addressCity: 'LUISANT',
         addressZip: '75001', addressCountry: 'FR',
       })
       expect(repo.update).toHaveBeenCalledWith(1, expect.objectContaining({
         first_name: 'A', last_name: 'B', phone: '0600',
-        address_street: '1 rue', address_city: 'Paris',
+        address_street: '1 rue', address_city: 'LUISANT',
         address_zip: '75001', address_country: 'FR',
       }))
     })

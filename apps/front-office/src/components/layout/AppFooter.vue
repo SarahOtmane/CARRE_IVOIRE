@@ -54,8 +54,8 @@ const cols = [
         </div>
         <p class="font-sans text-[13px] leading-relaxed text-ivoire opacity-70">
           Manufacture de chocolat<br />
-          4 rue du Nil<br />
-          75002 Paris
+          29 rue de Vauparfonds<br />
+          28600 LUISANT
         </p>
       </div>
 
@@ -84,7 +84,7 @@ const cols = [
       style="border-top: 1px solid var(--ivoire-a15)"
     >
       <span>© 2026 Carré Ivoire</span>
-      <span>Fait à Paris</span>
+      <span>Fait à LUISANT</span>
     </div>
   </footer>
 </template>

@@ -6,7 +6,7 @@ const mockSettings = {
   shippingFlat: 800,
   shippingFreeFrom: 7000,
   bccEmail: 'bcc@test.com',
-  address: '4 rue du Nil',
+  address: '29 rue de Vauparfonds',
   logoUrl: 'https://example.com/logo.webp',
 }
 

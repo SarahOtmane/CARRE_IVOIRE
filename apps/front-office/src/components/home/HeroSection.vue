@@ -35,7 +35,7 @@ const router = useRouter()
 
         <!-- Eyebrow -->
         <span class="mb-7 font-sans text-[11px] uppercase tracking-[0.32em]" style="opacity: 0.75">
-          Chocolat de fève — Paris
+          Chocolat de fève — LUISANT
         </span>
 
         <!-- H1 -->

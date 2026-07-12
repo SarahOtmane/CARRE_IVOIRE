@@ -159,7 +159,7 @@ function validateAndSave() {
               v-model="form.addressStreet"
               type="text"
               autocomplete="address-line1"
-              placeholder="4 rue du Nil"
+              placeholder="29 rue de Vauparfonds"
               class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
               style="border-bottom: 1px solid var(--brun-cacao)"
             />
@@ -179,7 +179,7 @@ function validateAndSave() {
                 v-model="form.addressCity"
                 type="text"
                 autocomplete="address-level2"
-                placeholder="Paris"
+                placeholder="LUISANT"
                 class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
                 style="border-bottom: 1px solid var(--brun-cacao)"
               />
@@ -196,7 +196,7 @@ function validateAndSave() {
                 v-model="form.addressZip"
                 type="text"
                 autocomplete="postal-code"
-                placeholder="75002"
+                placeholder="28600"
                 class="w-full bg-transparent py-2.5 font-sans text-[15px] text-cacao outline-none placeholder:text-cacao-3"
                 :style="{ borderBottom: `1px solid ${errors.addressZip ? '#9B1C1C' : 'var(--brun-cacao)'}` }"
               />

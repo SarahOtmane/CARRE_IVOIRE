@@ -31,7 +31,7 @@ const evenements: Evenement[] = [
     annee: '2026',
     titre: 'Dégustation Porcelana',
     type: 'Dégustation',
-    lieu: 'Atelier — 4 rue du Nil, Paris 2ᵉ',
+    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
     description: 'Une séance autour de la Porcelana vénézuélienne. Trois millésimes, deux expressions. Vingt participants maximum. Animée par nos chocolatiers.',
     complet: false,
     tag: null,
@@ -43,7 +43,7 @@ const evenements: Evenement[] = [
     annee: '2026',
     titre: 'Visite de l\'atelier',
     type: 'Visite',
-    lieu: 'Atelier — 4 rue du Nil, Paris 2ᵉ',
+    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
     description: 'Portes ouvertes sur notre fabrication. Torréfaction en direct, broyage, tempérage. Vous repartez avec un carré fait pendant la visite.',
     complet: false,
     tag: 'Nouveau',
@@ -55,7 +55,7 @@ const evenements: Evenement[] = [
     annee: '2026',
     titre: 'Masterclass Tempérage',
     type: 'Atelier',
-    lieu: 'Atelier — 4 rue du Nil, Paris 2ᵉ',
+    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
     description: 'Trois heures pour comprendre et pratiquer le tempérage sur marbre. Vous repartez avec vos propres tablettes. Niveau intermédiaire — une expérience chocolat est recommandée.',
     complet: true,
     tag: null,
@@ -67,7 +67,7 @@ const evenements: Evenement[] = [
     annee: '2026',
     titre: 'Parcours Bean-to-Bar',
     type: 'Atelier',
-    lieu: 'Atelier — 4 rue du Nil, Paris 2ᵉ',
+    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
     description: 'Une journée entière. De la fève brute au carré final. Torréfaction, broyage, conchage, moulage. Déjeuner inclus. Huit participants.',
     complet: false,
     tag: null,
@@ -79,7 +79,7 @@ const evenements: Evenement[] = [
     annee: '2026',
     titre: 'Millésimes 2025',
     type: 'Dégustation',
-    lieu: 'Atelier — 4 rue du Nil, Paris 2ᵉ',
+    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
     description: 'Présentation des fèves de la récolte 2025. Comparaison avec les millésimes précédents. Un moment pour les amateurs de cacao fin qui souhaitent comprendre comment une fève évolue.',
     complet: false,
     tag: 'Édition limitée',
@@ -257,7 +257,7 @@ const filteredEvenements = computed(() =>
           >
             <input
               type="email"
-              placeholder="vous@maison.fr"
+              placeholder="vous@domaine.fr"
               class="flex-1 bg-transparent py-3 font-sans text-[14px] text-cacao placeholder-cacao-3 outline-none"
             />
             <button

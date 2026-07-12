@@ -110,7 +110,7 @@ describe('Tunnel de commande (e2e)', () => {
           lastName: 'E2E',
           line1: '1 rue du Cacao',
           postalCode: '75001',
-          city: 'Paris',
+          city: 'LUISANT',
           country: 'France',
         },
       })
@@ -144,7 +144,7 @@ describe('Tunnel de commande (e2e)', () => {
           lastName: 'E2E',
           line1: '1 rue du Cacao',
           postalCode: '75001',
-          city: 'Paris',
+          city: 'LUISANT',
           country: 'France',
         },
       })
