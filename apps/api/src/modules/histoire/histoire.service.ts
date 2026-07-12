@@ -32,7 +32,7 @@ export class HistoireService {
       imageSide: s.displayOrder % 2 === 0 ? 'left' : 'right',
       image: s.image,
       imageAlt: s.imageAlt,
-      paragraphs: s.paragraphs,
+      paragraphs: s.paragraphs !== undefined ? JSON.parse(s.paragraphs) : null,
     }
   }
 }

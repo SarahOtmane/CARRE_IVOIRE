@@ -22,7 +22,7 @@ export class HistoireSectionRepository {
     const data: Record<string, unknown> = {}
     if (dto.image !== undefined) data.image = dto.image
     if (dto.imageAlt !== undefined) data.imageAlt = dto.imageAlt
-    if (dto.paragraphs !== undefined) data.paragraphs = dto.paragraphs
+    if (dto.paragraphs !== undefined) data.paragraphs = JSON.stringify(dto.paragraphs)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Record<string,unknown> incompatible with Sequelize update attributes type
     await this.db.update(data as any, { where: { id } })

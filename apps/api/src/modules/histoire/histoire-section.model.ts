@@ -42,14 +42,14 @@ export class HistoireSection extends Model<HistoireSection> {
   declare imageAlt: string
 
   @AllowNull(false)
-  @Column(DataType.JSON)
-  declare paragraphs: string[]
+  @Column({ type: DataType.TEXT('long')})
+  declare paragraphs: string
 
   declare created_at: Date
   declare updated_at: Date
  
-  @AfterFind
+  /*@AfterFind
   static formatParagraphs(section: HistoireSection) {
     if(section.paragraphs !== undefined) section.paragraphs = section.paragraphs.join().split(',')
-  }
+  }*/
 }
