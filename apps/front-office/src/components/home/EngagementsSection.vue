@@ -17,7 +17,7 @@ const engagements = [
   },
   {
     num: '04',
-    title: 'Paris, rue du Nil',
+    title: 'Carré Ivoire',
     text: 'Fabriqué à la main, dans notre manufacture-boutique.',
   },
 ]
