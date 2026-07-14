@@ -93,6 +93,14 @@ export class UpdateProductDto {
   allergens?: string
 
   @IsOptional()
+  @IsString()
+  degustation?: string
+
+  @IsOptional()
+  @IsString()
+  conservation?: string
+
+  @IsOptional()
   @IsInt()
   @Min(0)
   weightGrams?: number

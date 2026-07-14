@@ -28,6 +28,8 @@ module.exports = {
         is_seasonal: 0,
         display_order: 1,
         ingredients: "Pâte de cacao, sucre, beurre de cacao, sel de Guérande",
+        degustation: "A température ambiante",
+        conservation: "entre 16°C et 18°C",
         allergens: "Peut contenir des traces de lait et de fruits à coque",
         weight_grams: 18,
       },
@@ -46,6 +48,8 @@ module.exports = {
         is_seasonal: 0,
         display_order: 2,
         ingredients: "Noisettes, sucre, chocolat lait 40%, beurre de cacao",
+        degustation: "A température ambiante",
+        conservation: "entre 16°C et 18°C",
         allergens:
           "Contient des noisettes. Peut contenir d'autres fruits à coque.",
         weight_grams: 20,
@@ -65,6 +69,8 @@ module.exports = {
         is_seasonal: 0,
         display_order: 3,
         ingredients: "Sucre, crème, beurre AOP, chocolat noir 65%",
+        degustation: "A température ambiante",
+        conservation: "entre 16°C et 18°C",
         allergens:
           "Contient du lait. Peut contenir des traces de fruits à coque.",
         weight_grams: 22,
@@ -85,6 +91,7 @@ module.exports = {
         display_order: 1,
         ingredients:
           "Pâte de cacao Madagascar 72%, sucre, beurre de cacao, lécithine de tournesol",
+        conservation: "entre 16°C et 18°C",
         allergens: "Peut contenir des traces de lait et de fruits à coque",
         weight_grams: 80,
       },
@@ -104,6 +111,8 @@ module.exports = {
         display_order: 2,
         ingredients:
           "Pâte de cacao Pérou, sucre, lait entier, beurre de cacao, vanille naturelle",
+        degustation: "A température ambiante",
+        conservation: "entre 16°C et 18°C",
         allergens: "Contient du lait.",
         weight_grams: 80,
       },
@@ -123,6 +132,8 @@ module.exports = {
         display_order: 1,
         ingredients:
           "Chocolat noir 70%, pistaches, abricots, eau de fleur d'oranger",
+        degustation: "A température ambiante",
+        conservation: "entre 16°C et 18°C",
         allergens:
           "Contient des pistaches. Peut contenir d'autres fruits à coque.",
         weight_grams: 35,
@@ -142,6 +153,7 @@ module.exports = {
         is_seasonal: 0,
         display_order: 1,
         ingredients: "Noisettes 60%, cacao maigre, sucre de canne, sel",
+        degustation: "A température ambiante",
         allergens:
           "Contient des noisettes. Peut contenir d'autres fruits à coque.",
         weight_grams: 250,
