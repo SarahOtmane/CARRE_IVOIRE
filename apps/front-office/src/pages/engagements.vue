@@ -12,49 +12,72 @@ useHead({
 const engagements = [
   {
     num: '01',
-    titre: 'Bean-to-bar',
-    accroche: 'De la fève au carré, sans intermédiaire.',
-    corps: 'Nous achetons les fèves directement auprès des producteurs. Venezuela, Madagascar, Ghana, Piémont. Chaque provenance est négociée en direct, à des prix justes, avec des producteurs que nous connaissons par leur prénom. Pas de courtiers. Pas de coopérative intermédiaire. Le prix que nous payons va, en totalité, au travail agricole.',
+    titre: 'Valoriser le cacao ivoirien',
+    accroche: 'Nous souhaitons faire découvrir oute la richesse du cacao ivoirien, de ses terroirs et de ses arômes.',
+    corps: 'Pour Carré Ivoire, le cacao n\'est pas une simple matière première :',
     details: [
-      '12 origines sourcées directement',
-      'Prix contractuels + 30 à 60 % au-dessus du marché',
-      'Visites annuelles sur chaque origine principale',
+      'il apporte une histoire, ',
+      'une coulture ',
+      'et le savoire-faire des femmes et des hommes qui le cultivent.',
     ],
     bg: 'var(--ivoire)',
   },
   {
     num: '02',
-    titre: 'Agroforesterie',
-    accroche: 'Le cacao pousse à l\'ombre. C\'est voulu.',
-    corps: 'Le modèle industriel défriche pour maximiser le rendement. Nous faisons l\'inverse : nous sourceons exclusivement des parcelles en agroforesterie, où le cacaoyer cohabite avec des arbres forestiers natifs. Le rendement est plus faible. La complexité aromatique est incomparable. L\'écosystème, lui, reste intact.',
+    titre: 'Fabriquer de la fève à la tablette',
+    accroche: 'Npous transformons nous même les fèves de cacao dans notre attelier de Luisant.',
+    corps: 'Chaque étape est réalisée avec patience afin de préserver la personnalité du cacao :',
     details: [
-      '100 % des fèves issues de parcelles agroforestières',
-      'Première récolte directe en agroforesterie : Piémont, 2022',
-      'Zéro déforestation dans notre chaîne d\'approvisionnement',
+      'Torréfaction, ',
+      'Broyage, ',
+      'Affinage, ',
+      'Conchage, ',
+      'Tempérage et Moulage',
     ],
     bg: 'var(--rose-poudre)',
   },
   {
     num: '03',
-    titre: 'Deux ingrédients',
-    accroche: 'Fèves. Sucre de canne. Rien d\'autre.',
-    corps: 'Pas de lécithine de soja pour corriger la texture. Pas d\'arômes pour masquer une fève médiocre. Pas d\'émulsifiants pour allonger la durée de vie. Si le chocolat ne tient pas avec deux ingrédients, c\'est que la fève ou la technique est en cause — et c\'est notre problème à résoudre, pas celui de l\'additif alimentaire.',
+    titre: 'Respecter le travail des producteurs',
+    accroche: 'Derrière chaque fève se trouvent des femmes et des hommes dont le travail mérite d\'être reconnu et valorisé.',
+    corps: 'Nous souhaitons développer progressivement des relations avec les producteurs et les coopératives :',
     details: [
-      'Fèves + sucre de canne non raffiné — c\'est tout',
-      'Aucun additif, aucun arôme, aucune lécithine',
-      'DLC courte — signe de fraîcheur, pas de défaut',
+      'plus directes, ',
+      'durables ',
+      ' et transparentes',
     ],
     bg: 'var(--ivoire)',
   },
   {
     num: '04',
-    titre: 'LUISANT, 29 rue de Vauparfonds',
-    accroche: 'Tout est fabriqué ici. À la main.',
-    corps: 'Notre atelier est au 29 rue de Vauparfonds, dans le 2ᵉ arrondissement. Torréfaction, broyage, conchage, tempérage, moulage : chaque étape se déroule dans cet espace de 80 m². Nous ne sous-traitons pas la production. Nous ne faisons pas co-packer. Ce que vous recevez a été fait par les mains de ceux qui ont conçu la recette.',
+    titre: 'Favoriser la traçabilité',
+    accroche: 'Connaître l\'origine de nos fèves et suivre leur transformation est essentiel.',
+    corps: 'Nous avançons vers des approvisionnements toujours mieux identifiés afin de proposer',
     details: [
-      'Atelier / boutique à LUISANT — ouvert sur rendez-vous',
-      'Production limitée — jamais au-delà de ce que nos mains peuvent faire',
+      'un chocolat plus transparent, ',
+      'de la plantation jusqu\'au produit fini.',
     ],
+    bg: 'var(--beige-doux)',
+  },
+   {
+    num: '05',
+    titre: 'Protéger les terres et l\'enfance',
+    accroche: 'Le cacao ne doit jamais être produit au détriment des enfants ni des écosystèmes.',
+    corps: 'Nous défendons une filière respectueuse :',
+    details: [
+      'de la scolarisation, ',
+      'des familles productrices, ',
+      'des sols, des forêts ',
+      'et du développement de pratiques agricoles plus durables.'
+    ],
+    bg: 'var(--beige-doux)',
+  },
+   {
+    num: '06',
+    titre: 'Produire avec sincérité',
+    accroche: 'Nos chocolats sont fabriqués en petites séries, avec des recettes maîtrisées et des ingrédients sélectionnés avec soin',
+    corps: 'Carré Ivoire est une jeune chocolaterie qui apprend et progresse. Nous préférons parler avec honnêteté de notre démarche plutôt que promettre une perfection qui n’existe pas encore.',
+    
     bg: 'var(--beige-doux)',
   },
 ]
@@ -81,15 +104,15 @@ const chiffres = [
           class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(48px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.02em"
         >
-          Quatre principes,<br/>
+          Chez Carré Ivoire, le chocolat ne se résume pas à une gourmandise.<br/>
           <em class="text-cacao-2">sans compromis.</em>
         </h1>
         <p
           class="mt-12 max-w-[560px] font-sans text-cacao-2"
           style="font-size: 18px; line-height: 1.7"
         >
-          Nous aurions pu aller plus vite, moins cher, à plus grande échelle.
-          Nous avons choisi autrement.
+         Il relie une terre, des producteurs, un savoir-faire et les personnes qui le dégustent.
+         Nous avançons avec une ambition simple : créer un chocolat artisanal, sincère et porteur de sens.
         </p>
       </div>
     </section>
@@ -144,7 +167,7 @@ const chiffres = [
       </div>
     </section>
 
-    <!-- ── Chiffres ────────────────────────────────────────── -->
+    <!-- ── Chiffres ────────────────────────────────────────── 
     <section
       class="bg-cacao"
       style="padding: clamp(80px, 12vw, 192px) clamp(20px, 6vw, 104px)"
@@ -180,6 +203,7 @@ const chiffres = [
         </div>
       </div>
     </section>
+    -->
 
     <!-- ── CTA ────────────────────────────────────────────── -->
     <section
@@ -193,8 +217,13 @@ const chiffres = [
             class="mt-4 font-serif font-medium text-cacao"
             style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
           >
-            Des principes<br/>
-            <em class="text-cacao-2">que vous pouvez goûter.</em>
+            Le chocolat comme lien<br/>
+            <em class="text-cacao-2"><ul>
+              <li>Entre la Côte d\'Ivoire et la France.</li>
+              <li>Entre les producteurs et les consommateurs.</li>
+              <li>Entre les souvenirs, les terres et les créations de demain.</li>
+            </ul>
+            <p>Carré Ivoire — Le chocolat selon Koko.</p></em>
           </h2>
         </div>
         <div class="flex flex-col gap-4 sm:flex-row">

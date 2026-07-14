@@ -53,7 +53,7 @@ const cols = [
           Carré<br />Ivoire
         </div>
         <p class="font-sans text-[13px] leading-relaxed text-ivoire opacity-70">
-          Manufacture de chocolat<br />
+          Chocolaterie<br />
           29 rue de Vauparfonds<br />
           28600 LUISANT
         </p>
