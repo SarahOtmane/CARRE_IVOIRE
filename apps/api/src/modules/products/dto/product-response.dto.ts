@@ -24,6 +24,7 @@ export interface ProductResponseDto {
   isSeasonal: boolean
   displayOrder: number
   badge?: string
+  arome?: string
   ingredients?: string
   degustation?: string
   conservation?: string

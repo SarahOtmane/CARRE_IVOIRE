@@ -28,6 +28,7 @@ export interface Product {
   isSeasonal: boolean
   displayOrder: number
   badge?: string
+  arome?: string
   ingredients?: string
   degustation?: string
   conservation?: string
@@ -86,6 +87,7 @@ export interface CreateProductDto {
   isActive?: boolean
   isSeasonal?: boolean
   displayOrder?: number
+  arome?: string
   ingredients?: string
   degustation?: string
   conservation?: string

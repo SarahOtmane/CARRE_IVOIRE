@@ -27,6 +27,7 @@ module.exports = {
         is_active: 1,
         is_seasonal: 0,
         display_order: 1,
+        arome: "gôut de cacao ..."
         ingredients: "Pâte de cacao, sucre, beurre de cacao, sel de Guérande",
         degustation: "A température ambiante",
         conservation: "entre 16°C et 18°C",
@@ -174,6 +175,7 @@ module.exports = {
         is_active: 1,
         is_seasonal: 0,
         display_order: 1,
+        arome: "c'est très bon",
         allergens:
           "Contient du lait, des noisettes. Peut contenir d'autres fruits à coque.",
         weight_grams: 100,

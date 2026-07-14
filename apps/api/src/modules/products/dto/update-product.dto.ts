@@ -83,6 +83,10 @@ export class UpdateProductDto {
   @IsString()
   @MaxLength(100)
   badge?: string
+  
+  @IsOptional()
+  @IsString()
+  arome?: string
 
   @IsOptional()
   @IsString()

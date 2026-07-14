@@ -66,6 +66,7 @@ const draft = ref({
   shortDescription: "",
   description: "",
   isActive: true,
+  arome: "",
   ingredients: "",
   degustation: "",
   conservation: "",
@@ -102,6 +103,7 @@ watch(
         shortDescription: product.shortDescription ?? "",
         description: product.description ?? "",
         isActive: product.isActive,
+        arome: product.arome ?? "",
         ingredients: product.ingredients ?? "",
         degustation: product.degustation ?? "",
         conservation: product.conservation ?? "",
@@ -133,6 +135,7 @@ async function save() {
     shortDescription: draft.value.shortDescription || undefined,
     description: draft.value.description || undefined,
     isActive: draft.value.isActive,
+    arome: draft.value.arome || undefined,
     ingredients: draft.value.ingredients || undefined,
     degustation: draft.value.degustation || undefined,
     conservation: draft.value.conservation || undefined,
@@ -292,6 +295,15 @@ async function deleteProduct() {
             class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base leading-7 text-cacao outline-none focus:border-cacao/60"
           />
         </label>
+        
+        <label class="grid gap-2">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Profil aromatique</span>
+          <input
+            v-model="draft.arome"
+            type="text"
+            class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
+          />
+        </label>
 
         <label class="grid gap-2">
           <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Ingrédients</span>
@@ -307,7 +319,7 @@ async function deleteProduct() {
           <input
             v-model="draft.degustation"
             type="text"
-            placeholder="Contient : fruits à coque, lait, soja…"
+            placeholder="A température ambiante"
             class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
           />
         </label>
@@ -317,7 +329,7 @@ async function deleteProduct() {
           <input
             v-model="draft.conservation"
             type="text"
-            placeholder="Contient : fruits à coque, lait, soja…"
+            placeholder="Entre 16°C et 18°C"
             class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
           />
         </label>

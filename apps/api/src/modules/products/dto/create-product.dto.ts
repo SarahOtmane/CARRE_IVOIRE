@@ -81,6 +81,10 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
+  arome?: string
+
+  @IsOptional()
+  @IsString()
   ingredients?: string
 
   @IsOptional()

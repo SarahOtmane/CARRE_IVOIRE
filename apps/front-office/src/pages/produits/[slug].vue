@@ -41,7 +41,7 @@ const relatedProducts = computed(() => {
 })
 
 const quantity = ref(1)
-const tab = ref<'composition' | 'degustation' | 'conservation' | 'allergenes'>('composition')
+const tab = ref<'arome' | 'composition' | 'degustation' | 'conservation' | 'allergenes'>('arome')
 const added = ref(false)
 const selectedVariantId = ref<number | null>(null)
 
@@ -280,6 +280,12 @@ async function toggleFavorite() {
             <button
               type="button"
               class="border-b pb-1 font-sans text-[11px] uppercase tracking-[0.22em]"
+              :class="tab === 'arome' ? 'border-cacao text-cacao' : 'border-transparent text-cacao-3'"
+              @click="tab = 'arome'"
+            >Arôme</button>
+            <button
+              type="button"
+              class="border-b pb-1 font-sans text-[11px] uppercase tracking-[0.22em]"
               :class="tab === 'composition' ? 'border-cacao text-cacao' : 'border-transparent text-cacao-3'"
               @click="tab = 'composition'"
             >Composition</button>
@@ -304,7 +310,11 @@ async function toggleFavorite() {
           </div>
 
           <div class="pt-5">
-            <ul v-if="tab === 'composition' && compositionItems.length" class="space-y-0">
+            <p v-if="tab === 'arome'" class="font-sans text-[15px] leading-[1.8] text-cacao-2">
+              {{ product.arome ?? 'Notes du profil arômatique à venir.' }}
+            </p>
+
+            <ul v-else-if="tab === 'composition' && compositionItems.length" class="space-y-0">
               <li
                 v-for="(item, index) in compositionItems"
                 :key="item"
@@ -315,6 +325,7 @@ async function toggleFavorite() {
                 <span class="text-cacao-3">0{{ index + 1 }}</span>
               </li>
             </ul>
+
             <p v-else-if="tab === 'composition'" class="font-sans text-[15px] leading-[1.8] text-cacao-2">
               Composition non renseignée.
             </p>

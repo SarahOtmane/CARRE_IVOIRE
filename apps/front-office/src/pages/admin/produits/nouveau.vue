@@ -47,6 +47,7 @@ const draft = ref({
   shortDescription: "",
   description: "",
   isActive: true,
+  arome: "",
   ingredients: "",
   degustation: "",
   conservation: "",
@@ -90,6 +91,7 @@ async function save() {
     shortDescription: draft.value.shortDescription || undefined,
     description: draft.value.description || undefined,
     isActive: draft.value.isActive,
+    arome: draft.value.arome || undefined,
     ingredients: draft.value.ingredients || undefined,
     degustation: draft.value.degustation || undefined,
     conservation: draft.value.conservation || undefined,
@@ -258,6 +260,16 @@ async function save() {
         </label>
 
         <label class="grid gap-2">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Profil aromatique</span>
+          <input
+            v-model="draft.arome"
+            type="text"
+            placeholder="Goût intense de cacao ..."
+            class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
+          />
+        </label>
+        
+        <label class="grid gap-2">
           <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Ingrédients</span>
           <input
             v-model="draft.ingredients"
@@ -272,7 +284,7 @@ async function save() {
           <input
             v-model="draft.degustation"
             type="text"
-            placeholder="Contient : fruits à coque, lait, soja…"
+            placeholder="A déguster à température ambiante"
             class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
           />
         </label>
@@ -282,7 +294,7 @@ async function save() {
           <input
             v-model="draft.conservation"
             type="text"
-            placeholder="Contient : fruits à coque, lait, soja…"
+            placeholder="A conserver entre 16°C et 18°C"
             class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
           />
         </label>

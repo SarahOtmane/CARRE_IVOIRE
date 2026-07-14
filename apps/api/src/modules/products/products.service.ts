@@ -101,6 +101,7 @@ export class ProductsService {
       isSeasonal: p.isSeasonal === 1,
       displayOrder: p.displayOrder,
       badge: p.badge ?? undefined,
+      arome: p.arome ?? undefined,
       ingredients: p.ingredients ?? undefined,
       degustation: p.degustation ?? undefined,
       conservation: p.conservation ?? undefined,

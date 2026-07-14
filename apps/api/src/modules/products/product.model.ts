@@ -110,6 +110,10 @@ export class Product extends Model<Product> {
   @AllowNull(true)
   @Column(DataType.STRING(100))
   declare badge: string | null
+  
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  declare arome: string | null
 
   @AllowNull(true)
   @Column(DataType.TEXT)

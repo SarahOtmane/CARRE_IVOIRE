@@ -106,6 +106,7 @@ export class ProductsRepository {
       isSeasonal: dto.isSeasonal ? 1 : 0,
       displayOrder: dto.displayOrder ?? 0,
       badge: dto.badge ?? null,
+      arome: dto.arome ?? null,
       ingredients: dto.ingredients ?? null,
       degustation: dto.degustation ?? null,
       conservation: dto.conservation ?? null,
@@ -138,6 +139,7 @@ export class ProductsRepository {
     if (dto.isSeasonal !== undefined) data.isSeasonal = dto.isSeasonal ? 1 : 0
     if (dto.displayOrder !== undefined) data.displayOrder = dto.displayOrder
     if (dto.badge !== undefined) data.badge = dto.badge
+    if (dto.arome !== undefined) data.arome = dto.arome
     if (dto.ingredients !== undefined) data.ingredients = dto.ingredients
     if (dto.degustation !== undefined) data.degustation = dto.degustation
     if (dto.conservation !== undefined) data.conservation = dto.conservation

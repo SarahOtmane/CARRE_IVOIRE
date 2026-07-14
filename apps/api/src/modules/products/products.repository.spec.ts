@@ -173,6 +173,7 @@ describe('ProductsRepository', () => {
         stock: 10, stockStatus: 'in_stock', taxRateId: null,
         isActive: false, isSeasonal: true, displayOrder: 1,
         badge: 'new', 
+        arome: 'cacao intense',
         ingredients: 'cacao', 
         degustation: 'température ambiente', 
         conservation: '16 et 18 °C', 
