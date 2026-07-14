@@ -109,7 +109,7 @@ function handleSubmit() {
               Atelier &amp; boutique
             </div>
             <div class="font-serif text-[22px] leading-[1.3] text-cacao">
-              4, rue du Nil<br />
+              29, rue de Vauparfonds<br />
               <span class="italic">28600 LUISANT</span>
             </div>
             <div
@@ -167,23 +167,8 @@ function handleSubmit() {
               class="font-serif text-[22px] text-cacao"
               style="font-variant-numeric: tabular-nums"
             >
-              +33 1 42 33 84 12
+              +33 7 63 71 84 33
             </div>
-          </div>
-
-          <div>
-            <div
-              class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
-            >
-              Presse &amp; professionnels
-            </div>
-            <a
-              href="mailto:presse@carre-ivoire.fr"
-              class="inline-block border-b pb-[2px] font-serif text-[18px] italic text-cacao"
-              style="border-color: var(--cacao-a24)"
-            >
-              presse@carre-ivoire.fr
-            </a>
           </div>
         </div>
       </aside>
@@ -400,7 +385,7 @@ function handleSubmit() {
             29 rue de Vauparfonds<br /><span class="italic">28600 LUISANT</span>
           </div>
           <a
-            href="https://maps.google.com/?q=4+rue+du+Nil+28600+LUISANT"
+            href="https://maps.google.com/?q=29+rue+de+Vauparfonds+28600+LUISANT"
             target="_blank"
             rel="noopener"
             class="mt-3 inline-block border-b pb-[2px] font-sans text-[11px] tracking-[0.06em] text-cacao"

@@ -5,8 +5,8 @@ const { Op } = require("sequelize");
 const sections = [
   {
     key: "enfance",
-    display_order: 0,
-    image: "http://localhost:3000/uploads/e3ecf26b-9fee-4681-b319-3e9808dc3002.webp",
+    display_order: 0,{p}
+    image: "https//api.carre-ivoire/uploads/e3ecf26b-9fee-4681-b319-3e9808dc3002.webp",
     image_alt: "Cabosses et fèves de cacao",
     paragraphs: JSON.stringify([
       "Pour moi, ils ont la couleur d'une cabosse de cacao mûrie sous le soleil de Côte d'Ivoire.",
@@ -17,7 +17,7 @@ const sections = [
   {
     key: "parcours",
     display_order: 1,
-    image: "http://localhost:3000/uploads/8d32b956-61a2-4037-99b8-3907cbd72c02.webp",
+    image: "https//api.carre-ivoire/uploads/8d32b956-61a2-4037-99b8-3907cbd72c02.webp",
     image_alt: "Artisan chocolatier au travail",
     paragraphs: JSON.stringify([
       "Les années ont passé.",
@@ -29,7 +29,7 @@ const sections = [
   {
     key: "naissance",
     display_order: 2,
-    image: "http://localhost:3000/uploads/3abb9067-bec9-4f5c-ba28-8ca8c1fd73bc.webp",
+    image: "https//api.carre-ivoire/uploads/3abb9067-bec9-4f5c-ba28-8ca8c1fd73bc.webp",
     image_alt: "Tablettes de chocolat artisanal",
     paragraphs: JSON.stringify([
       "C'est de cette réflexion qu'est né Carré Ivoire.",
@@ -41,7 +41,7 @@ const sections = [
   {
     key: "hommage",
     display_order: 3,
-    image: "http://localhost:3000/uploads/876624e9-c4a3-419f-9380-c9b1b7501206.webp",
+    image: "https//api.carre-ivoire/uploads/876624e9-c4a3-419f-9380-c9b1b7501206.webp",
     image_alt: "Plantation de cacao",
     paragraphs: JSON.stringify([
       "Carré Ivoire est aussi un hommage à mes racines.",

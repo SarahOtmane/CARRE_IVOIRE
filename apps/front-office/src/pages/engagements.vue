@@ -48,12 +48,11 @@ const engagements = [
   },
   {
     num: '04',
-    titre: 'LUISANT, rue du Nil',
+    titre: 'LUISANT, 29 rue de Vauparfonds',
     accroche: 'Tout est fabriqué ici. À la main.',
     corps: 'Notre atelier est au 29 rue de Vauparfonds, dans le 2ᵉ arrondissement. Torréfaction, broyage, conchage, tempérage, moulage : chaque étape se déroule dans cet espace de 80 m². Nous ne sous-traitons pas la production. Nous ne faisons pas co-packer. Ce que vous recevez a été fait par les mains de ceux qui ont conçu la recette.',
     details: [
-      'Atelier de 80 m², LUISANT 2ᵉ — ouvert sur rendez-vous',
-      'Effectif permanent : 4 personnes',
+      'Atelier / boutique à LUISANT — ouvert sur rendez-vous',
       'Production limitée — jamais au-delà de ce que nos mains peuvent faire',
     ],
     bg: 'var(--beige-doux)',

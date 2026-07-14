@@ -174,7 +174,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 docker compose exec backend npm run build
 docker compose exec front-office npm run build
 docker compose logs -f backend
-stripe listen --forward-to localhost:3000/api/v1/stripe/webhook
+stripe listen --forward-to https://api.carre-ivoire/api/v1/stripe/webhook
 ```
 
 ## URLs locales
@@ -183,7 +183,7 @@ stripe listen --forward-to localhost:3000/api/v1/stripe/webhook
 | ------------ | ---------------------------- |
 | Front Office | http://localhost:5173        |
 | Back Office  | http://localhost:5173/admin  |
-| API          | http://localhost:3000/api/v1 |
+| API          |https://api.carre-ivoire/api/v1 |
 
 ---
 

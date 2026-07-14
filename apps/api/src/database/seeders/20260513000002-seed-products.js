@@ -20,7 +20,7 @@ module.exports = {
         description:
           "Un carré d'intensité pure. Chocolat noir 72% du Ghana, ganache lisse, sel en finition.",
         price: 390,
-        image_url: "http://localhost:3000/uploads/a329e3ac-df91-4897-8444-d15611d037e4.webp",
+        image_url: "https//api.carre-ivoire/uploads/a329e3ac-df91-4897-8444-d15611d037e4.webp",
         category_id: catMap["carres-signature"],
         stock: 999,
         stock_status: "in_stock",
@@ -38,7 +38,7 @@ module.exports = {
         description:
           "Noisettes grillées à l'ancienne, broyées en praliné sablé. Enrobage chocolat lait 40%.",
         price: 420,
-        image_url: "http://localhost:3000/uploads/bac64b36-fba9-4d1b-b89c-400bec83de54.webp",
+        image_url: "https//api.carre-ivoire/uploads/bac64b36-fba9-4d1b-b89c-400bec83de54.webp",
         category_id: catMap["carres-signature"],
         stock: 999,
         stock_status: "in_stock",
@@ -57,7 +57,7 @@ module.exports = {
         description:
           "Le caramel coule. Beurre demi-sel breton, enrobage chocolat noir 65%.",
         price: 410,
-        image_url: "http://localhost:3000/uploads/90273e39-0b82-4548-aeea-5d3e66a36f1c.webp",
+        image_url: "https//api.carre-ivoire/uploads/90273e39-0b82-4548-aeea-5d3e66a36f1c.webp",
         category_id: catMap["carres-signature"],
         stock: 999,
         stock_status: "in_stock",
@@ -76,7 +76,7 @@ module.exports = {
         description:
           "Fèves Trinitario de la côte est de Madagascar. Fruité, léger, persistant.",
         price: 1290,
-        image_url: "http://localhost:3000/uploads/1b23a56d-c3a3-4b18-b276-2a277a469a20.webp",
+        image_url: "https//api.carre-ivoire/uploads/1b23a56d-c3a3-4b18-b276-2a277a469a20.webp",
         category_id: catMap["tablettes"],
         stock: 999,
         stock_status: "in_stock",
@@ -95,7 +95,7 @@ module.exports = {
         description:
           "Cacao Chuncho des hauts plateaux péruviens. Chocolat lait en slow-roasting.",
         price: 1190,
-        image_url: "http://localhost:3000/uploads/0def7783-e99b-4ed4-b05a-7f23f5f366dd.webp",
+        image_url: "https//api.carre-ivoire/uploads/0def7783-e99b-4ed4-b05a-7f23f5f366dd.webp",
         category_id: catMap["tablettes"],
         stock: 999,
         stock_status: "in_stock",
@@ -114,7 +114,7 @@ module.exports = {
         description:
           "Disque de chocolat noir 70%, garni à la main. Une tradition revisitée.",
         price: 490,
-        image_url: "http://localhost:3000/uploads/55637869-b7ab-4004-96d1-5babc7d2f1d9.webp",
+        image_url: "https//api.carre-ivoire/uploads/55637869-b7ab-4004-96d1-5babc7d2f1d9.webp",
         category_id: catMap["gourmandises"],
         stock: 999,
         stock_status: "in_stock",
@@ -134,7 +134,7 @@ module.exports = {
         description:
           "Noisettes du Piémont, cacao pur, sucre de canne blond. Rien d'autre.",
         price: 1490,
-        image_url: "http://localhost:3000/uploads/3cd20e22-486b-4847-bcba-9fb4d617db87.webp",
+        image_url: "https//api.carre-ivoire/uploads/3cd20e22-486b-4847-bcba-9fb4d617db87.webp",
         category_id: catMap["pates-a-tartiner"],
         stock: 999,
         stock_status: "in_stock",
@@ -154,7 +154,7 @@ module.exports = {
           "Noir intense, praliné noisette, caramel beurre salé, framboise, gianduja. 10 pièces.",
         price: 1890,
         discount_price: 1690,
-        image_url: "http://localhost:3000/uploads/85537c29-13bf-484d-bdba-a3ce6035ce7e.webp",
+        image_url: "https//api.carre-ivoire/uploads/85537c29-13bf-484d-bdba-a3ce6035ce7e.webp",
         badge: "NOUVEAU",
         category_id: catMap["mini-carres"],
         stock: 999,

@@ -88,8 +88,8 @@ npm --prefix apps/api run db:seed:undo:all
 | ------------------- | ------------------------------------------------------- |
 | Front Office        | http://localhost:5173                                   |
 | Back Office (admin) | http://localhost:5173/admin (compte avec `role: admin`) |
-| API                 | http://localhost:3000/api/v1                            |
-| Health              | http://localhost:3000/api/health                        |
+| API                 |https://api.carre-ivoire/api/v1                            |
+| Health              |https://api.carre-ivoire/api/health                        |
 
 ## API
 
@@ -135,7 +135,7 @@ docker compose exec backend sh
 docker compose exec database mysql -u carre_user -p carre_ivoire
 
 # Stripe webhooks en local
-stripe listen --forward-to localhost:3000/api/v1/stripe/webhook
+stripe listen --forward-to https://api.carre-ivoire/api/v1/stripe/webhook
 ```
 
 ## Production
