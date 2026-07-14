@@ -81,13 +81,6 @@ const engagements = [
     bg: 'var(--beige-doux)',
   },
 ]
-
-const chiffres = [
-  { valeur: '12', unite: 'origines', detail: 'sourcées directement auprès des producteurs' },
-  { valeur: '2', unite: 'ingrédients', detail: 'fèves de cacao et sucre — rien d\'autre' },
-  { valeur: '72h', unite: 'minimum', detail: 'de conchage pour chaque lot de couverture' },
-  { valeur: '25', unite: 'm² d\'atelier', detail: 'rue de Vauparfonds, LUISANT — toute la fabrication ici' },
-]
 </script>
 
 <template>
@@ -166,44 +159,6 @@ const chiffres = [
         </div>
       </div>
     </section>
-
-    <!-- ── Chiffres ────────────────────────────────────────── 
-    <section
-      class="bg-cacao"
-      style="padding: clamp(80px, 12vw, 192px) clamp(20px, 6vw, 104px)"
-    >
-      <div class="mb-20">
-        <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-dore">En chiffres</span>
-        <h2
-          class="mt-4 font-serif font-medium text-ivoire"
-          style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
-        >
-          Ce que nos engagements<br/>
-          <em style="opacity: 0.6">signifient concrètement.</em>
-        </h2>
-      </div>
-
-      <div class="grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-4">
-        <div
-          v-for="item in chiffres"
-          :key="item.unite"
-          class="border-t py-10 pr-10"
-          style="border-color: var(--ivoire-a15)"
-        >
-          <div
-            class="font-serif font-medium leading-none text-dore"
-            style="font-size: clamp(48px, 6vw, 72px)"
-          >{{ item.valeur }}</div>
-          <div class="mt-1 font-sans text-[11px] uppercase tracking-[0.18em] text-ivoire" style="opacity: 0.6">
-            {{ item.unite }}
-          </div>
-          <p class="mt-4 font-sans text-[13px] leading-relaxed text-ivoire" style="opacity: 0.5">
-            {{ item.detail }}
-          </p>
-        </div>
-      </div>
-    </section>
-    -->
 
     <!-- ── CTA ────────────────────────────────────────────── -->
     <section
