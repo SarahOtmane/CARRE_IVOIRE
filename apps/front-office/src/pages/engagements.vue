@@ -95,14 +95,14 @@ const engagements = [
         <span class="ci-eyebrow">Nos Engagements</span>
         <h1
           class="mt-4 font-serif font-medium text-cacao"
-          style="font-size: clamp(48px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.02em"
+          style="font-size: clamp(48px, 6vw, 80px); line-height: 0.95; letter-spacing: -0.02em"
         >
-          Chez Carré Ivoire, le chocolat ne se résume pas à une gourmandise.<br/>
-          <em class="text-cacao-2">sans compromis.</em>
+          Chez Carré Ivoire,<br/>
+          <em class="text-cacao-2">le chocolat ne se résume pas à une gourmandise.</em>
         </h1>
         <p
           class="mt-12 max-w-[560px] font-sans text-cacao-2"
-          style="font-size: 18px; line-height: 1.7"
+          style="font-size: 20px; line-height: 1.7"
         >
          Il relie une terre, des producteurs, un savoir-faire et les personnes qui le dégustent.
          Nous avançons avec une ambition simple : créer un chocolat artisanal, sincère et porteur de sens.
@@ -166,18 +166,19 @@ const engagements = [
       style="padding: clamp(80px, 12vw, 192px) clamp(20px, 6vw, 104px)"
     >
       <div class="flex flex-col items-start gap-10 lg:flex-row lg:items-end lg:justify-between">
-        <div class="max-w-[560px]">
+        <div class="max-w-[600px]">
           <span class="ci-eyebrow">La boutique</span>
           <h2
             class="mt-4 font-serif font-medium text-cacao"
-            style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
+            style="font-size: clamp(28px, 4vw, 40px); line-height: 1"
           >
-            Le chocolat comme lien<br/>
+            Le chocolat comme lien<br/><br/>
             <em class="text-cacao-2"><ul>
-              <li>Entre la Côte d\'Ivoire et la France.</li>
+              <li>Entre la Côte d'Ivoire et la France.</li>
               <li>Entre les producteurs et les consommateurs.</li>
               <li>Entre les souvenirs, les terres et les créations de demain.</li>
             </ul>
+            <br/>
             <p>Carré Ivoire — Le chocolat selon Koko.</p></em>
           </h2>
         </div>

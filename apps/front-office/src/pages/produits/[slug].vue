@@ -74,7 +74,11 @@ function formatPrice(centimes: number) {
 // Prix HT — affiché partout sur la fiche produit. La TVA ne s'applique qu'au moment de l'ajout au panier.
 const activePrice = computed(() => selectedVariant.value?.price ?? product.value?.price ?? 0)
 
-const unitTotal = computed(() => activePrice.value * quantity.value)
+const unitTotal = computed(() => {
+  let taxtRate
+  if (product.value) taxtRate = selectedVariant.value?.taxRate ?? product.value.taxRate
+  return taxtRate ? activePrice.value * ( 1 + taxtRate.rate / 100 ) * quantity.value : activePrice.value * quantity.value
+})
 
 function addToCart() {
   if (!product.value) return
@@ -193,7 +197,7 @@ async function toggleFavorite() {
         </div>
         <h1
           class="mt-4 font-serif text-cacao"
-          style="font-size: clamp(44px, 6vw, 80px); line-height: 0.95; font-weight: 500; letter-spacing: -0.02em"
+          style="font-size: clamp(32px, 4vw, 56px); line-height: 0.95; font-weight: 500; letter-spacing: -0.02em"
         >
           {{ product.name }}
         </h1>
@@ -221,7 +225,7 @@ async function toggleFavorite() {
               "
               @click="selectedVariantId = variant.id"
             >
-              {{ variant.label }} — {{ formatPrice(variant.price) }}
+              {{ variant.label }} — {{ formatPrice(variant.taxRate ? variant.price * (1 + variant.taxRate?.rate /100) : variant.price)}}
               <span v-if="variant.stockStatus === 'out_of_stock'" class="ml-1 text-[11px] italic">(rupture)</span>
             </button>
           </div>
