@@ -320,11 +320,11 @@ async function toggleFavorite() {
             </p>
 
             <p v-else-if="tab === 'degustation'" class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-cacao-2">
-              {{ product.description ?? product.shortDescription ?? 'Notes de dégustation à venir.' }}
+              {{ product.degustation ?? 'Notes de dégustation à venir.' }}
             </p>
 
             <p v-else-if="tab === 'conservation'" class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-cacao-2">
-              Conserver dans un endroit frais et sec, à l'abri de la lumière et des odeurs. Température idéale : entre 16 et 18 °C.
+              {{ product.conservation ?? 'Conserver dans un endroit frais et sec, à l\'abri de la lumière et des odeurs. Température idéale : entre 16 et 18 °C.' }}
             </p>
 
             <div v-else>

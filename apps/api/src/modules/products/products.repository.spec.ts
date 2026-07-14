@@ -172,7 +172,11 @@ describe('ProductsRepository', () => {
         price: 100, discountPrice: 90, imageUrl: 'img.jpg', categoryId: 2,
         stock: 10, stockStatus: 'in_stock', taxRateId: null,
         isActive: false, isSeasonal: true, displayOrder: 1,
-        badge: 'new', ingredients: 'cacao', allergens: 'none', weightGrams: 70,
+        badge: 'new', 
+        ingredients: 'cacao', 
+        degustation: 'température ambiente', 
+        conservation: '16 et 18 °C', 
+        allergens: 'none', weightGrams: 70,
       } as any)
       const call = model.update.mock.calls[0][0]
       expect(call.name).toBe('N')

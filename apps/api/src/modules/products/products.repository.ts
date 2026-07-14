@@ -107,6 +107,8 @@ export class ProductsRepository {
       displayOrder: dto.displayOrder ?? 0,
       badge: dto.badge ?? null,
       ingredients: dto.ingredients ?? null,
+      degustation: dto.degustation ?? null,
+      conservation: dto.conservation ?? null,
       allergens: dto.allergens ?? null,
       weightGrams: dto.weightGrams ?? null,
     } as any)
@@ -137,6 +139,8 @@ export class ProductsRepository {
     if (dto.displayOrder !== undefined) data.displayOrder = dto.displayOrder
     if (dto.badge !== undefined) data.badge = dto.badge
     if (dto.ingredients !== undefined) data.ingredients = dto.ingredients
+    if (dto.degustation !== undefined) data.degustation = dto.degustation
+    if (dto.conservation !== undefined) data.conservation = dto.conservation
     if (dto.allergens !== undefined) data.allergens = dto.allergens
     if (dto.weightGrams !== undefined) data.weightGrams = dto.weightGrams
     return data

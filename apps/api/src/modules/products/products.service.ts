@@ -102,6 +102,8 @@ export class ProductsService {
       displayOrder: p.displayOrder,
       badge: p.badge ?? undefined,
       ingredients: p.ingredients ?? undefined,
+      degustation: p.degustation ?? undefined,
+      conservation: p.conservation ?? undefined,
       allergens: p.allergens ?? undefined,
       weightGrams: p.weightGrams ?? undefined,
       variants: ((p.variants ?? []) as ProductVariant[]).map((v) => toVariantResponseDto(v)),

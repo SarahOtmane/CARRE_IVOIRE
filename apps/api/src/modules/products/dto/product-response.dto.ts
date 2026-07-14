@@ -25,6 +25,8 @@ export interface ProductResponseDto {
   displayOrder: number
   badge?: string
   ingredients?: string
+  degustation?: string
+  conservation?: string
   allergens?: string
   weightGrams?: number
   variants: VariantResponseDto[]

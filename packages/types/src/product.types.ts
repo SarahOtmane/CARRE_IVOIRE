@@ -29,6 +29,8 @@ export interface Product {
   displayOrder: number
   badge?: string
   ingredients?: string
+  degustation?: string
+  conservation?: string
   allergens?: string
   weightGrams?: number
   variants: ProductVariant[]
@@ -85,6 +87,8 @@ export interface CreateProductDto {
   isSeasonal?: boolean
   displayOrder?: number
   ingredients?: string
+  degustation?: string
+  conservation?: string
   allergens?: string
   weightGrams?: number
 }

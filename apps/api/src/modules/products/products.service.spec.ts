@@ -10,7 +10,7 @@ const mockProduct = {
   stock: 100, stockStatus: 'in_stock',
   taxRateId: null, taxRate: null,
   isActive: 1, isSeasonal: 0, displayOrder: 1,
-  badge: null, ingredients: null, allergens: null, weightGrams: null,
+  badge: null, ingredients: null, degustation: null, converation: null, allergens: null, weightGrams: null,
   created_at: new Date(), updated_at: new Date(),
 }
 

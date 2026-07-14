@@ -54,8 +54,8 @@ export class CreateProductDto {
   stock?: number
 
   @IsOptional()
-  @IsIn(['in_stock', 'out_of_stock'])
-  stockStatus?: 'in_stock' | 'out_of_stock'
+  @IsIn(['in_stock', 'low_stock', 'out_of_stock'])
+  stockStatus?: 'in_stock' | 'low_stock' | 'out_of_stock'
 
   @IsInt()
   @Min(1)
@@ -82,6 +82,14 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   ingredients?: string
+
+  @IsOptional()
+  @IsString()
+  degustation?: string
+
+  @IsOptional()
+  @IsString()
+  conservation?: string
 
   @IsOptional()
   @IsString()

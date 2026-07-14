@@ -117,6 +117,14 @@ export class Product extends Model<Product> {
 
   @AllowNull(true)
   @Column(DataType.TEXT)
+  declare degustation: string | null
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  declare conservation: string | null
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
   declare allergens: string | null
 
   @AllowNull(true)

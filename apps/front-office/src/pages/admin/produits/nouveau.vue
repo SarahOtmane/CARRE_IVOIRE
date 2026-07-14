@@ -48,6 +48,8 @@ const draft = ref({
   description: "",
   isActive: true,
   ingredients: "",
+  degustation: "",
+  conservation: "",
   allergens: "",
   weightGrams: 0,
   imageUrl: "",
@@ -89,6 +91,8 @@ async function save() {
     description: draft.value.description || undefined,
     isActive: draft.value.isActive,
     ingredients: draft.value.ingredients || undefined,
+    degustation: draft.value.degustation || undefined,
+    conservation: draft.value.conservation || undefined,
     allergens: draft.value.allergens || undefined,
     weightGrams: draft.value.weightGrams || undefined,
     imageUrl: draft.value.imageUrl || undefined,
@@ -259,6 +263,26 @@ async function save() {
             v-model="draft.ingredients"
             type="text"
             placeholder="Pâte de cacao, sucre, beurre de cacao…"
+            class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
+          />
+        </label>
+
+        <label class="grid gap-2">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Dégustation</span>
+          <input
+            v-model="draft.degustation"
+            type="text"
+            placeholder="Contient : fruits à coque, lait, soja…"
+            class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
+          />
+        </label>
+
+        <label class="grid gap-2">
+          <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Conservation</span>
+          <input
+            v-model="draft.conservation"
+            type="text"
+            placeholder="Contient : fruits à coque, lait, soja…"
             class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
           />
         </label>
