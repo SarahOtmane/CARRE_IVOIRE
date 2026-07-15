@@ -30,7 +30,7 @@ const { result } = useProducts({ limit: 3 })
     <!-- Grille produits -->
     <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
       <ProductCard
-        v-for="product in result.items.slice(10, 14)"
+        v-for="product in result.items.slice(3, 6)"
         :key="product.id"
         :product="product"
       />

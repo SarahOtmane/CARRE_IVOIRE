@@ -51,13 +51,14 @@ const categories = computed(() =>
           class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4.5vw, 64px); line-height: 1; letter-spacing: -0.01em"
         >
-          Cacao de Côte d’Ivoire<br/>
+          Cacao de Côte d'Ivoire<br/>
           <em class="text-cacao-2">Des fèves sélectionnées pour leur origine et leur caractère.</em>
         </h2>
+        <br />
         <div class="mt-4 font-serif font-medium text-cacao" 
           style="font-size: clamp(20px, 4vw, 56px); line-height: 1; letter-spacing: -0.01em">
           <p>Nous transformons les fèves dans notre atelier.</p>
-          <ul>
+          <ul style="list-style-type:'> '">
             <li>Fabrication artisanale</li>
             <li>Des créations réalisées en petites séries</li>
             <li>Atelier à Luisant</li>
