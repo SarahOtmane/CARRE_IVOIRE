@@ -34,7 +34,7 @@ const router = useRouter()
       <div class="flex max-w-[600px] flex-col" style="color: var(--ivoire)">
 
         <!-- Eyebrow -->
-        <span class="mb-7 font-sans text-[11px] uppercase tracking-[0.32em]" style="opacity: 0.75">
+        <span class="mb-7 font-sans text-[10px] uppercase tracking-[0.32em]" style="opacity: 0.75">
           Chocolaterie Bean-to-Bar à Luisant · Fabrication artisanale<br />
           CARRÉ IVOIRE — LE CARRÉ, À L'ÉTAT PUR
         </span>
@@ -42,7 +42,7 @@ const router = useRouter()
         <!-- H1 -->
         <h1
           class="mb-14 font-serif font-normal"
-          style="font-size: clamp(34px, 6vw, 56px); line-height: 0.95; letter-spacing: -0.02em; color: var(--ivoire)"
+          style="font-size: clamp(34px, 6vw, 54px); line-height: 0.95; letter-spacing: -0.02em; color: var(--ivoire)"
         >
           Le cacao ivoirien, transformé ici<br/><br/>
           <em>Des chocolats artisanaux fabriqués de la fève à la tablette dans notre atelier de Luisant</em>
