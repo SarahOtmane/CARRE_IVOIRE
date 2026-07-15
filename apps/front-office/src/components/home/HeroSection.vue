@@ -35,7 +35,8 @@ const router = useRouter()
 
         <!-- Eyebrow -->
         <span class="mb-7 font-sans text-[11px] uppercase tracking-[0.32em]" style="opacity: 0.75">
-          Chocolat de fève — LUISANT
+          Chocolaterie Bean-to-Bar à Luisant · Fabrication artisanale<br />
+          CARRÉ IVOIRE — LE CARRÉ, À L’ÉTAT PUR
         </span>
 
         <!-- H1 -->
@@ -43,8 +44,8 @@ const router = useRouter()
           class="mb-14 font-serif font-normal"
           style="font-size: clamp(44px, 7.5vw, 116px); line-height: 0.95; letter-spacing: -0.02em; color: var(--ivoire)"
         >
-          Le carré,<br/>
-          <em>à l'état pur.</em>
+          Le cacao ivoirien, transformé ici,<br/>
+          <em>Des chocolats artisanaux fabriqués de la fève à la tablette dans notre atelier de Luisant</em>
         </h1>
 
         <!-- CTAs -->

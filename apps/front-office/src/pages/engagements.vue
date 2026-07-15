@@ -28,10 +28,8 @@ const engagements = [
     accroche: 'Npous transformons nous même les fèves de cacao dans notre attelier de Luisant.',
     corps: 'Chaque étape est réalisée avec patience afin de préserver la personnalité du cacao :',
     details: [
-      'Torréfaction, ',
-      'Broyage, ',
-      'Affinage, ',
-      'Conchage, ',
+      'Torréfaction, Broyage, ',
+      'Affinage, Conchage, ',
       'Tempérage et Moulage',
     ],
     bg: 'var(--rose-poudre)',

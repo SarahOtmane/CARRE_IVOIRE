@@ -20,8 +20,8 @@ const { result } = useProducts({ limit: 3 })
           class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
         >
-          Nos carrés<br/>
-          <em>de mars.</em>
+          Les créations Carré Ivoire<br/>
+          <em>Une première sélection pour découvrir notre chocolat</em>
         </h2>
       </div>
       <span class="font-sans text-[11px] uppercase tracking-[0.22em] text-cacao-3">— II</span>
@@ -30,7 +30,7 @@ const { result } = useProducts({ limit: 3 })
     <!-- Grille produits -->
     <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
       <ProductCard
-        v-for="product in result.items.slice(0, 3)"
+        v-for="product in result.items.slice(10, 14)"
         :key="product.id"
         :product="product"
       />
