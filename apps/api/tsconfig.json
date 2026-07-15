@@ -3,7 +3,6 @@
   "compilerOptions": {
     "ignoreDeprecations": "5.0",
     "outDir": "./dist",
-    "baseUrl": "./src",
     "rootDir": "./src",
     "paths": {
       "@/*": ["./*"]

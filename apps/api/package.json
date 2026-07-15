@@ -1,6 +1,6 @@
 {
   "name": "@carre-ivoire/api",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "private": true,
   "engines": {
     "node": ">=20.0.0"
