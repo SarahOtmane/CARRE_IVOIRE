@@ -1,6 +1,6 @@
 {
   "name": "@carre-ivoire/monorepo",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "packageManager": "npm@10.0.0",
   "private": true,
   "engines": {
