@@ -1,6 +1,6 @@
 {
   "name": "@carre-ivoire/front-office",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "private": true,
   "type": "module",
   "engines": {

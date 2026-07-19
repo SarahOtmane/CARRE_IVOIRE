@@ -25,68 +25,56 @@ interface Evenement {
 
 const evenements: Evenement[] = [
   {
-    id: 'degustation-porcelana-juin-2026',
+    id: 'ouverture-atelier-boutique',
     date: '14',
-    mois: 'Juin',
-    annee: '2026',
-    titre: 'Dégustation Porcelana',
-    type: 'Dégustation',
-    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
-    description: 'Une séance autour de la Porcelana vénézuélienne. Trois millésimes, deux expressions. Vingt participants maximum. Animée par nos chocolatiers.',
-    complet: false,
-    tag: null,
-  },
-  {
-    id: 'visite-atelier-juillet-2026',
-    date: '05',
-    mois: 'Juillet',
-    annee: '2026',
-    titre: 'Visite de l\'atelier',
-    type: 'Visite',
-    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
-    description: 'Portes ouvertes sur notre fabrication. Torréfaction en direct, broyage, tempérage. Vous repartez avec un carré fait pendant la visite.',
-    complet: false,
-    tag: 'Nouveau',
-  },
-  {
-    id: 'masterclass-temperage-juillet-2026',
-    date: '19',
-    mois: 'Juillet',
-    annee: '2026',
-    titre: 'Masterclass Tempérage',
-    type: 'Atelier',
-    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
-    description: 'Trois heures pour comprendre et pratiquer le tempérage sur marbre. Vous repartez avec vos propres tablettes. Niveau intermédiaire — une expérience chocolat est recommandée.',
-    complet: true,
-    tag: null,
-  },
-  {
-    id: 'parcours-bean-to-bar-aout-2026',
-    date: '22',
-    mois: 'Août',
-    annee: '2026',
-    titre: 'Parcours Bean-to-Bar',
-    type: 'Atelier',
-    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
-    description: 'Une journée entière. De la fève brute au carré final. Torréfaction, broyage, conchage, moulage. Déjeuner inclus. Huit participants.',
-    complet: false,
-    tag: null,
-  },
-  {
-    id: 'degustation-millésimes-septembre-2026',
-    date: '10',
     mois: 'Septembre',
     annee: '2026',
-    titre: 'Millésimes 2025',
-    type: 'Dégustation',
-    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT 2ᵉ',
-    description: 'Présentation des fèves de la récolte 2025. Comparaison avec les millésimes précédents. Un moment pour les amateurs de cacao fin qui souhaitent comprendre comment une fève évolue.',
+    titre: 'Ouverture de l\'atelier / boutique',
+    type: 'Visite',
+    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT',
+    description: 'Notre atelier / boutique ouvre ces portes, venez nous rendre visite. Nous vous accuillerons avec toutes nos gourmandises',
     complet: false,
-    tag: 'Édition limitée',
+    tag: 'A venir',
+  },
+  {
+    id: 'telethon-de-luisant',
+    date: '31',
+    mois: 'Octobre',
+    annee: '2026',
+    titre: 'Téléthon de Luisant',
+    type: 'Exposition',
+    lieu: 'Salle André Malraux — Cour Charles Brune, LUISANT',
+    description: 'Le Téléthon de Luisant vous propose un salon des artisants et professionnels du bien-être de la région.',
+    complet: false,
+    tag: 'A venir',
+  },
+  {
+    id: 'salon-du-bien-etre',
+    date: '29',
+    mois: 'Novembre',
+    annee: '2026',
+    titre: 'Salon du bien être de Chateaudun',
+    type: 'Exposition',
+    lieu: 'CHATEAUDUN',
+    description: 'Salon des artisants et professionnel de Chatraudun vous accueil dans une ambiance zen et festive .',
+    complet: false,
+    tag: 'A venir',
+  },
+  {
+    id: 'marcher-de-noel',
+    date: '12-13',
+    mois: 'Décembre',
+    annee: '2026',
+    titre: 'Marché de Noël de Luisant',
+    type: 'Exposition',
+    lieu: 'LUISANT',
+    description: 'Préparez-vous pour les fêtes, venez nous rendre visite au Marché de Noël de luisant.',
+    complet: false,
+    tag: 'A venir',
   },
 ]
 
-const types = ['Tous', 'Dégustation', 'Visite', 'Atelier']
+const types = ['Tous', 'Dégustation', 'Visite', 'Atelier', 'Exposition']
 
 const selectedType = ref('Tous')
 
@@ -208,7 +196,7 @@ const filteredEvenements = computed(() =>
             </div>
           </div>
 
-          <!-- CTA -->
+          <!-- CTA 
           <div class="flex items-start lg:justify-end">
             <button
               v-if="!evt.complet"
@@ -222,7 +210,7 @@ const filteredEvenements = computed(() =>
             >
               Liste d'attente →
             </span>
-          </div>
+          </div> -->
         </article>
 
         <div class="border-t" style="border-color: var(--cacao-a12)" />
@@ -288,13 +276,13 @@ const filteredEvenements = computed(() =>
     >
       <div class="flex flex-col items-start gap-10 lg:flex-row lg:items-end lg:justify-between">
         <div class="max-w-[560px]">
-          <span class="ci-eyebrow">Pendant ce temps</span>
+          <span class="ci-eyebrow">En attendant</span>
           <h2
             class="mt-4 font-serif font-medium text-cacao"
             style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
           >
             La boutique,<br/>
-            <em class="text-cacao-2">elle, n'attend pas.</em>
+            <em class="text-cacao-2">Accessible tous les jours.</em>
           </h2>
         </div>
         <div class="flex flex-col gap-4 sm:flex-row">

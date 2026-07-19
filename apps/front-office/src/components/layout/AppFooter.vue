@@ -8,15 +8,13 @@ const cols = [
   {
     title: "Boutique",
     items: [
-      { label: "Carrés Signature", path: "/boutique/carres-signature" },
-      { label: "Mini Carrés", path: "/boutique/mini-carres" },
       { label: "Tablettes", path: "/boutique/tablettes" },
+      { label: "Mini Carrés", path: "/boutique/mini-carres" },
+      { label: "Carrés Signature", path: "/boutique/carres-signature" },
       { label: "Gourmandises", path: "/boutique/gourmandises" },
-      { label: "Sablés", path: "/boutique/sables" },
-      { label: "Mendiants", path: "/boutique/mendiants" },
-      { label: "Oursons", path: "/boutique/oursons" },
-      { label: "Chocobombs", path: "/boutique/chocobombs" },
       { label: "Pâtes à tartiner", path: "/boutique/pates-a-tartiner" },
+      { label: "Gamme professionnelle", path: "/boutique/gamme-professionnelle" },
+      { label: "Ateliers", path: "/boutique/ateliers" },
     ],
   },
   {

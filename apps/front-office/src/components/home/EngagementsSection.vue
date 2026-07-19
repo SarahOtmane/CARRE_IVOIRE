@@ -45,7 +45,7 @@ const engagements = [
         class="mt-4 font-serif font-medium text-cacao"
         style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
       >
-        Quatre principes,<br/>
+        Six principes,<br/>
         <em>sans compromis.</em>
       </h2>
     </div>

@@ -136,6 +136,11 @@ function openProduct(productId: number) {
             {{ product.isActive ? "Actif" : "Inactif" }}
           </span>
         </div>
+        <div class="flex justify-center">
+          <span class="border border-cacao px-3 py-1 font-body text-[10px] uppercase tracking-[0.18em] text-cacao/70">
+            {{ product.displayOrder !== undefined ? "" : product.displayOrder }}
+          </span>
+        </div>
         <span class="text-center font-body text-[11px] uppercase tracking-[0.18em] text-cacao/55">Ouvrir</span>
       </button>
 

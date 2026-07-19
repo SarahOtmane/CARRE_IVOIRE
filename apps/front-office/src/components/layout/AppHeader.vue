@@ -354,27 +354,29 @@ function toggleSearch() {
             @click="navigate('/boutique/carres-signature')"
           >
             <span class="ci-label">À la une</span>
+            <img src="http://api.carre-ivoire.fr/uploads/3192bba8-422a-44b2-8d10-b73662569e8b.webp" alt="Coffret de 12 bonbons de chocolat" loading="lazy" decoding="async" class="h-[150px] w-[150px] object-cover">
             <div>
               <div class="font-serif text-[22px] leading-[1.1] text-cacao">
                 Coffret<br /><em>Signature</em>
               </div>
               <div class="mt-1.5 font-sans text-[11px] text-cacao-3">
-                16 carrés — 42 €
+                16 carrés — 22 €
               </div>
             </div>
           </div>
           <div
             class="flex flex-1 cursor-pointer flex-col justify-between bg-rose-poudre p-6 transition-opacity duration-200 hover:opacity-90"
             style="aspect-ratio: 1/1"
-            @click="navigate('/boutique/chocobombs')"
+            @click="navigate('/boutique/tablette')"
           >
-            <span class="ci-label">Saison</span>
+            <span class="ci-label">Incontounables</span>
+            <img src="http://api.carre-ivoire.fr/uploads/3df9f08b-f8f5-42d4-98ef-958a6273afa1.webp" alt="Escapade dans le Moronou" loading="lazy" decoding="async" class="h-[150px] w-[150px] object-cover">
             <div>
               <div class="font-serif text-[22px] leading-[1.1] text-cacao">
-                Chocobombs<br /><em>printemps</em>
+                Tablettes<br /><em>Origine Côte d'Ivoire</em>
               </div>
               <div class="mt-1.5 font-sans text-[11px] text-cacao-3">
-                Édition limitée
+                Cacao 70%, 75% et 80%
               </div>
             </div>
           </div>

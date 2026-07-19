@@ -39,8 +39,8 @@ function formatPrice(centimes: number) {
 
 const displayPrice = computed(() => {
   const variants = props.product.variants ?? []
-  if (variants.length === 0) return formatPrice(props.product.price)
-  const cheapest = Math.min(...variants.map((v) => v.price))
+  if (variants.length === 0) return formatPrice(props.product.priceTtc !== undefined ? props.product.price :  props.product.price)
+  const cheapest = Math.min(...variants.map((v) => v.priceTtc !== undefined ? v.priceTtc : v.price ))
   return `À partir de ${formatPrice(cheapest)}`
 })
 
