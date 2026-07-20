@@ -280,6 +280,7 @@ small,
   display: inline-block;
   font-family: var(--font-sans);
   font-size: 11px;
+  text-transform: uppercase;
   letter-spacing: 0.22em;
   color: var(--fg-muted);
   padding-bottom: var(--sp-3);
@@ -288,7 +289,6 @@ small,
   display: inline-block;
   font-family: var(--font-sans);
   font-size: 11px;
-  text-transform: uppercase;
   letter-spacing: 0.22em;
   color: var(--fg-muted);
   padding-bottom: var(--sp-3);

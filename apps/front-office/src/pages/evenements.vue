@@ -18,7 +18,9 @@ interface Evenement {
   titre: string
   type: string
   lieu: string
-  description: string
+  description1: string
+  description2: string
+  description3: string
   commentaire: string
   complet: boolean
   tag: string | null
@@ -33,7 +35,9 @@ const evenements: Evenement[] = [
     titre: 'Journée porte ouverte',
     type: 'Visite',
     lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT',
-    description: 'Carré Ivoire ouvrira prochainement les portes de son laboratoire au public.<br />Cette journée sera l\'occasion de découvrir notre univers, notre histoire et les différentes étapes de transformation de la fève de cacao en chocolat.<br />Vous pourrez également découvrir les créations de la maison, échanger avec Koko et participer à une dégustation de chocolats artisanaux.',
+    description1: 'Carré Ivoire ouvrira prochainement les portes de son laboratoire au public.',
+    description2: 'Cette journée sera l\'occasion de découvrir notre univers, notre histoire et les différentes étapes de transformation de la fève de cacao en chocolat.',
+    description3: 'Vous pourrez également découvrir les créations de la maison, échanger avec Koko et participer à une dégustation de chocolats artisanaux.',
     commentaire: 'La date de notre prochaine journée portes ouvertes sera annoncée prochainement.',
     complet: false,
     tag: '',
@@ -46,7 +50,9 @@ const evenements: Evenement[] = [
     titre: 'Atelier adulte : De la fève à la tablette',
     type: 'Atelier',
     lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT',
-    description: 'Découvrez le parcours du cacao, ses origines et les principales étapes de fabrication du chocolat Bean-to-Bar.<br />Après une dégustation de différents chocolats, chaque participant pourra mouler et personnaliser sa propre tablette Carré Ivoire.',
+    description1: 'Découvrez le parcours du cacao, ses origines et les principales étapes de fabrication du chocolat Bean-to-Bar.',
+    description2: 'Après une dégustation de différents chocolats, chaque participant pourra mouler et personnaliser sa propre tablette Carré Ivoire.',
+    description3: '',
     commentaire: 'Dates, tarifs et modalités d’inscription prochainement disponibles',
     complet: false,
     tag: '',
@@ -59,7 +65,9 @@ const evenements: Evenement[] = [
     titre: 'Atelier enfant : Ma première tablette Carré Ivoire',
     type: 'Atelier',
     lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT',
-    description: 'Un atelier ludique et gourmand pour permettre aux enfants de découvrir le monde du cacao.<br />Ils pourront observer, sentir et goûter différents ingrédients, puis mouler et décorer leur propre tablette de chocolat.<br />Chaque enfant repartira avec sa création soigneusement emballée.',
+    description1: 'Un atelier ludique et gourmand pour permettre aux enfants de découvrir le monde du cacao.',
+    description2: 'Ils pourront observer, sentir et goûter différents ingrédients, puis mouler et décorer leur propre tablette de chocolat.',
+    description3: 'Chaque enfant repartira avec sa création soigneusement emballée.',
     commentaire: 'Atelier destiné aux enfants de 7 à 12 ans. Dates, tarifs et modalités d\'inscription prochainement disponibles.',
     complet: false,
     tag: '',
@@ -72,7 +80,9 @@ const evenements: Evenement[] = [
     titre: 'Téléthon de Luisant',
     type: 'Salon',
     lieu: 'Salle André Malraux — Cour Charles Brune, LUISANT',
-    description: 'Retrouvez Carré Ivoire à l\'occasion du Téléthon de Luisant.<br />Venez découvrir et déguster nos créations chocolatées tout en participant à une journée placée sous le signe de la solidarité.',
+    description1: 'Retrouvez Carré Ivoire à l\'occasion du Téléthon de Luisant.',
+    description2: 'Venez découvrir et déguster nos créations chocolatées tout en participant à une journée placée sous le signe de la solidarité.',
+    description3: '',
     commentaire: '',
     complet: false,
     tag: 'A venir',
@@ -85,7 +95,9 @@ const evenements: Evenement[] = [
     titre: 'Salon Zen de Chateaudun',
     type: 'Salon',
     lieu: 'CHATEAUDUN',
-    description: 'Carré Ivoire sera présent au Salon Zen de Châteaudun pour une journée consacrée au bien-être, à la découverte et aux savoir-faire artisanaux.',
+    description1: 'Carré Ivoire sera présent au Salon Zen de Châteaudun pour une journée consacrée au bien-être, à la découverte et aux savoir-faire artisanaux.',
+    description2: '',
+    description3: '',
     commentaire: 'Venez rencontrer Koko et découvrir autrement l\'univers du cacao et du chocolat artisanal',
     complet: false,
     tag: 'A venir',
@@ -98,7 +110,9 @@ const evenements: Evenement[] = [
     titre: 'Marché de Noël de Luisant',
     type: 'Marché',
     lieu: 'LUISANT',
-    description: 'Retrouvez Carré Ivoire à l’occasion du marché de Noël.<br />Tablettes, gourmandises chocolatées, créations de saison et idées cadeaux seront au rendez-vous pour préparer les fêtes.',
+    description1: 'Retrouvez Carré Ivoire à l’occasion du marché de Noël.',
+    description2: 'Tablettes, gourmandises chocolatées, créations de saison et idées cadeaux seront au rendez-vous pour préparer les fêtes.',
+    description3: '',
     commentaire: 'Le lieu exact sera communiqué prochainement.',
     complet: false,
     tag: 'A venir',
@@ -210,10 +224,15 @@ const filteredEvenements = computed(() =>
             >{{ evt.titre }}</h2>
 
             <p class="mt-3 font-sans text-[14px] leading-relaxed text-cacao-2" style="max-width: 520px">
-              {{ evt.description }}
+              {{ evt.description1 }}
             </p>
-            
-            <p class="mt-3 font-sans text-[14px] leading-relaxed text-cacao-2" style="max-width: 520px"><b>
+            <p v-if="evt.description2 !== ''" class="mt-3 font-sans text-[14px] leading-relaxed text-cacao-2" style="max-width: 520px">
+              {{ evt.description2 }}
+            </p>
+            <p v-if="evt.description3 !== ''" class="mt-3 font-sans text-[14px] leading-relaxed text-cacao-2" style="max-width: 520px">
+              {{ evt.description3 }}
+            </p>
+            <p v-if="evt.commentaire !== ''" class="mt-3 font-sans text-[14px] leading-relaxed text-cacao-2" style="max-width: 520px"><b>
               {{ evt.commentaire }}
             </b></p>
 
