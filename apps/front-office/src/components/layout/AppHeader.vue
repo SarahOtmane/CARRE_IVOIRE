@@ -360,7 +360,7 @@ function toggleSearch() {
                 Coffret<br /><em>Signature</em>
               </div>
               <div class="mt-1.5 font-sans text-[11px] text-cacao-3">
-                16 carrés — 22 €
+                12 carrés — 22 €
               </div>
             </div>
           </div>

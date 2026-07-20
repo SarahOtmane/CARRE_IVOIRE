@@ -10,15 +10,13 @@ const hoveredSlug = ref<string | null>(null)
 const { categories: apiCategories } = useCategories()
 
 const categoryMeta: Record<string, { num: string; tagline: string; bg: string; fg: string; featured?: boolean }> = {
-  'carres-signature': { num: '01', tagline: 'bonbons au chocolat',        bg: 'var(--brun-cacao)',    fg: 'var(--ivoire)',     featured: true },
-  'mini-carres':      { num: '02', tagline: 'format dégustation',         bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
-  'tablettes':        { num: '03', tagline: 'pur cacao, grand format',    bg: 'var(--beige-doux)',   fg: 'var(--brun-cacao)' },
-  'gourmandises':     { num: '04', tagline: 'praliné, caramel, noisette', bg: 'var(--ivoire-deep)',  fg: 'var(--brun-cacao)' },
-  'sables':           { num: '05', tagline: 'biscuits au beurre',         bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
-  'mendiants':        { num: '06', tagline: 'fruits secs & cacao',        bg: 'var(--beige-doux)',   fg: 'var(--brun-cacao)' },
-  'oursons':          { num: '07', tagline: 'guimauve enrobée',           bg: 'var(--ivoire-deep)',  fg: 'var(--brun-cacao)' },
-  'chocobombs':       { num: '08', tagline: 'édition printemps',          bg: 'var(--brun-cacao-2)', fg: 'var(--ivoire)'     },
-  'pates-a-tartiner': { num: '09', tagline: 'noisette & cacao',           bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
+  'mini-carres':      { num: '01', tagline: 'format dégustation',         bg: 'var(--rose-poudre)',  fg: 'var(--ivoire)',     featured: true },
+  'tablettes':        { num: '02', tagline: 'pur cacao, grand format',    bg: 'var(--beige-doux)',   fg: 'var(--brun-cacao)' },
+  'carres-signature': { num: '03', tagline: 'bonbons au chocolat',        bg: 'var(--brun-cacao)',   fg: 'var(--brun-cacao)' },
+  'gourmandises':     { num: '04', tagline: 'Ourson guimauve, praliné, caramel', bg: 'var(--ivoire-deep)',  fg: 'var(--brun-cacao)' },
+  'pates-a-tartiner': { num: '05', tagline: 'noisette & cacao',           bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
+  'gamme-professionnelle': { num: '06', tagline: 'Produits à base de cacao pour les professionnels',           bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
+  'atelier': { num: '07', tagline: 'Atelier bean to bar',           bg: 'var(--rose-poudre)',  fg: 'var(--brun-cacao)' },
 }
 
 const FALLBACK_COLORS = ['var(--rose-poudre)', 'var(--beige-doux)', 'var(--ivoire-deep)']

@@ -38,9 +38,10 @@ function formatPrice(centimes: number) {
 }
 
 const displayPrice = computed(() => {
+  const rate = props.product.taxRate?.rate !== undefined ? props.product.taxRate?.rate : 0
   const variants = props.product.variants ?? []
-  if (variants.length === 0) return formatPrice(props.product.priceTtc !== undefined ? props.product.price :  props.product.price)
-  const cheapest = Math.min(...variants.map((v) => v.priceTtc !== undefined ? v.priceTtc : v.price ))
+  if (variants.length === 0) return formatPrice(props.product.price * (1 + rate/100))
+  const cheapest = Math.min(...variants.map((v) => v.price * (1 + rate/100)))
   return `À partir de ${formatPrice(cheapest)}`
 })
 
@@ -109,7 +110,8 @@ const badgeVariants: Record<string, string> = {
 
     <!-- Infos produit -->
     <div class="pt-5">
-      <span v-if="product.shortDescription" class="ci-eyebrow">{{ product.shortDescription }}</span>
+      <span v-if="product.shortDescription" class="ci-eyebrow-title">{{ product.shortDescription.split(':')[0] }}:</span>
+      <span v-if="product.shortDescription" class="ci-eyebrow">{{ product.shortDescription.split(':')[1] }}</span>
       <div class="mt-1.5 font-serif text-[22px] leading-[1.15] tracking-[-0.005em] text-cacao">
         {{ product.name }}
       </div>

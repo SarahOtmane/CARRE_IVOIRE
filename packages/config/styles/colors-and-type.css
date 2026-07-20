@@ -276,6 +276,14 @@ small,
   color: var(--fg-accent);
   letter-spacing: 0.02em;
 }
+.ci-eyebrow-title {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--fg-muted);
+  padding-bottom: var(--sp-3);
+}
 .ci-eyebrow {
   display: inline-block;
   font-family: var(--font-sans);

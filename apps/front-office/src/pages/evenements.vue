@@ -19,22 +19,50 @@ interface Evenement {
   type: string
   lieu: string
   description: string
+  commentaire: string
   complet: boolean
   tag: string | null
 }
 
 const evenements: Evenement[] = [
   {
-    id: 'ouverture-atelier-boutique',
-    date: '14',
-    mois: 'Septembre',
-    annee: '2026',
-    titre: 'Ouverture de l\'atelier / boutique',
+    id: 'journee-porte-ouverte',
+    date: 'A venir',
+    mois: '',
+    annee: '',
+    titre: 'Journée porte ouverte',
     type: 'Visite',
     lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT',
-    description: 'Notre atelier / boutique ouvre ces portes, venez nous rendre visite. Nous vous accuillerons avec toutes nos gourmandises',
+    description: 'Carré Ivoire ouvrira prochainement les portes de son laboratoire au public.<br />Cette journée sera l\'occasion de découvrir notre univers, notre histoire et les différentes étapes de transformation de la fève de cacao en chocolat.<br />Vous pourrez également découvrir les créations de la maison, échanger avec Koko et participer à une dégustation de chocolats artisanaux.',
+    commentaire: 'La date de notre prochaine journée portes ouvertes sera annoncée prochainement.',
     complet: false,
-    tag: 'A venir',
+    tag: '',
+  },
+  {
+    id: 'atelier-adulte',
+    date: 'A venir',
+    mois: '',
+    annee: '',
+    titre: 'Atelier adulte : De la fève à la tablette',
+    type: 'Atelier',
+    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT',
+    description: 'Découvrez le parcours du cacao, ses origines et les principales étapes de fabrication du chocolat Bean-to-Bar.<br />Après une dégustation de différents chocolats, chaque participant pourra mouler et personnaliser sa propre tablette Carré Ivoire.',
+    commentaire: 'Dates, tarifs et modalités d’inscription prochainement disponibles',
+    complet: false,
+    tag: '',
+  },
+  {
+    id: 'atelier-enfant',
+    date: 'A venir',
+    mois: '',
+    annee: '',
+    titre: 'Atelier enfant : Ma première tablette Carré Ivoire',
+    type: 'Atelier',
+    lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT',
+    description: 'Un atelier ludique et gourmand pour permettre aux enfants de découvrir le monde du cacao.<br />Ils pourront observer, sentir et goûter différents ingrédients, puis mouler et décorer leur propre tablette de chocolat.<br />Chaque enfant repartira avec sa création soigneusement emballée.',
+    commentaire: 'Atelier destiné aux enfants de 7 à 12 ans. Dates, tarifs et modalités d\'inscription prochainement disponibles.',
+    complet: false,
+    tag: '',
   },
   {
     id: 'telethon-de-luisant',
@@ -42,21 +70,23 @@ const evenements: Evenement[] = [
     mois: 'Octobre',
     annee: '2026',
     titre: 'Téléthon de Luisant',
-    type: 'Exposition',
+    type: 'Salon',
     lieu: 'Salle André Malraux — Cour Charles Brune, LUISANT',
-    description: 'Le Téléthon de Luisant vous propose un salon des artisants et professionnels du bien-être de la région.',
+    description: 'Retrouvez Carré Ivoire à l\'occasion du Téléthon de Luisant.<br />Venez découvrir et déguster nos créations chocolatées tout en participant à une journée placée sous le signe de la solidarité.',
+    commentaire: '',
     complet: false,
     tag: 'A venir',
   },
   {
-    id: 'salon-du-bien-etre',
+    id: 'salon-zen-chateaudun',
     date: '29',
     mois: 'Novembre',
     annee: '2026',
-    titre: 'Salon du bien être de Chateaudun',
-    type: 'Exposition',
+    titre: 'Salon Zen de Chateaudun',
+    type: 'Salon',
     lieu: 'CHATEAUDUN',
-    description: 'Salon des artisants et professionnel de Chatraudun vous accueil dans une ambiance zen et festive .',
+    description: 'Carré Ivoire sera présent au Salon Zen de Châteaudun pour une journée consacrée au bien-être, à la découverte et aux savoir-faire artisanaux.',
+    commentaire: 'Venez rencontrer Koko et découvrir autrement l\'univers du cacao et du chocolat artisanal',
     complet: false,
     tag: 'A venir',
   },
@@ -66,15 +96,16 @@ const evenements: Evenement[] = [
     mois: 'Décembre',
     annee: '2026',
     titre: 'Marché de Noël de Luisant',
-    type: 'Exposition',
+    type: 'Marché',
     lieu: 'LUISANT',
-    description: 'Préparez-vous pour les fêtes, venez nous rendre visite au Marché de Noël de luisant.',
+    description: 'Retrouvez Carré Ivoire à l’occasion du marché de Noël.<br />Tablettes, gourmandises chocolatées, créations de saison et idées cadeaux seront au rendez-vous pour préparer les fêtes.',
+    commentaire: 'Le lieu exact sera communiqué prochainement.',
     complet: false,
     tag: 'A venir',
   },
 ]
 
-const types = ['Tous', 'Dégustation', 'Visite', 'Atelier', 'Exposition']
+const types = ['Tous', 'Visite', 'Atelier', 'Salon', 'Marché']
 
 const selectedType = ref('Tous')
 
@@ -99,15 +130,14 @@ const filteredEvenements = computed(() =>
           class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(48px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.02em"
         >
-          L'atelier<br/>
-          <em class="text-cacao-2">vous ouvre ses portes.</em>
+          Nos rendez-vous<br/>
+          <em class="text-cacao-2"></em>
         </h1>
         <p
           class="mt-12 max-w-[560px] font-sans text-cacao-2"
           style="font-size: 18px; line-height: 1.7"
         >
-          Dégustations, visites, masterclasses. Des moments pour comprendre
-          ce que signifie faire du chocolat à la main.
+          Découvrez les prochains rendez-vous de Carré Ivoire : ateliers autour du chocolat, rencontres au laboratoire, salons et marchés artisanaux
         </p>
       </div>
     </section>
@@ -123,7 +153,7 @@ const filteredEvenements = computed(() =>
         class="mb-12 flex items-end justify-between border-b pb-6"
         style="border-color: var(--cacao-a12)"
       >
-        <span class="ci-eyebrow">{{ evenements.length }} événements à venir</span>
+        <span class="ci-eyebrow">{{ evenements.length }} événements et rendrez-vous à venir</span>
         <div class="hidden gap-6 sm:flex">
           <a
             v-for="type in types"
@@ -182,6 +212,10 @@ const filteredEvenements = computed(() =>
             <p class="mt-3 font-sans text-[14px] leading-relaxed text-cacao-2" style="max-width: 520px">
               {{ evt.description }}
             </p>
+            
+            <p class="mt-3 font-sans text-[14px] leading-relaxed text-cacao-2" style="max-width: 520px"><b>
+              {{ evt.commentaire }}
+            </b></p>
 
             <div class="mt-4 flex items-center gap-2">
               <svg
@@ -224,17 +258,16 @@ const filteredEvenements = computed(() =>
     >
       <div class="grid grid-cols-1 items-end gap-16 lg:grid-cols-2">
         <div>
-          <span class="ci-eyebrow">Ne rien manquer</span>
+          <span class="ci-eyebrow">Ne manquez pas nos prochaines dates</span>
           <h2
             class="mt-4 font-serif font-medium text-cacao"
             style="font-size: clamp(32px, 4vw, 52px); line-height: 1"
           >
-            Les places partent vite.<br/>
-            <em class="text-cacao-2">La lettre arrive à temps.</em>
+            <br/>
+            <em class="text-cacao-2"></em>
           </h2>
           <p class="mt-6 font-sans text-[15px] leading-relaxed text-cacao-2" style="max-width: 440px">
-            Une fois par mois, les événements du trimestre, les nouvelles fèves,
-            ce qui se passe dans l'atelier. Rien de superflu.
+            Les dates des ateliers et de la journée portes ouvertes seront annoncées prochainement sur notre site internet et nos réseaux sociaux.
           </p>
         </div>
 
