@@ -43,7 +43,7 @@
     "passport-jwt": "^4.0.0",
     "puppeteer-core": "^22.15.0",
     "reflect-metadata": "^0.1.13",
-    "resend": "^4.8.0",
+    "resend": "^6.22.0",
     "rxjs": "^7.8.2",
     "sequelize": "^6.35.0",
     "sequelize-typescript": "^2.1.6",
