@@ -88,8 +88,8 @@ const evenements: Evenement[] = [
     tag: 'A venir',
   },{
     id: 'festival-du-legendaire',
-    date: '18',
-    mois: 'November',
+    date: '18,21 et 22',
+    mois: 'Novembre',
     annee: '2026',
     titre: 'Festival du légendaire',
     type: 'Salon',

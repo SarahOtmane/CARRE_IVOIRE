@@ -52,7 +52,7 @@ services:
       - ./packages:/app/packages
       - node_modules_front:/app/node_modules
     environment:
-      VITE_API_URL: "https://api.carre-ivoire/api/v1"
+      VITE_API_URL: ${VITE_API_URL}
       VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY:-pk_test_xxx}
     ports:
       - "5173:5173"

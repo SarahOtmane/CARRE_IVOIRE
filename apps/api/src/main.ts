@@ -48,7 +48,7 @@
 
     app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' })
 
-    app.setGlobalPrefix('api/v1', { exclude: ['api/health'] })
+    app.setGlobalPrefix('api/v1')
 
     app.enableCors({
       origin: buildCorsOrigins(),
@@ -84,4 +84,4 @@
     await app.listen(process.env.PORT ?? 3000)
   }
 
-  await bootstrap()
+  bootstrap()
