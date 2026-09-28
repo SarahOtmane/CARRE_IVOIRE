@@ -13,19 +13,19 @@ const engagements = [
   {
     num: '01',
     titre: 'Valoriser le cacao ivoirien',
-    accroche: 'Nous souhaitons faire découvrir oute la richesse du cacao ivoirien, de ses terroirs et de ses arômes.',
-    corps: 'Pour Carré Ivoire, le cacao n\'est pas une simple matière première :',
+    accroche: 'Nous souhaitons faire découvrir toute la richesse du cacao ivoirien, de ses terroirs et de ses arômes.',
+    corps: 'Pour Carré Ivoire, le cacao n’est pas une simple matière première :',
     details: [
-      'il apporte une histoire, ',
-      'une coulture ',
-      'et le savoire-faire des femmes et des hommes qui le cultivent.',
+      'il porte une histoire, ',
+      'une culture ',
+      'et le savoir-faire des femmes et des hommes qui le cultivent.',
     ],
     bg: 'var(--ivoire)',
   },
   {
     num: '02',
     titre: 'Fabriquer de la fève à la tablette',
-    accroche: 'Npous transformons nous même les fèves de cacao dans notre attelier de Luisant.',
+    accroche: 'Nous transformons nous mêmes les fèves de cacao dans notre atelier de Luisant.',
     corps: 'Chaque étape est réalisée avec patience afin de préserver la personnalité du cacao :',
     details: [
       'Torréfaction, Broyage, ',
@@ -37,7 +37,7 @@ const engagements = [
   {
     num: '03',
     titre: 'Respecter le travail des producteurs',
-    accroche: 'Derrière chaque fève se trouvent des femmes et des hommes dont le travail mérite d\'être reconnu et valorisé.',
+    accroche: 'Derrière chaque fève se trouvent des femmes et des hommes dont le travail mérite d’être reconnu et valorisé.',
     corps: 'Nous souhaitons développer progressivement des relations avec les producteurs et les coopératives :',
     details: [
       'plus directes, ',
@@ -49,17 +49,17 @@ const engagements = [
   {
     num: '04',
     titre: 'Favoriser la traçabilité',
-    accroche: 'Connaître l\'origine de nos fèves et suivre leur transformation est essentiel.',
+    accroche: 'Connaître l’origine de nos fèves et suivre leur transformation est essentiel.',
     corps: 'Nous avançons vers des approvisionnements toujours mieux identifiés afin de proposer',
     details: [
       'un chocolat plus transparent, ',
-      'de la plantation jusqu\'au produit fini.',
+      'de la plantation jusqu’au produit fini.',
     ],
     bg: 'var(--beige-doux)',
   },
    {
     num: '05',
-    titre: 'Protéger les terres et l\'enfance',
+    titre: 'Protéger les terres et l’enfance',
     accroche: 'Le cacao ne doit jamais être produit au détriment des enfants ni des écosystèmes.',
     corps: 'Nous défendons une filière respectueuse :',
     details: [
@@ -90,7 +90,7 @@ const engagements = [
       style="padding: 120px clamp(20px, 6vw, 104px) clamp(80px, 12vw, 192px)"
     >
       <div class="max-w-[880px]">
-        <span class="ci-eyebrow">Nos Engagements</span>
+        <span class="ci-eyebrow">Nos engagements</span>
         <h1
           class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(48px, 6vw, 80px); line-height: 0.95; letter-spacing: -0.02em"
@@ -172,7 +172,7 @@ const engagements = [
           >
             Le chocolat comme lien<br/><br/>
             <em class="text-cacao-2"><ul>
-              <li>Entre la Côte d'Ivoire et la France.</li>
+              <li>Entre la Côte d’Ivoire et la France.</li>
               <li>Entre les producteurs et les consommateurs.</li>
               <li>Entre les souvenirs, les terres et les créations de demain.</li>
             </ul>

@@ -49,7 +49,7 @@ const categories = computed(() =>
           class="mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4.5vw, 46px); line-height: 1; letter-spacing: -0.01em"
         >
-          Cacao de Côte d'Ivoire<br/>
+          Cacao de Côte d’Ivoire<br/>
           <em class="text-cacao-2">Des fèves sélectionnées pour leur origine et leur caractère.</em>
         </h2>
         <br />

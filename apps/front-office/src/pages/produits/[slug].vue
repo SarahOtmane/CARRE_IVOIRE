@@ -339,7 +339,7 @@ async function toggleFavorite() {
             </p>
 
             <p v-else-if="tab === 'conservation'" class="max-w-[540px] font-sans text-[15px] leading-[1.8] text-cacao-2">
-              {{ product.conservation ?? 'Conserver dans un endroit frais et sec, à l\'abri de la lumière et des odeurs. Température idéale : entre 16 et 18 °C.' }}
+              {{ product.conservation ?? 'Conserver dans un endroit frais et sec, à l’abri de la lumière et des odeurs. Température idéale : entre 16 et 18 °C.' }}
             </p>
 
             <div v-else>
@@ -379,7 +379,7 @@ async function toggleFavorite() {
           class="mt-4 font-serif text-cacao"
           style="font-size: clamp(28px, 4vw, 48px); line-height: 1; font-weight: 500"
         >
-          D'autres carrés.
+          d’autres carrés.
         </h2>
       </div>
       <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">

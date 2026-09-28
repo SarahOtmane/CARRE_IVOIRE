@@ -36,7 +36,7 @@ const evenements: Evenement[] = [
     type: 'Visite',
     lieu: 'Atelier — 29 rue de Vauparfonds, LUISANT',
     description1: 'Carré Ivoire ouvrira prochainement les portes de son laboratoire au public.',
-    description2: 'Cette journée sera l\'occasion de découvrir notre univers, notre histoire et les différentes étapes de transformation de la fève de cacao en chocolat.',
+    description2: 'Cette journée sera l’occasion de découvrir notre univers, notre histoire et les différentes étapes de transformation de la fève de cacao en chocolat.',
     description3: 'Vous pourrez également découvrir les créations de la maison, échanger avec Koko et participer à une dégustation de chocolats artisanaux.',
     commentaire: 'La date de notre prochaine journée portes ouvertes sera annoncée prochainement.',
     complet: false,
@@ -68,7 +68,7 @@ const evenements: Evenement[] = [
     description1: 'Un atelier ludique et gourmand pour permettre aux enfants de découvrir le monde du cacao.',
     description2: 'Ils pourront observer, sentir et goûter différents ingrédients, puis mouler et décorer leur propre tablette de chocolat.',
     description3: 'Chaque enfant repartira avec sa création soigneusement emballée.',
-    commentaire: 'Atelier destiné aux enfants de 7 à 12 ans. Dates, tarifs et modalités d\'inscription prochainement disponibles.',
+    commentaire: 'Atelier destiné aux enfants de 7 à 12 ans. Dates, tarifs et modalités d’inscription prochainement disponibles.',
     complet: false,
     tag: '',
   },
@@ -80,7 +80,7 @@ const evenements: Evenement[] = [
     titre: 'Téléthon de Luisant',
     type: 'Salon',
     lieu: 'Salle André Malraux — Cour Charles Brune, LUISANT',
-    description1: 'Retrouvez Carré Ivoire à l\'occasion du Téléthon de Luisant.',
+    description1: 'Retrouvez Carré Ivoire à l’occasion du Téléthon de Luisant.',
     description2: 'Venez découvrir et déguster nos créations chocolatées tout en participant à une journée placée sous le signe de la solidarité.',
     description3: '',
     commentaire: '',
@@ -112,7 +112,7 @@ const evenements: Evenement[] = [
     description1: 'Carré Ivoire sera présent au Salon Zen de Châteaudun pour une journée consacrée au bien-être, à la découverte et aux savoir-faire artisanaux.',
     description2: '',
     description3: '',
-    commentaire: 'Venez rencontrer Koko et découvrir autrement l\'univers du cacao et du chocolat artisanal',
+    commentaire: 'Venez rencontrer Koko et découvrir autrement l’univers du cacao et du chocolat artisanal',
     complet: false,
     tag: 'A venir',
   },
@@ -275,7 +275,7 @@ const filteredEvenements = computed(() =>
               v-else
               class="font-sans text-[12px] tracking-[0.04em] text-cacao-3"
             >
-              Liste d'attente →
+              Liste d’attente →
             </span>
           </div> -->
         </article>

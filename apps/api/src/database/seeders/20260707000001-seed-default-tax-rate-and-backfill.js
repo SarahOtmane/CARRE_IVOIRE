@@ -23,7 +23,7 @@ module.exports = {
       } else {
         await queryInterface.bulkInsert('tax_rates', [
           {
-            label: 'TVA standard',
+            label: 'TVA standard’,
             rate: 20.0,
             is_default: 1,
             created_at: now,

@@ -45,7 +45,7 @@ const priceHt = computed(() =>
         >
           <span v-if="item.format">Format {{ item.format }}</span>
           <span v-if="item.format && item.taxRatePercent !== undefined"> · </span>
-          <span v-if="item.taxRatePercent !== undefined">TVA {{ item.taxRatePercent }}%</span>
+          <span v-if="item.taxRatePercent !== undefined">TVA {{ item.taxRatePercent }} %</span>
         </div>
       </div>
 

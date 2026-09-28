@@ -64,7 +64,7 @@ const recentOrders = computed(() =>
 
 const kpis = computed(() => [
   {
-    label: "Chiffre d'affaires",
+    label: "Chiffre d’affaires",
     value: formatPrice(revenue.value),
     hint: `${orders.value.length} commandes`,
   },
@@ -106,7 +106,7 @@ function goTo(name: string, params?: Record<string, string>) {
             class="mt-4 max-w-3xl font-display text-5xl leading-[0.92] text-cacao sm:text-6xl"
           >
             Bonjour.
-            <span class="italic text-cacao/55"> aujourd'hui à l'atelier.</span>
+            <span class="italic text-cacao/55"> aujourd’hui à l'atelier.</span>
           </h2>
         </div>
         <div class="font-body text-sm text-cacao/55">{{ today }}</div>

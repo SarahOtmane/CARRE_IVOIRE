@@ -45,7 +45,7 @@ const { favorites, isLoading } = useFavorites();
         class="border-b border-cacao pb-px font-sans text-[13px] text-cacao transition-opacity duration-180 hover:opacity-60"
         @click="router.push({ name: 'boutique' })"
       >
-        Ajouter d'autres produits →
+        Ajouter d’autres produits →
       </button>
     </div>
 

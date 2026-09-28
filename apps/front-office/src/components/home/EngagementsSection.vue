@@ -13,16 +13,16 @@ const engagements = [
   {
     num: '03',
     title: 'Respecter le travail des producteurs',
-    text: 'Derrière chaque fève se trouvent des femmes et des hommes dont le travail mérite d\'être reconnu et valorisé',
+    text: 'Derrière chaque fève se trouvent des femmes et des hommes dont le travail mérite d’être reconnu et valorisé.',
   },
   {
     num: '04',
     title: 'Favoriser la traçabilité',
-    text: 'Connaître l\'origine de nos fèves et suivre leur transformation est essentiel.',
+    text: 'Connaître l’origine de nos fèves et suivre leur transformation est essentiel.',
   },
   {
     num: '05',
-    title: 'Protéger les terres et l\'enfance',
+    title: 'Protéger les terres et l’enfance',
     text: 'Le cacao ne doit jamais être produit au détriment des enfants ni des écosystèmes.',
   },
   {

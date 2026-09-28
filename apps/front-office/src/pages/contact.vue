@@ -66,7 +66,7 @@ function handleSubmit() {
         border-bottom: 1px solid var(--cacao-a12);
       "
     >
-      <span class="ci-eyebrow">Maison — Nous écrire</span>
+      <span class="ci-eyebrow">Accueil — Nous écrire</span>
       <h1
         class="mt-6 font-serif text-cacao"
         style="
@@ -106,17 +106,17 @@ function handleSubmit() {
             <div
               class="mb-3 font-sans text-[10px] uppercase tracking-[0.22em] text-cacao-2"
             >
-              Atelier &amp; boutique
+              Atelier et boutique
             </div>
             <div class="font-serif text-[22px] leading-[1.3] text-cacao">
-              29, rue de Vauparfonds<br />
+              29 rue de Vauparfonds<br />
               <span class="italic">28600 LUISANT</span>
             </div>
             <div
               class="mt-3 font-sans text-[13px] leading-[1.6] text-cacao-2"
             >
-              Mardi — samedi<br />
-              10 h 30 — 19 h 30
+              du mardi au samedi<br />
+              de 10h30 à 18h00
             </div>
           </div>
 
@@ -152,7 +152,7 @@ function handleSubmit() {
                   <line x1="1" y1="7" x2="13" y2="7" />
                   <polyline points="8,2 13,7 8,12" />
                 </svg>
-                Nous envoyer un message depuis votre messagerie
+                Nous écrire depuis votre messagerie
               </a>
             </div>
           </div>
@@ -176,10 +176,6 @@ function handleSubmit() {
       <div>
         <div class="mb-12 flex items-end justify-between">
           <span class="ci-eyebrow">II — Formulaire</span>
-          <span
-            class="font-sans text-[10px] tracking-[0.22em] text-cacao-2"
-            >— II / II</span
-          >
         </div>
 
         <div
@@ -279,8 +275,8 @@ function handleSubmit() {
             <span
               class="max-w-[320px] font-sans text-[11px] leading-[1.6] tracking-[0.04em] text-cacao-2"
             >
-              En envoyant, vous adressez un message à
-              <span class="text-cacao">contact@carre-ivoire.fr</span>.
+              En envoyant ce formulaire, vous adressez un message à
+              <span class="text-cacao">Carre Ivoire</span>.
             </span>
           </div>
         </form>
@@ -296,7 +292,7 @@ function handleSubmit() {
       <div class="mb-8 flex items-end justify-between">
         <span class="ci-eyebrow">III — Nous trouver</span>
         <span class="font-sans text-[11px] tracking-[0.22em] text-cacao-2"
-          >LUISANT II<sup>e</sup></span
+          >LUISANT</span
         >
       </div>
 

@@ -16,7 +16,7 @@ export const databaseConfig = (): SequelizeModuleOptions => ({
   // alter:true uniquement en dev (base persistante) — la base de test est toujours
   // recréée vide, un simple create-if-not-exists suffit et évite l'accumulation
   // d'index observée avec alter:true (cf. incident DB-001)
-  sync: process.env.NODE_ENV === 'development' ? { alter: true } : {},
+  sync: process.env.NODE_ENV === 'development' ? { alter: false } : {},
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
   pool: {
     max: 10,

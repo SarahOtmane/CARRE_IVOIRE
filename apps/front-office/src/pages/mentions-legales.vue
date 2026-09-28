@@ -30,18 +30,18 @@ const sections = [
     num: '03',
     titre: 'Propriété intellectuelle',
     contenu: [
-      'L\'ensemble des éléments figurant sur ce site — textes, photographies, illustrations, logotypes, icônes, vidéos, sons — est la propriété exclusive de Carré Ivoire ou de ses partenaires.',
-      'Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie de ces éléments, quel que soit le moyen ou le procédé utilisé, est interdite sans l\'autorisation écrite préalable de Carré Ivoire.',
-      'Toute exploitation non autorisée du site ou de l\'un quelconque des éléments qu\'il contient est considérée comme constitutive d\'une contrefaçon et poursuivie conformément aux dispositions de l\'article L.335-2 et suivants du Code de la Propriété Intellectuelle.',
+      'L’ensemble des éléments figurant sur ce site — textes, photographies, illustrations, logotypes, icônes, vidéos, sons — est la propriété exclusive de Carré Ivoire ou de ses partenaires.',
+      'Toute reproduction, représentation, modification, publication ou adaptation de tout ou partie de ces éléments, quel que soit le moyen ou le procédé utilisé, est interdite sans l’autorisation écrite préalable de Carré Ivoire.',
+      'Toute exploitation non autorisée du site ou de l’un quelconque des éléments qu’il contient est considérée comme constitutive d’une contrefaçon et poursuivie conformément aux dispositions de l’article L.335-2 et suivants du Code de la Propriété Intellectuelle.',
     ],
   },
   {
     num: '04',
     titre: 'Limitation de responsabilité',
     contenu: [
-      'Carré Ivoire s\'efforce d\'assurer au mieux de ses possibilités l\'exactitude et la mise à jour des informations diffusées sur son site. Toutefois, Carré Ivoire ne peut garantir l\'exactitude, la précision ou l\'exhaustivité des informations mises à disposition sur ce site.',
-      'En conséquence, Carré Ivoire décline toute responsabilité pour tout dommage direct ou indirect pouvant résulter de l\'accès au site ou de l\'utilisation des informations qu\'il contient.',
-      'Des liens hypertextes peuvent renvoyer vers d\'autres sites. Carré Ivoire n\'exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.',
+      'Carré Ivoire s’efforce d’assurer au mieux de ses possibilités l’exactitude et la mise à jour des informations diffusées sur son site. Toutefois, Carré Ivoire ne peut garantir l’exactitude, la précision ou l’exhaustivité des informations mises à disposition sur ce site.',
+      'En conséquence, Carré Ivoire décline toute responsabilité pour tout dommage direct ou indirect pouvant résulter de l’accès au site ou de l’utilisation des informations qu’il contient.',
+      'Des liens hypertextes peuvent renvoyer vers d’autres sites. Carré Ivoire n’exerce aucun contrôle sur ces sites et décline toute responsabilité quant à leur contenu.',
     ],
   },
   {

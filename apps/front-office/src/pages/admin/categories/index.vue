@@ -258,7 +258,7 @@ async function deleteCategory() {
 
           <div class="grid gap-6 sm:grid-cols-2">
             <label class="grid gap-2">
-              <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Ordre d'affichage</span>
+              <span class="font-body text-[10px] uppercase tracking-[0.22em] text-cacao/55">Ordre d’affichage</span>
               <input
                 v-model.number="draft.displayOrder"
                 type="number"

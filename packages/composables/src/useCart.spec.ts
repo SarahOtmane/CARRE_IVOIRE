@@ -5,7 +5,7 @@ import type { ProductResponse } from '@carre-ivoire/types'
 
 const makeProduct = (overrides: Partial<ProductResponse> = {}): ProductResponse => ({
   id: 1,
-  name: 'Tablette Noir 70%',
+  name: 'Tablette Noir 70 %',
   slug: 'tablette-noir-70',
   description: '',
   price: 1200,
@@ -86,7 +86,7 @@ describe('useCart', () => {
     expect(total.value).toBeCloseTo(25)
   })
 
-  it('isEmpty passe à false dès qu\'un article est ajouté', () => {
+  it('isEmpty passe à false dès qu’un article est ajouté', () => {
     const { add, isEmpty } = useCart()
     add(makeProduct())
     expect(isEmpty.value).toBe(false)
@@ -99,7 +99,7 @@ describe('useCart', () => {
     expect(items.value).toHaveLength(0)
   })
 
-  it('updateQuantity() met à jour la quantité d\'un article', () => {
+  it('updateQuantity() met à jour la quantité d’un article', () => {
     const { add, updateQuantity, items } = useCart()
     add(makeProduct())
     updateQuantity(1, 5)

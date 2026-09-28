@@ -12,7 +12,7 @@ useHead({
     {
       name: "description",
       content:
-        "De la Côte d'Ivoire à la France : découvrez l'histoire de Carré Ivoire, chocolaterie artisanale Bean-to-Bar née d'un souvenir d'enfance.",
+        "De la Côte d’Ivoire à la France : découvrez l'histoire de Carré Ivoire, chocolaterie artisanale Bean-to-Bar née d’un souvenir d’enfance.",
     },
   ],
 });

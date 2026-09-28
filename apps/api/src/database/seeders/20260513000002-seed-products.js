@@ -14,11 +14,11 @@ module.exports = {
 
     const products = [
       {
-        name: "Carré Noir Intense 72%",
+        name: "Carré Noir Intense 72 %",
         slug: "carre-noir-intense-72",
         short_description: "Ganache grand cru, éclat de sel de Guérande",
         description:
-          "Un carré d'intensité pure. Chocolat noir 72% du Ghana, ganache lisse, sel en finition.",
+          "Un carré d’intensité pure. Chocolat noir 72% du Ghana, ganache lisse, sel en finition.",
         price: 390,
         image_url: "https//api.carre-ivoire/uploads/a329e3ac-df91-4897-8444-d15611d037e4.webp",
         category_id: catMap["carres-signature"],
@@ -39,7 +39,7 @@ module.exports = {
         slug: "carre-praline-noisette",
         short_description: "Praliné maison, noisettes du Piémont",
         description:
-          "Noisettes grillées à l'ancienne, broyées en praliné sablé. Enrobage chocolat lait 40%.",
+          "Noisettes grillées à l'ancienne, broyées en praliné sablé. Enrobage chocolat lait 40 %.",
         price: 420,
         image_url: "https//api.carre-ivoire/uploads/bac64b36-fba9-4d1b-b89c-400bec83de54.webp",
         category_id: catMap["carres-signature"],
@@ -48,11 +48,11 @@ module.exports = {
         is_active: 1,
         is_seasonal: 0,
         display_order: 2,
-        ingredients: "Noisettes, sucre, chocolat lait 40%, beurre de cacao",
+        ingredients: "Noisettes, sucre, chocolat lait 40 %, beurre de cacao",
         degustation: "A température ambiante",
         conservation: "entre 16°C et 18°C",
         allergens:
-          "Contient des noisettes. Peut contenir d'autres fruits à coque.",
+          "Contient des noisettes. Peut contenir d’autres fruits à coque.",
         weight_grams: 20,
       },
       {
@@ -60,7 +60,7 @@ module.exports = {
         slug: "carre-caramel-beurre-sale",
         short_description: "Coulant caramel, beurre breton AOP",
         description:
-          "Le caramel coule. Beurre demi-sel breton, enrobage chocolat noir 65%.",
+          "Le caramel coule. Beurre demi-sel breton, enrobage chocolat noir 65 %.",
         price: 410,
         image_url: "https//api.carre-ivoire/uploads/90273e39-0b82-4548-aeea-5d3e66a36f1c.webp",
         category_id: catMap["carres-signature"],
@@ -69,7 +69,7 @@ module.exports = {
         is_active: 1,
         is_seasonal: 0,
         display_order: 3,
-        ingredients: "Sucre, crème, beurre AOP, chocolat noir 65%",
+        ingredients: "Sucre, crème, beurre AOP, chocolat noir 65 %",
         degustation: "A température ambiante",
         conservation: "entre 16°C et 18°C",
         allergens:
@@ -77,7 +77,7 @@ module.exports = {
         weight_grams: 22,
       },
       {
-        name: "Tablette Grand Cru Madagascar 72%",
+        name: "Tablette Grand Cru Madagascar 72 %",
         slug: "tablette-grand-cru-madagascar-72",
         short_description: "Notes fruitées, pointe de framboise sauvage",
         description:
@@ -91,13 +91,13 @@ module.exports = {
         is_seasonal: 0,
         display_order: 1,
         ingredients:
-          "Pâte de cacao Madagascar 72%, sucre, beurre de cacao, lécithine de tournesol",
+          "Pâte de cacao Madagascar 72 %, sucre, beurre de cacao, lécithine de tournesol",
         conservation: "entre 16°C et 18°C",
         allergens: "Peut contenir des traces de lait et de fruits à coque",
         weight_grams: 80,
       },
       {
-        name: "Tablette Lait Pérou 45%",
+        name: "Tablette Lait Pérou 45 %",
         slug: "tablette-lait-perou-45",
         short_description: "Rondeur caramel, notes de vanille naturelle",
         description:
@@ -120,9 +120,9 @@ module.exports = {
       {
         name: "Mendiant Noir",
         slug: "mendiant-noir",
-        short_description: "Pistaches, abricots moelleux, fleur d'oranger",
+        short_description: "Pistaches, abricots moelleux, fleur d’oranger",
         description:
-          "Disque de chocolat noir 70%, garni à la main. Une tradition revisitée.",
+          "Disque de chocolat noir 70 %, garni à la main. Une tradition revisitée.",
         price: 490,
         image_url: "https//api.carre-ivoire/uploads/55637869-b7ab-4004-96d1-5babc7d2f1d9.webp",
         category_id: catMap["gourmandises"],
@@ -132,11 +132,11 @@ module.exports = {
         is_seasonal: 0,
         display_order: 1,
         ingredients:
-          "Chocolat noir 70%, pistaches, abricots, eau de fleur d'oranger",
+          "Chocolat noir 70 %, pistaches, abricots, eau de fleur d’oranger",
         degustation: "A température ambiante",
         conservation: "entre 16°C et 18°C",
         allergens:
-          "Contient des pistaches. Peut contenir d'autres fruits à coque.",
+          "Contient des pistaches. Peut contenir d’autres fruits à coque.",
         weight_grams: 35,
       },
       {
@@ -144,7 +144,7 @@ module.exports = {
         slug: "pate-tartiner-noisette-noir",
         short_description: "Broyée minute, sans huile de palme",
         description:
-          "Noisettes du Piémont, cacao pur, sucre de canne blond. Rien d'autre.",
+          "Noisettes du Piémont, cacao pur, sucre de canne blond. Rien d’autre.",
         price: 1490,
         image_url: "https//api.carre-ivoire/uploads/3cd20e22-486b-4847-bcba-9fb4d617db87.webp",
         category_id: catMap["pates-a-tartiner"],
@@ -153,10 +153,10 @@ module.exports = {
         is_active: 1,
         is_seasonal: 0,
         display_order: 1,
-        ingredients: "Noisettes 60%, cacao maigre, sucre de canne, sel",
+        ingredients: "Noisettes 60 %, cacao maigre, sucre de canne, sel",
         degustation: "A température ambiante",
         allergens:
-          "Contient des noisettes. Peut contenir d'autres fruits à coque.",
+          "Contient des noisettes. Peut contenir d’autres fruits à coque.",
         weight_grams: 250,
       },
       {
@@ -177,7 +177,7 @@ module.exports = {
         display_order: 1,
         arome: "c'est très bon",
         allergens:
-          "Contient du lait, des noisettes. Peut contenir d'autres fruits à coque.",
+          "Contient du lait, des noisettes. Peut contenir d’autres fruits à coque.",
         weight_grams: 100,
       },
     ];

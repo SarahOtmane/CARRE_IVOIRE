@@ -9,7 +9,7 @@ const sections = [
     image: "https//api.carre-ivoire/uploads/e3ecf26b-9fee-4681-b319-3e9808dc3002.webp",
     image_alt: "Cabosses et fèves de cacao",
     paragraphs: JSON.stringify([
-      "Pour moi, ils ont la couleur d'une cabosse de cacao mûrie sous le soleil de Côte d'Ivoire.",
+      "Pour moi, ils ont la couleur d’une cabosse de cacao mûrie sous le soleil de Côte d’Ivoire.",
       "Enfant, je passais du temps dans les plantations familiales. Je regardais les cabosses être récoltées, ouvertes à la machette, puis les fèves fermenter avant de sécher lentement au soleil. Je me souviens encore du goût délicatement sucré de la pulpe blanche qui les entoure.",
       "À cette époque, je ne savais pas que ces instants guideraient un jour toute ma vie.",
     ]),
@@ -21,9 +21,9 @@ const sections = [
     image_alt: "Artisan chocolatier au travail",
     paragraphs: JSON.stringify([
       "Les années ont passé.",
-      "Installée en France, j'ai choisi d'apprendre les métiers de bouche avec la même exigence que celle des artisans que j'admire.",
-      "Pâtisserie, boulangerie, puis chocolaterie-confiserie : chaque formation m'a permis d'acquérir un savoir-faire et une rigueur qui m'accompagnent aujourd'hui dans chacune de mes créations.",
-      "Mais une question revenait sans cesse. Pourquoi la Côte d'Ivoire, premier producteur mondial de cacao, est-elle surtout connue pour exporter des fèves, alors que toute leur richesse aromatique peut être révélée par des artisans qui les transforment avec soin ?",
+      "Installée en France, j'ai choisi d’apprendre les métiers de bouche avec la même exigence que celle des artisans que j'admire.",
+      "Pâtisserie, boulangerie, puis chocolaterie-confiserie : chaque formation m'a permis d’acquérir un savoir-faire et une rigueur qui m'accompagnent aujourd’hui dans chacune de mes créations.",
+      "Mais une question revenait sans cesse. Pourquoi la Côte d’Ivoire, premier producteur mondial de cacao, est-elle surtout connue pour exporter des fèves, alors que toute leur richesse aromatique peut être révélée par des artisans qui les transforment avec soin ?",
     ]),
   },
   {
@@ -33,7 +33,7 @@ const sections = [
     image_alt: "Tablettes de chocolat artisanal",
     paragraphs: JSON.stringify([
       "C'est de cette réflexion qu'est né Carré Ivoire.",
-      "Une chocolaterie artisanale où chaque création raconte un voyage : celui d'un cacao cultivé en Côte d'Ivoire, puis transformé en France selon la méthode Bean-to-Bar, de la fève jusqu'à la tablette.",
+      "Une chocolaterie artisanale où chaque création raconte un voyage : celui d’un cacao cultivé en Côte d’Ivoire, puis transformé en France selon la méthode Bean-to-Bar, de la fève jusqu'à la tablette.",
       "Dans mon atelier, rien n'est laissé au hasard. Chaque étape est réalisée avec patience : la sélection des fèves, la torréfaction, le raffinage, le conchage, le tempérage et le moulage.",
       "Le temps devient un ingrédient à part entière. Je ne cherche pas simplement à fabriquer du chocolat. Je souhaite révéler l'identité du cacao ivoirien, faire découvrir ses arômes, son caractère et l'histoire des femmes et des hommes qui le cultivent.",
     ]),

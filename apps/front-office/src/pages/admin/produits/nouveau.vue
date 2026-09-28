@@ -140,7 +140,7 @@ async function save() {
           <input
             v-model="draft.name"
             type="text"
-            placeholder="Ex. Noir Pur 72%"
+            placeholder="Ex. Noir Pur 72 %"
             required
             class="border border-cacao bg-beige-doux/20 px-3 py-2.5 font-body text-base text-cacao outline-none focus:border-cacao/60"
             @blur="autoSlug"

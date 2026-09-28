@@ -103,7 +103,7 @@ describe('OrdersService', () => {
     it('crée la commande si le stock est suffisant', async () => {
       const result = await service.createOrder(dto as any, 1)
       expect(result.orderId).toBe(1)
-      expect(result.totalAmount).toBe(468 * 2) // 390 HT * 1.2 (TVA 20%) = 468 TTC
+      expect(result.totalAmount).toBe(468 * 2) // 390 HT * 1.2 (TVA 20 %) = 468 TTC
       expect(result.clientSecret).toBe('cs_test')
       expect(productsRepo.decrementStock).toHaveBeenCalledWith(1, 2, mockTransaction)
     })

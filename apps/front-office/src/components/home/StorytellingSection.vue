@@ -25,15 +25,15 @@ const router = useRouter()
           class="mb-8 mt-4 font-serif font-medium text-cacao"
           style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
         >
-          Une histoire entre la Côte d'Ivoire et la France<br/>
-          <em class="text-cacao-2">Carré Ivoire est née d'un lien profond avec la terre du cacao.</em>
+          Une histoire entre la Côte d’Ivoire et la France<br/>
+          <em class="text-cacao-2">Carré Ivoire est née d’un lien profond avec la terre du cacao.</em>
         </h2>
 
         <p class="mb-5 max-w-[480px] font-sans leading-relaxed text-cacao-2" style="font-size: 18px; line-height: 1.7">
-          Originaire de Côte d'Ivoire et issue d'une famille de planteurs, </p>
+          Originaire de Côte d’Ivoire et issue d’une famille de planteurs, </p>
 
         <p class="mb-10 max-w-[480px] font-sans text-cacao-2" style="font-size: 18px; line-height: 1.7">
-          Koko transforme aujourd'hui les fèves dans son atelier de Luisant, avec la volonté de faire découvrir un chocolat sincère, artisanal et porteur d'histoire
+          Koko transforme aujourd’hui les fèves dans son atelier de Luisant, avec la volonté de faire découvrir un chocolat sincère, artisanal et porteur d’histoire.
         </p>
 
         <button

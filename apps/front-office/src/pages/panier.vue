@@ -199,7 +199,7 @@ function goToCheckout() {
           type="button"
           @click="router.push('/contact')"
         >
-          Besoin d'aide ?
+          Besoin d’aide ?
         </button>
       </aside>
     </section>

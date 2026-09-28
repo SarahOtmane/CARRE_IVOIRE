@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { ScheduleModule } from '@nestjs/schedule'
-import { SequelizeModule } from '@nestjs/sequelize'
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
-import { databaseConfig } from './config/database.config'
 import { AuthModule } from './modules/auth/auth.module'
 import { UsersModule } from './modules/users/users.module'
 import { HealthModule } from './modules/health/health.module'
@@ -20,6 +18,8 @@ import { NewsletterModule } from './modules/newsletter/newsletter.module'
 import { SettingsModule } from './modules/settings/settings.module'
 import { HistoireModule } from './modules/histoire/histoire.module'
 import { envValidationSchema } from './config/env.validation'
+import { SequelizeModule } from '@nestjs/sequelize'
+import { databaseConfig } from './config/database.config'
 
 @Module({
   imports: [

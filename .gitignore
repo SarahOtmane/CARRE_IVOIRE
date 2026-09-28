@@ -8,7 +8,7 @@ dist/
 .turbo/
 *.tsbuildinfo
 
-# Variables d'environnement — ne jamais commiter
+# Variables d’environnement — ne jamais commiter
 .env
 .env.local
 .env.production

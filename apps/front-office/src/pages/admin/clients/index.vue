@@ -33,7 +33,7 @@ onMounted(() => fetchUsers())
         style="font-size: clamp(32px, 4vw, 56px); line-height: 1"
       >
         Notre carnet
-        <em class="text-cacao-2">d'adresses.</em>
+        <em class="text-cacao-2">d’adresses.</em>
       </h2>
     </section>
 
